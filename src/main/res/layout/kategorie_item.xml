@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:id="@+id/kat_layout"
+    android:clickable="false"
+    android:background="#E4E4E4">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:id="@+id/menu_layout"
+        android:clickable="false"
+        android:background="@drawable/kategorie_selector"
+        android:layout_margin="1dp"
+        android:paddingLeft="10dp">
+
+    <!-- title -->
+    <TextView
+         android:id="@+id/list_title"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+        android:textSize="19sp"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/list_icon"
+        android:layout_marginLeft="8dp"
+        android:textStyle="bold"
+        android:textColor="#000000" />
+
+    <ImageView
+        android:id="@+id/list_icon"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="8dp"
+        android:src="@drawable/ic_action_cancel"
+        android:elevation="8dp"
+        android:background="#ffffff"
+        android:layout_marginLeft="8dp" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/list_dropdown"
+        android:clickable="false"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:checked="false"
+        android:src="@drawable/ic_dropdown"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="8dp" />
+
+    <!-- counter -->
+
+</RelativeLayout>
+</RelativeLayout>

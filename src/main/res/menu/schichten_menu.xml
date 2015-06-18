@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/action_add_schicht"
+        android:icon="@drawable/ic_action_new"
+        android:titleCondensed="Hinzufügen"
+        android:title="@string/referenz_add" app:showAsAction="always|withText"/>
+
+    <item android:id="@+id/action_filter_est"
+          android:icon="@drawable/ic_action_place"
+          android:title="@string/einsatzstelle" app:showAsAction="always|withText"/>
+    <item android:id="@+id/action_filter_funktion"
+          android:icon="@drawable/ic_action_group"
+          android:title="@string/funktion" app:showAsAction="always|withText"/>
+    <item android:id="@+id/action_filter_gb"
+          android:icon="@drawable/ic_action_domain"
+          android:titleCondensed="G-Bereich"
+          android:title="@string/geschäftsbereich" app:showAsAction="always|withText"/>
+</menu>

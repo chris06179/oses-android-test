@@ -1,0 +1,774 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.Toolbar xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/schichtadd_toolbar"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_width="match_parent"
+        android:background="?attr/colorPrimary"
+        android:elevation="5dp"
+        app:titleTextAppearance="@style/ToolbarTitle"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentRight="true"
+        android:id="@+id/verwendungadd_bottom_buttons"
+        android:visibility="visible"
+        android:background="#ffeaeaea">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#CACACA" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/infobox">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Abbrechen"
+                android:id="@+id/schichtadd_back"
+                android:layout_weight="0.5"
+                style="?android:attr/borderlessButtonStyle"
+                android:drawableLeft="@drawable/ic_action_cancel"/>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="#CACACA" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Speichern"
+                android:id="@+id/schichtadd_save"
+                android:layout_weight="0.5"
+                style="?android:attr/borderlessButtonStyle"
+                android:drawableRight="@drawable/ic_action_accept" />
+        </LinearLayout>
+    </LinearLayout>
+
+<ScrollView
+    android:id="@+id/ScrollView1"
+    android:layout_width="match_parent"
+    android:layout_height="fill_parent"
+    android:fadingEdgeLength="10dp"
+    android:clipToPadding="false"
+    android:scrollbarStyle="outsideOverlay"
+    android:layout_below="@+id/schichtadd_toolbar"
+    android:layout_alignParentLeft="true"
+    android:layout_alignParentStart="true"
+    android:layout_above="@+id/verwendungadd_bottom_buttons">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="2dp">
+
+        <android.support.v7.widget.CardView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            card_view:cardUseCompatPadding="true">
+
+        <LinearLayout
+            android:id="@+id/LinearLayout06"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingBottom="6dp"
+            android:paddingTop="4dp">
+
+            <LinearLayout
+                android:id="@+id/LinearLayout10"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/TextView02"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="left|center_horizontal"
+                    android:text="@string/Basisinformationen"
+                    style="@style/Theme.OSES.ListSeparator" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/LinearLayout03"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/LinearLayout05"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/TextView20"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="left|center_vertical"
+                        android:text="@string/schicht_"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:minWidth="80dp" />
+
+                    <EditText
+                        android:id="@+id/schichtadd_schicht"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:maxLength="10"
+                        android:singleLine="true"
+                        android:capitalize="characters"
+                        android:inputType="textNoSuggestions|phone"
+                        android:minWidth="100dp"
+                        android:layout_weight="1"
+                        android:textSize="18sp" />
+
+                    <ToggleButton
+                        android:layout_width="60dp"
+                        android:layout_height="wrap_content"
+                        android:text="ABC"
+                        android:id="@+id/schichtadd_abcbutton"
+                        android:textOff="ABC"
+                        android:textOn="ABC"
+                        android:longClickable="false" />
+
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/schichtadd_fpla_box">
+
+                    <TextView
+                        android:id="@+id/TextView04"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="right|center_vertical"
+                        android:minWidth="80dp"
+                        android:text="@string/_fpl_n_"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <EditText
+                        android:id="@+id/schichtadd_fpla"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:maxLength="5"
+                        android:numeric="integer"
+                        android:inputType="textNoSuggestions|phone"
+                        android:minWidth="70dp"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:id="@+id/TextView21"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="left|center_vertical"
+                        android:text="@string/close_bracket"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <CheckBox
+                        android:id="@+id/checkBox1"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/anreise_mit_zug"
+                        android:checked="false"
+                        android:visibility="gone" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/linearLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical" >
+
+                    <TextView
+                        android:id="@+id/textView22"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left|center_vertical"
+                        android:minWidth="120dp"
+                        android:text="G-Bereich:"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <Spinner
+                        style="@style/Base.Widget.AppCompat.Spinner.Underlined"
+                        android:id="@+id/schichtadd_gbereich"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:spinnerMode="dialog"
+                        android:prompt="@string/select_gb" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/LinearLayout11"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/TextView06"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left|center_vertical"
+                        android:minWidth="120dp"
+                        android:text="@string/einsatzstelle_"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <Spinner
+                        android:id="@+id/schichtadd_est"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:spinnerMode="dialog"
+                        android:prompt="@string/select_est"
+                        style="@style/Base.Widget.AppCompat.Spinner.Underlined" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/LinearLayout19"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/TextView15"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left|center_vertical"
+                        android:minWidth="120dp"
+                        android:text="@string/funktion_"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <Spinner
+                        android:id="@+id/schichtadd_funktion"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:spinnerMode="dialog"
+                        android:prompt="@string/select_funktion"
+                        style="@style/Base.Widget.AppCompat.Spinner.Underlined" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            card_view:cardUseCompatPadding="true">
+
+        <LinearLayout
+            android:id="@+id/LinearLayout29"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingBottom="6dp"
+            android:paddingTop="4dp">
+
+            <LinearLayout
+                android:id="@+id/LinearLayout28"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+
+                <TextView
+                    android:id="@+id/TextView17"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="left|center_horizontal"
+                    android:text="@string/schichtadd_gkzr"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    style="@style/Theme.OSES.ListSeparator" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/schichtadd_gv_box"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+on
+                <TextView
+                    android:id="@+id/schichtadd_v"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="left|center_vertical"
+                    android:minWidth="120dp"
+                    android:text="@string/schicht_gv"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <EditText
+                    android:id="@+id/schichtadd_von"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:focusable="false"
+                    android:hint="@string/dd_mm_jjjj"
+                    android:inputType="textNoSuggestions"
+                    style="@style/Base.Widget.AppCompat.Spinner.Underlined"
+                    android:textSize="18sp"
+                    android:paddingLeft="8dp">
+
+                </EditText>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/schichtadd_gb_box"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/schichtadd_b"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="left|center_vertical"
+                    android:minWidth="120dp"
+                    android:text="@string/schicht_gb"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <EditText
+                    android:id="@+id/schichtadd_bis"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:focusable="false"
+                    android:hint="@string/dd_mm_jjjj"
+                    android:inputType="textNoSuggestions"
+                    style="@style/Base.Widget.AppCompat.Spinner.Underlined"
+                    android:textSize="18sp"
+                    android:paddingLeft="8dp">
+
+                </EditText>
+
+            </LinearLayout>
+        </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            card_view:cardUseCompatPadding="true">
+
+        <LinearLayout
+            android:id="@+id/LinearLayout31"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingBottom="6dp"
+            android:paddingTop="4dp">
+
+            <LinearLayout
+                android:id="@+id/LinearLayout30"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/TextView18"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="left|center_horizontal"
+                    android:text="@string/Arbeitszeit"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    style="@style/Theme.OSES.ListSeparator" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/LinearLayout02"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/LinearLayout13"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/TextView08"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left|center_vertical"
+                        android:minWidth="120dp"
+                        android:text="@string/dienstbeginn_"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <EditText
+                        android:id="@+id/schichtadd_db"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:clickable="true"
+                        android:ems="10"
+                        android:focusable="false"
+                        android:hint="@string/hh_mm"
+                        style="@style/Base.Widget.AppCompat.Spinner.Underlined"
+                        android:textSize="18sp"
+                        android:paddingLeft="8dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/LinearLayout12"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/TextView07"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left|center_vertical"
+                        android:minWidth="120dp"
+                        android:text="@string/dienstende_"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <EditText
+                        android:id="@+id/schichtadd_de"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:clickable="true"
+                        android:focusable="false"
+                        android:hint="@string/hh_mm"
+                        style="@style/Base.Widget.AppCompat.Spinner.Underlined"
+                        android:textSize="18sp"
+                        android:paddingLeft="8dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/LinearLayout14"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/TextView09"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left|center_vertical"
+                        android:minWidth="120dp"
+                        android:text="@string/pause_"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <Spinner
+                        android:id="@+id/schichtadd_pause"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:spinnerMode="dialog"
+                        android:prompt="@string/select_pause"
+                        style="@style/Base.Widget.AppCompat.Spinner.Underlined" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/schichtadd_pause_box"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/TextView10"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left|center_vertical"
+                        android:minWidth="120dp"
+                        android:text="@string/pause_in_"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <EditText
+                        android:id="@+id/schichtadd_pausein"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="@string/ril100"
+                        android:inputType="textCapCharacters|textFilter"
+                        android:paddingLeft="8dp"
+                        android:textSize="18sp" />
+
+                    <LinearLayout
+                        android:id="@+id/progress1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:contentDescription="@string/fortschritt"
+                        android:minWidth="40dp" >
+
+                        <ImageView
+                            android:id="@+id/schichtadd_rilstatus"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:layout_marginLeft="5dp"
+                            android:contentDescription="@string/hinweis"
+                            android:src="@drawable/icon_delete" />
+
+                        <ProgressBar
+                            android:id="@+id/schichtadd_rilprogress"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:visibility="gone" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            card_view:cardUseCompatPadding="true">
+
+
+
+        <LinearLayout
+            android:id="@+id/schichtadd_auf_box"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingBottom="6dp"
+            android:paddingTop="4dp">
+
+            <LinearLayout
+                android:id="@+id/linearLayout4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <TextView
+                    style="@style/Theme.OSES.ListSeparator"
+                    android:id="@+id/schichtadd_auftitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="left|center_horizontal"
+                    android:text="@string/aufenthalt"
+                    android:textAppearance="?android:attr/textAppearanceLarge" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linearLayout7"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <LinearLayout
+                    android:id="@+id/linearLayout5"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible"
+                    android:gravity="center_vertical" >
+
+                    <TextView
+                        android:id="@+id/textView8"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left|center_vertical"
+                        android:minWidth="120dp"
+                        android:text="@string/nach_db"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <EditText
+                        android:id="@+id/schichtadd_aufdb"
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:hint="3"
+                        android:inputType="number"
+                        android:paddingLeft="8dp"
+                        android:paddingRight="8dp" />
+
+                    <TextView
+                        android:id="@+id/textView10"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left|center_vertical"
+                        android:text="Minuten"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/linearLayout6"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical" >
+
+                    <TextView
+                        android:id="@+id/textView9"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left|center_vertical"
+                        android:text="@string/vor_de"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:minWidth="120dp" />
+
+                    <EditText
+                        android:id="@+id/schichtadd_aufde"
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:singleLine="true"
+                        android:hint="0"
+                        android:paddingLeft="8dp"
+                        android:paddingRight="8dp"
+                        android:inputType="number" />
+
+                    <TextView
+                        android:id="@+id/textView11"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left|center_vertical"
+                        android:text="Minuten"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            card_view:cardUseCompatPadding="true">
+
+        <LinearLayout
+            android:id="@+id/LinearLayout34"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingBottom="6dp"
+            android:paddingTop="4dp">
+
+            <LinearLayout
+                android:id="@+id/LinearLayout33"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/TextView19"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="left|center_horizontal"
+                    android:text="@string/sonstiges"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    style="@style/Theme.OSES.ListSeparator" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/LinearLayout32"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/schichtadd_baureihen_box"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/TextView11"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left|center_vertical"
+                        android:minWidth="120dp"
+                        android:text="@string/baureihen_"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <EditText
+                        android:id="@+id/schichtadd_baureihen"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:digits="0123456789,;"
+                        android:hint="@string/z_b_648_425_146"
+                        android:inputType="textImeMultiLine|textFilter|number"
+                        android:paddingLeft="8dp"
+                        android:textSize="18sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/linearLayout3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/textView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left|center_vertical"
+                        android:text="Notizen:"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:minWidth="120dp" />
+
+                    <EditText
+                        android:id="@+id/schichtadd_notiz"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:singleLine="true"
+                        android:minWidth="100dp"
+                        android:layout_weight="1"
+                        android:inputType="textMultiLine"
+                        android:hint="Kommentare, Hinweise, etc."
+                        android:paddingLeft="8dp"
+                        android:textSize="18sp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+    </LinearLayout>
+
+</ScrollView>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:background="@drawable/bottom_button_shadow_n"
+        android:layout_above="@+id/verwendungadd_bottom_buttons"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+</RelativeLayout>

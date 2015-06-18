@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.OSES" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Set AppCompat’s actionBarStyle -->
+        <!--<item name="actionBarStyle">@style/MyActionBarStyle</item>-->
+
+
+        <!-- Set AppCompat’s color theming attrs -->
+        <item name="colorPrimary">@color/oses_green</item>
+        <item name="colorPrimaryDark">@color/oses_green_dark</item>
+        <item name="colorAccent">@color/oses_green</item>
+        <item name="actionModeBackground">@color/oses_green</item>
+        <item name="windowActionModeOverlay">true</item>
+        <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="actionBarTheme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
+        <item name="actionBarPopupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="windowActionBar">false</item>
+
+        <!-- The rest of your attributes -->
+    </style>
+
+    <style name="Theme.OSES.DialogWhenLarge" parent="Theme.AppCompat.Light.DialogWhenLarge">
+        <!-- Set AppCompat’s actionBarStyle -->
+        <!--<item name="actionBarStyle">@style/MyActionBarStyle</item>-->
+
+        <!-- Set AppCompat’s color theming attrs -->
+        <item name="colorPrimary">@color/oses_green</item>
+        <item name="colorPrimaryDark">@color/oses_green_dark</item>
+        <item name="colorAccent">@color/oses_green</item>
+        <item name="actionModeBackground">@color/oses_green</item>
+        <item name="windowActionModeOverlay">true</item>
+        <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="actionBarTheme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
+        <item name="actionBarPopupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+
+        <!-- The rest of your attributes -->
+    </style>
+
+    <style name="Theme.OSES.ListSeparator">
+        <item name="android:textColor">@color/oses_green</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:paddingBottom">5dp</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="ToolbarTitle" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textSize">19sp</item>
+    </style>
+
+    <style name="OSESBetterPickerTheme" parent="BetterPickersDialogFragment.Light">
+        <item name="bpDividerColor">@color/oses_green</item>
+    </style>
+
+
+</resources>

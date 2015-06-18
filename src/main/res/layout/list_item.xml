@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:id="@+id/menu_layout"
+    android:clickable="false"
+    android:paddingLeft="10dp">
+
+    <!-- title -->
+    <TextView
+         android:id="@+id/list_title"
+         android:layout_width="fill_parent"
+         android:layout_height="wrap_content"
+        android:textSize="19sp"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/list_icon"
+        android:layout_marginLeft="8dp"
+        android:textColor="#ff565656"
+        android:layout_toLeftOf="@+id/list_selected"
+        android:layout_marginRight="8dp" />
+
+    <ImageView
+        android:id="@+id/list_icon"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="8dp"
+        android:src="@drawable/ic_action_cancel"
+        android:elevation="8dp"
+        android:layout_marginLeft="8dp" />
+
+    <RadioButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/list_selected"
+        android:clickable="false"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:checked="false"
+        android:layout_marginRight="18dp"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="18dp" />
+
+    <!-- counter -->
+
+</RelativeLayout>

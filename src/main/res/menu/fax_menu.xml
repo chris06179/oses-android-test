@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/action_add_fax"
+        android:icon="@drawable/ic_action_new"
+        android:visible="false"
+        android:title="Faxziel hinzufügen" app:showAsAction="ifRoom|withText"/>
+    <item android:id="@+id/action_refresh_fax"
+        android:title="Aktualisieren"
+        android:icon="@drawable/ic_action_refresh_white"
+        android:titleCondensed="Aktualisieren" app:showAsAction="ifRoom|withText"/>
+    <item android:id="@+id/action_copy_fax"
+        android:title="Kopie für eigene Unterlagen"
+        android:checkable="true"
+        android:checked="false"
+        android:titleCondensed="Kopie" app:showAsAction="never"/>
+    <item android:id="@+id/action_number_fax"
+        android:title="Faxnummer manuell eingeben"
+        android:titleCondensed="Faxnummer" app:showAsAction="never"/>
+
+</menu>

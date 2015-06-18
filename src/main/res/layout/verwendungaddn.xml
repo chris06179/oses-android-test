@@ -1,0 +1,1402 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.Toolbar xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/verwendungadd_toolbar"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_width="match_parent"
+        android:background="?attr/colorPrimary"
+        android:elevation="5dp"
+        app:titleTextAppearance="@style/ToolbarTitle"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentRight="true"
+        android:id="@+id/verwendungadd_bottom_buttons"
+        android:visibility="visible"
+        android:background="#ffeaeaea">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#CACACA" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/infobox">
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Zurück"
+                android:id="@+id/verwendungadd_back"
+                android:layout_weight="0.5"
+                style="?android:attr/borderlessButtonStyle"
+                android:drawableLeft="@drawable/ic_action_cancel"/>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="#CACACA" />
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Speichern"
+                android:id="@+id/verwendungadd_save"
+                android:layout_weight="0.5"
+                style="?android:attr/borderlessButtonStyle"
+                android:drawableRight="@drawable/ic_action_accept" />
+        </LinearLayout>
+    </LinearLayout>
+
+<ScrollView
+    android:id="@+id/verwendungadd_scroll_main"
+    android:layout_width="match_parent"
+    android:layout_height="fill_parent"
+    android:fadingEdgeLength="10dp"
+    android:clipToPadding="false"
+    android:scrollbarStyle="outsideOverlay"
+    android:layout_below="@+id/verwendungadd_toolbar"
+    android:layout_alignParentLeft="true"
+    android:layout_alignParentStart="true"
+    android:layout_above="@+id/verwendungadd_bottom_buttons">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="10dp"
+        android:id="@+id/verwendungadd_scroll_linear"
+        android:focusable="true"
+        android:focusableInTouchMode="true">
+
+        <LinearLayout
+            android:id="@+id/verwendungadd_kategorie_box"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:id="@+id/linearLayout8"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="5dp" >
+
+                <TextView
+                    style="@style/Theme.OSES.ListSeparator"
+                    android:id="@+id/textView7"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="left|center_horizontal"
+                    android:text="@string/kategorie"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linearLayout10"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" >
+
+                <Spinner
+                    android:id="@+id/verwendungadd_kategorie"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:spinnerMode="dialog"
+                    android:prompt="@string/select_kategorie"
+                    android:background="#E4E4E4"
+                    android:elevation="2dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/verwendungadd_urlaub_box"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:id="@+id/linearLayout14"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <TextView
+                    style="@style/Theme.OSES.ListSeparator"
+                    android:id="@+id/textView26"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="left|center_horizontal"
+                    android:text="Urlaub" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linearLayout28"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <LinearLayout
+                    android:id="@+id/linearLayout26"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical" >
+
+                    <TextView
+                        android:id="@+id/textView30"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left|center_vertical"
+                        android:minWidth="120dp"
+                        android:text="Urlaubstyp:"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <Spinner
+                        style="@style/Base.Widget.AppCompat.Spinner.Underlined"
+                        android:id="@+id/verwendungadd_urlaubtyp"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:spinnerMode="dialog"
+                        android:prompt="@string/select_utyp" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/verwendungadd_ubeschreibung_box"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <TextView
+                    android:id="@+id/textView27"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="left|center_vertical"
+                    android:text="Beschreibung:"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:minWidth="120dp" />
+
+                <EditText
+                    android:id="@+id/verwendungadd_ubeschreibung"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:minWidth="100dp"
+                    android:layout_weight="1"
+                    android:textSize="18sp"
+                    android:paddingLeft="8dp" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/verwendungadd_buero_box"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:id="@+id/linearLayout30"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <TextView
+                    style="@style/Theme.OSES.ListSeparator"
+                    android:id="@+id/textView31"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="left|center_horizontal"
+                    android:text="Bürotätigkeit" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linearLayout33"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <LinearLayout
+                    android:id="@+id/linearLayout32"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical" >
+
+                    <TextView
+                        android:id="@+id/textView32"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left|center_vertical"
+                        android:minWidth="120dp"
+                        android:text="Einsatzstelle:"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <Spinner
+                        style="@style/Base.Widget.AppCompat.Spinner.Underlined"
+                        android:id="@+id/verwendungadd_best"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:spinnerMode="dialog"
+                        android:prompt="@string/select_est" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linearLayout34"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <TextView
+                    android:id="@+id/textView33"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="left|center_vertical"
+                    android:text="Beschreibung:"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:minWidth="120dp" />
+
+                <EditText
+                    android:id="@+id/verwendungadd_bbeschreibung"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:minWidth="100dp"
+                    android:layout_weight="1"
+                    android:textSize="18sp"
+                    android:hint="optional"
+                    android:paddingLeft="8dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/verwendungadd_dispo_box"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:id="@+id/linearLayout23"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <TextView
+                    style="@style/Theme.OSES.ListSeparator"
+                    android:id="@+id/textView28"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="left|center_horizontal"
+                    android:text="Dispo" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linearLayout27"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <LinearLayout
+                    android:id="@+id/linearLayout25"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical" >
+
+                    <TextView
+                        android:id="@+id/textView29"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left|center_vertical"
+                        android:minWidth="120dp"
+                        android:text="Zeitfenster:"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <Spinner
+                        style="@style/Base.Widget.AppCompat.Spinner.Underlined"
+                        android:id="@+id/verwendungadd_dispotyp"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:spinnerMode="dialog"
+                        android:prompt="@string/select_zeitfenster" />
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/verwendungadd_schicht_box"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:id="@+id/LinearLayout10"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/TextView02"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="left|center_horizontal"
+                    android:text="@string/Basisinformationen"
+                    style="@style/Theme.OSES.ListSeparator" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/LinearLayout03"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/LinearLayout05"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/TextView20"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="left|center_vertical"
+                        android:text="@string/schicht_"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:minWidth="80dp" />
+
+                    <EditText
+                        android:id="@+id/verwendungadd_bezeichner"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:imeOptions="actionSearch"
+                        android:singleLine="true"
+                        android:capitalize="characters"
+                        android:inputType="textNoSuggestions|phone"
+                        android:minWidth="100dp"
+                        android:layout_weight="1"
+                        android:textSize="18sp" />
+
+                    <ToggleButton
+                        android:layout_width="60dp"
+                        android:layout_height="wrap_content"
+                        android:text="ABC"
+                        android:id="@+id/verwendungadd_abcbutton"
+                        android:textOff="ABC"
+                        android:textOn="ABC"
+                        android:longClickable="false" />
+
+                    <LinearLayout
+                        android:id="@+id/LinearLayout18"
+                        android:layout_width="60dp"
+                        android:layout_height="fill_parent"
+                        android:gravity="center_horizontal"
+                        android:orientation="horizontal"
+                        android:minWidth="60dp">
+
+                        <ImageButton
+                            android:id="@+id/verwendungadd_search"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_action_search"
+                            android:minWidth="70dp" />
+
+                        <ProgressBar
+                            android:id="@+id/verwendungadd_searchprogress"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:visibility="gone" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/verwendungadd_fpla_box">
+
+                    <TextView
+                        android:id="@+id/TextView04"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="right|center_vertical"
+                        android:minWidth="80dp"
+                        android:text="@string/_fpl_n_"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <EditText
+                        android:id="@+id/verwendungadd_fpla"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:maxLength="5"
+                        android:numeric="integer"
+                        android:inputType="textNoSuggestions|phone"
+                        android:minWidth="70dp"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:id="@+id/TextView21"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="left|center_vertical"
+                        android:text="@string/close_bracket"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <CheckBox
+                        android:id="@+id/checkBox1"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/anreise_mit_zug"
+                        android:checked="false"
+                        android:visibility="gone" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/LinearLayout11"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/TextView06"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left|center_vertical"
+                        android:minWidth="120dp"
+                        android:text="@string/einsatzstelle_"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <Spinner
+                        android:id="@+id/verwendungadd_est"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:spinnerMode="dialog"
+                        android:prompt="@string/select_est"
+                        style="@style/Widget.AppCompat.Spinner.Underlined" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/LinearLayout19"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/TextView15"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left|center_vertical"
+                        android:minWidth="120dp"
+                        android:text="@string/funktion_"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <Spinner
+                        android:id="@+id/verwendungadd_funktion"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:spinnerMode="dialog"
+                        android:prompt="@string/select_funktion"
+                        style="@style/Widget.AppCompat.Spinner.Underlined" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/verwendungadd_datum_box"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <TextView
+                    style="@style/Theme.OSES.ListSeparator"
+                    android:id="@+id/textView14"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="left|center_horizontal"
+                    android:text="@string/zeitraum"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linearLayout15"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <LinearLayout
+                    android:id="@+id/linearLayout12"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/textView15"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="left|center_vertical"
+                        android:minWidth="120dp"
+                        android:text="@string/datum_"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <EditText
+                        style="@style/Widget.AppCompat.Spinner.Underlined"
+                        android:id="@+id/verwendungadd_datumStart"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:focusable="false"
+                        android:hint="@string/dd_mm_jjjj"
+                        android:paddingLeft="8dp"
+                        android:inputType="textNoSuggestions"
+                        android:textSize="19sp"
+                        android:clickable="false" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/verwendungadd_zeitraum_box"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible">
+
+                    <TextView
+                        android:id="@+id/textView16"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="left|center_vertical"
+                        android:minWidth="120dp"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <CheckBox
+                        android:id="@+id/verwendungadd_zeitraum"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/zeitraum_"
+                        android:textSize="19sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/verwendungadd_datumEnde_box"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone" >
+
+                    <TextView
+                        android:id="@+id/textView17"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="left|center_vertical"
+                        android:minWidth="120dp"
+                        android:text="@string/bis_datum"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <EditText
+                        style="@style/Base.Widget.AppCompat.Spinner.Underlined"
+                        android:id="@+id/verwendungadd_datumEnde"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:focusable="false"
+                        android:paddingLeft="8dp"
+                        android:inputType="textNoSuggestions"
+                        android:textSize="19sp"
+                        android:clickable="false" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/verwendungadd_az_box"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:id="@+id/LinearLayout30"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/TextView18"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="left|center_horizontal"
+                    android:text="@string/Arbeitszeit"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    style="@style/Theme.OSES.ListSeparator" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/LinearLayout02"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="1dp"
+                android:layout_marginLeft="1dp"
+                android:layout_marginRight="1dp"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/LinearLayout13"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/TextView08"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left|center_vertical"
+                        android:minWidth="120dp"
+                        android:text="@string/dienstbeginn_"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <EditText
+                        android:id="@+id/verwendungadd_db"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:clickable="false"
+                        android:ems="10"
+                        android:focusable="false"
+                        android:hint="@string/hh_mm"
+                        style="@style/Widget.AppCompat.Spinner.Underlined"
+                        android:textSize="18sp"
+                        android:paddingLeft="8dp"
+                        android:focusableInTouchMode="false" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/LinearLayout12"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/TextView07"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left|center_vertical"
+                        android:minWidth="120dp"
+                        android:text="@string/dienstende_"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <EditText
+                        android:id="@+id/verwendungadd_de"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:clickable="false"
+                        android:focusable="false"
+                        android:hint="@string/hh_mm"
+                        style="@style/Widget.AppCompat.Spinner.Underlined"
+                        android:textSize="18sp"
+                        android:paddingLeft="8dp"
+                        android:focusableInTouchMode="true" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/LinearLayout14"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/TextView09"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left|center_vertical"
+                        android:minWidth="120dp"
+                        android:text="@string/pause_"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <Spinner
+                        android:id="@+id/verwendungadd_pause"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:spinnerMode="dialog"
+                        android:prompt="@string/select_pause"
+                        style="@style/Widget.AppCompat.Spinner.Underlined" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/verwendungadd_pausein_box"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/TextView10"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left|center_vertical"
+                        android:minWidth="120dp"
+                        android:text="@string/pause_in_"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <EditText
+                        android:id="@+id/verwendungadd_pausein"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="@string/ril100"
+                        android:inputType="textCapCharacters|textFilter"
+                        android:paddingLeft="8dp"
+                        android:textSize="18sp" />
+
+                    <LinearLayout
+                        android:id="@+id/progress1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:contentDescription="@string/fortschritt"
+                        android:minWidth="40dp" >
+
+                        <ImageView
+                            android:id="@+id/verwendungadd_rilstatus"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:layout_marginLeft="5dp"
+                            android:contentDescription="@string/hinweis"
+                            android:src="@drawable/ic_action_cancel" />
+
+                        <ProgressBar
+                            android:id="@+id/verwendungadd_rilprogress"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:visibility="gone" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/verwendungadd_oaz_box"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:id="@+id/linearLayout36"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <TextView
+                    style="@style/Theme.OSES.ListSeparator"
+                    android:id="@+id/textView34"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="left|center_horizontal"
+                    android:text="Arbeitszeit überschreiben"
+                    android:textAppearance="?android:attr/textAppearanceLarge" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linearLayout40"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="1dp"
+                android:layout_marginLeft="1dp"
+                android:layout_marginRight="1dp"
+                android:orientation="vertical" >
+
+                <LinearLayout
+                    android:id="@+id/linearLayout38"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible"
+                    android:gravity="bottom" >
+
+                    <TextView
+                        android:id="@+id/textView37"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left|center_vertical"
+                        android:minWidth="120dp"
+                        android:text="abw. Arbeitszeit:"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textSize="16sp"
+                        android:textIsSelectable="false" />
+
+                    <EditText
+                        style="@style/Widget.AppCompat.Spinner.Underlined"
+                        android:id="@+id/verwendungadd_oaz"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:hint="keine Angabe"
+                        android:inputType="textImeMultiLine"
+                        android:paddingLeft="8dp"
+                        android:paddingRight="8dp"
+                        android:clickable="false"
+                        android:focusable="false"
+                        android:textSize="18sp"
+                        android:layout_weight="1" />
+
+                    <ImageButton
+                        android:id="@+id/verwendungadd_deloaz"
+                        android:layout_width="30dp"
+                        android:layout_height="match_parent"
+                        android:text="@string/l_schen"
+                        android:src="@drawable/ic_action_cancel"
+                        android:layout_marginBottom="-3dp"
+                        android:visibility="gone" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/verwendungadd_auf_box"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:id="@+id/linearLayout17"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <TextView
+                    style="@style/Theme.OSES.ListSeparator"
+                    android:id="@+id/verwendungadd_auftitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="left|center_horizontal"
+                    android:text="@string/aufenthalt"
+                    android:textAppearance="?android:attr/textAppearanceLarge" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linearLayout11"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical" >
+
+                <TextView
+                    android:id="@+id/textView18"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="left|center_vertical"
+                    android:minWidth="120dp"
+                    android:text="Berechnung:"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <Spinner
+                    style="@style/Widget.AppCompat.Spinner.Underlined"
+                    android:id="@+id/verwendungadd_aufart"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:spinnerMode="dialog"
+                    android:prompt="@string/berech_art" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/verwendungadd_auf_inner_box"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="1dp"
+                android:layout_marginLeft="1dp"
+                android:layout_marginRight="1dp"
+                android:orientation="vertical" >
+
+                <TextView
+                    style="@style/Theme.OSES.ListSeparator"
+                    android:id="@+id/verwendungadd_auf_est"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="left|center_horizontal"
+                    android:text="@string/aufenthalt_in"
+                    android:textAppearance="?android:attr/textAppearanceLarge" />
+
+                <LinearLayout
+                    android:id="@+id/linearLayout18"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible"
+                    android:gravity="center_vertical" >
+
+                    <TextView
+                        android:id="@+id/textView19"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left|center_vertical"
+                        android:minWidth="120dp"
+                        android:text="@string/nach_db"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:maxWidth="120dp"
+                        android:ellipsize="none"
+                        android:singleLine="true" />
+
+                    <EditText
+                        android:id="@+id/verwendungadd_aufdb"
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:paddingLeft="8dp"
+                        android:paddingRight="8dp" />
+
+                    <TextView
+                        android:id="@+id/textView20"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left|center_vertical"
+                        android:text="Minuten"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/linearLayout20"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical" >
+
+                    <TextView
+                        android:id="@+id/textView24"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left|center_vertical"
+                        android:text="@string/vor_de"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:minWidth="120dp"
+                        android:maxWidth="120dp"
+                        android:ellipsize="none"
+                        android:singleLine="true" />
+
+                    <EditText
+                        android:id="@+id/verwendungadd_aufde"
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:singleLine="true"
+                        android:paddingLeft="8dp"
+                        android:paddingRight="8dp"
+                        android:inputType="number" />
+
+                    <TextView
+                        android:id="@+id/textView25"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left|center_vertical"
+                        android:text="Minuten"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+                </LinearLayout>
+
+                <TextView
+                    style="@style/Theme.OSES.ListSeparator"
+                    android:id="@+id/verwendungadd_auf_erste_tgk"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="left|center_horizontal"
+                    android:text="@string/aufenthalt_erste"
+                    android:textAppearance="?android:attr/textAppearanceLarge" />
+
+                <LinearLayout
+                    android:id="@+id/linearLayout19"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible"
+                    android:gravity="center_vertical" >
+
+                    <TextView
+                        android:id="@+id/textView21"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left|center_vertical"
+                        android:minWidth="120dp"
+                        android:text="@string/auf_dz"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:maxWidth="120dp"
+                        android:ellipsize="none"
+                        android:singleLine="true" />
+
+                  fdb  <EditText
+                        style="@style/Widget.AppCompat.Spinner.Underlined"
+                        android:id="@+id/verwendungadd_aufdz"
+                        android:layout_width="90dp"
+                        android:layout_height="wrap_content"
+                        android:hint="HH:MM"
+                        android:inputType="textImeMultiLine"
+                        android:paddingLeft="8dp"
+                        android:paddingRight="8dp"
+                        android:clickable="false"
+                        android:focusable="false"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:id="@+id/textView23"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left|center_vertical"
+                        android:text="Std:Min"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/verwendungadd_sonstiges_box"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:id="@+id/LinearLayout33"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/TextView19"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="left|center_horizontal"
+                    android:text="@string/sonstiges"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    style="@style/Theme.OSES.ListSeparator" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/LinearLayout32"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="1dp"
+                android:layout_marginLeft="1dp"
+                android:layout_marginRight="1dp"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/verwendungadd_baureihen_box"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/TextView11"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left|center_vertical"
+                        android:minWidth="120dp"
+                        android:text="@string/baureihen_"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <EditText
+                        android:id="@+id/verwendungadd_baureihen"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:digits="0123456789,;"
+                        android:hint="@string/z_b_648_425_146"
+                        android:inputType="textImeMultiLine|textFilter|number"
+                        android:paddingLeft="8dp"
+                        android:textSize="18sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/linearLayout3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/textView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left|center_vertical"
+                        android:text="Notizen:"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:minWidth="120dp" />
+
+                    <EditText
+                        android:id="@+id/verwendungadd_notiz"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:singleLine="false"
+                        android:minWidth="100dp"
+                        android:layout_weight="1"
+                        android:inputType="textMultiLine"
+                        android:hint="Kommentare, Hinweise, etc."
+                        android:paddingLeft="8dp"
+                        android:textSize="18sp"
+                        android:paddingRight="8dp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/verwendungadd_abweichungen_box"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:baselineAligned="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/TextView05"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="left|center_horizontal"
+                    android:text="@string/AbweichungenvomDienstauftrag"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    style="@style/Theme.OSES.ListSeparator">
+                </TextView>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/LinearLayout20"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/LinearLayout08"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="bottom">
+
+                    <TextView
+                        android:id="@+id/TextView12"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left|center_vertical"
+                        android:minWidth="120dp"
+                        android:text="@string/dienstbeginn_"
+                        android:textAppearance="?android:attr/textAppearanceMedium" >
+                    </TextView>
+
+                    <EditText
+                        android:id="@+id/verwendungadd_adb"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:focusable="false"
+                        android:hint="@string/hh_mm"
+                        android:singleLine="true"
+                        style="@style/Widget.AppCompat.Spinner.Underlined"
+                        android:textSize="17sp"
+                        android:paddingLeft="8dp"
+                        android:clickable="false">
+                    </EditText>
+
+                    <Spinner
+                        android:layout_width="75dp"
+                        android:layout_height="match_parent"
+                        android:id="@+id/verwendungadd_adban"
+                        style="@style/Widget.AppCompat.Spinner.Underlined"
+                        android:visibility="gone" />
+
+                    <ImageButton
+                        android:id="@+id/verwendungadd_deladb"
+                        android:layout_width="30dp"
+                        android:layout_height="match_parent"
+                        android:text="@string/l_schen"
+                        android:src="@drawable/ic_action_cancel"
+                        android:layout_marginBottom="-3dp"
+                        android:layout_gravity="top"
+                        android:visibility="gone">
+                    </ImageButton>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/LinearLayout23"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/verwendungadd_dbr"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="@string/begrundung"
+                        android:inputType="textMultiLine"
+                        android:textSize="18sp"
+                        android:visibility="gone"
+                        android:layout_marginLeft="120dp"
+                        android:paddingLeft="8dp"
+                        android:paddingRight="8dp">
+                    </EditText>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/LinearLayout09"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="bottom">
+
+                    <TextView
+                        android:id="@+id/TextView13"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left|center_vertical"
+                        android:minWidth="120dp"
+                        android:text="@string/dienstende_"
+                        android:textAppearance="?android:attr/textAppearanceMedium" >
+                    </TextView>
+
+                    <EditText
+                        android:id="@+id/verwendungadd_ade"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:focusable="false"
+                        android:hint="@string/hh_mm"
+                        style="@style/Widget.AppCompat.Spinner.Underlined"
+                        android:textSize="17sp"
+                        android:paddingLeft="8dp"
+                        android:clickable="false"
+                        android:singleLine="true">
+                    </EditText>
+
+                    <Spinner
+                        style="@style/Widget.AppCompat.Spinner.Underlined"
+                        android:layout_width="75dp"
+                        android:layout_height="match_parent"
+                        android:id="@+id/verwendungadd_adean"
+                        android:visibility="gone" />
+
+                    <ImageButton
+                        android:id="@+id/verwendungadd_delade"
+                        android:layout_width="30dp"
+                        android:layout_height="match_parent"
+                        android:text="@string/l_schen"
+                        android:src="@drawable/ic_action_cancel"
+                        android:layout_marginBottom="-3dp"
+                        android:layout_gravity="top"
+                        android:visibility="gone">
+                    </ImageButton>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/LinearLayout25"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/verwendungadd_der"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="@string/begrundung"
+                        android:textSize="18sp"
+                        android:visibility="gone"
+                        android:inputType="textMultiLine"
+                        android:layout_marginLeft="120dp"
+                        android:paddingLeft="8dp"
+                        android:paddingRight="8dp">
+                    </EditText>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/LinearLayout01"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/TextView03"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left|center_vertical"
+                        android:minWidth="120dp"
+                        android:text="@string/pause_"
+                        android:textAppearance="?android:attr/textAppearanceMedium" >
+                    </TextView>
+
+                    <Spinner
+                        android:id="@+id/verwendungadd_apause"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:spinnerMode="dialog"
+                        android:prompt="@string/select_pause"
+                        style="@style/Widget.AppCompat.Spinner.Underlined">
+                    </Spinner>
+
+                    <ImageButton
+                        android:id="@+id/verwendungadd_delapause"
+                        android:layout_width="30dp"
+                        android:layout_height="match_parent"
+                        android:text="@string/l_schen"
+                        android:src="@drawable/ic_action_cancel"
+                        android:layout_marginBottom="-3dp"
+                        android:layout_gravity="top"
+                        android:visibility="gone" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/LinearLayout24"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/verwendungadd_apauser"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="@string/begrundung"
+                        android:textSize="18sp"
+                        android:visibility="gone"
+                        android:layout_marginLeft="120dp"
+                        android:inputType="textMultiLine"
+                        android:paddingLeft="8dp"
+                        android:paddingRight="8dp">
+                    </EditText>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</ScrollView>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:background="@drawable/bottom_button_shadow_n"
+        android:layout_above="@+id/verwendungadd_bottom_buttons"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+</RelativeLayout>

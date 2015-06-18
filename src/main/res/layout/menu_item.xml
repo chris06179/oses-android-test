@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="36dp"
+    android:id="@+id/menu_layout">
+ 
+     <!-- icon -->
+
+    <View
+        android:layout_width="10dp"
+        android:layout_height="fill_parent"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:background="@drawable/menu_active_bar"
+        android:id="@+id/menu_select_block"
+        android:visibility="invisible" />
+
+    <ImageView
+         android:id="@+id/item_icon"
+         android:layout_width="32dp"
+         android:layout_height="32dp"
+         android:layout_alignParentLeft="true"
+         android:layout_marginLeft="8dp"
+         android:layout_marginRight="8dp"
+         android:layout_marginTop="2dp"
+         android:src="@drawable/ic_action_cancel" />
+ 
+    <!-- title -->
+    <TextView
+         android:id="@+id/item_title"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/item_icon"
+        android:layout_toEndOf="@+id/item_icon"
+        android:textColor="#484848"
+        android:textStyle="bold" />
+ 
+        <!-- counter -->
+        <TextView
+            android:id="@+id/item_counter"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="2dp"
+            android:background="@drawable/rectangle_red"
+            android:gravity="center"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+</RelativeLayout>

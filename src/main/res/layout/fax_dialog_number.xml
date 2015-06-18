@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="24dp"
+    android:paddingRight="24dp">
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="phone"
+        android:ems="10"
+        android:id="@+id/fax_dialog_number"
+        android:layout_gravity="center_horizontal"
+        android:hint="+491234567890" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Hinweis: Das System unterstützt nur Rufnummern, welche aus dem deutschen Festnetz erreichbar sind. Interne Rufnummern z.B. im ehemaligen BASA Netz werden nicht unterstützt. Um diese Faxnummern dennoch nutzen zu können, müssen diese mit einer externen Vorwahl eingegeben werden!"
+        android:id="@+id/textView6"
+        android:layout_marginTop="10dp" />
+
+</LinearLayout>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fax_protokoll_frame"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+
+    android:foreground="?attr/selectableItemBackground"
+    android:paddingTop="5dp"
+    android:paddingRight="8dp"
+    android:paddingBottom="5dp">
+
+    <RelativeLayout
+        android:id="@+id/fax_protokoll_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+
+        <View
+            android:layout_width="wrap_content"
+            android:layout_height="1dp"
+            android:background="#AAAAAA"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignTop="@+id/fax_protokoll_sum"
+            android:layout_alignLeft="@+id/fax_protokoll_units"
+            android:layout_alignStart="@+id/fax_protokoll_units"
+            android:id="@+id/fax_protokoll_sum_divider" />
+
+        <!-- title -->
+
+        <ImageView
+            android:id="@+id/fax_protokoll_icon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_action_accept"
+            android:layout_marginRight="5dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Ausbleibezeit (Mai 2015)"
+            android:id="@+id/fax_protokoll_description"
+            android:textIsSelectable="false"
+            android:layout_below="@+id/fax_protokoll_date"
+            android:layout_toRightOf="@+id/fax_protokoll_icon"
+            android:layout_alignRight="@+id/fax_protokoll_date"
+            android:layout_alignEnd="@+id/fax_protokoll_date"
+            android:singleLine="true"
+            android:ellipsize="end" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="04.06.2015 15:21"
+            android:id="@+id/fax_protokoll_date"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/fax_protokoll_icon"
+            android:layout_toLeftOf="@+id/fax_protokoll_units"
+            android:layout_toStartOf="@+id/fax_protokoll_units"
+            android:layout_marginRight="10dp"
+            android:singleLine="true"
+            android:ellipsize="end" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="1,6 Einheiten"
+            android:id="@+id/fax_protokoll_units"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="x 0,11 €"
+            android:id="@+id/fax_protokoll_costs"
+            android:layout_below="@+id/fax_protokoll_units"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="= 0,176 €"
+            android:id="@+id/fax_protokoll_sum"
+            android:textStyle="bold"
+            android:layout_below="@+id/fax_protokoll_costs"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Northeim (Han) - Melderaum"
+            android:id="@+id/fax_protokoll_destination"
+            android:layout_below="@+id/fax_protokoll_description"
+            android:layout_toRightOf="@+id/fax_protokoll_icon"
+            android:layout_alignRight="@+id/fax_protokoll_description"
+            android:layout_alignEnd="@+id/fax_protokoll_description"
+            android:singleLine="true"
+            android:ellipsize="end" />
+
+        <!-- counter -->
+
+    </RelativeLayout>
+
+</FrameLayout>

@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name" translatable="false">OSES für Android</string>
+
+
+    <string-array name="exclude_type">
+        <item>Nein</item>
+        <item>Ja, Zeile überspringen</item>
+        <item>Ja, Zeile frei lassen</item>
+    </string-array>
+
+    <string-array name="pref_sum_pos_entries">
+        <item>Nicht anzeigen</item>
+        <item>Kopfzeile</item>
+        <item>Fußzeile</item>
+        <item>Kopf+Fußzeile</item>
+    </string-array>
+
+    <string-array name="pref_sum_pos_values">
+        <item>NONE</item>
+        <item>TOP</item>
+        <item>BOTTOM</item>
+        <item>BOTH</item>
+    </string-array>
+
+    <string name="oses_logo">OSES Logo</string>
+    <string name="anmeldung">Anmeldung</string>
+    <string name="verwendung">Verwendung</string>
+    <string name="funktionen">Funktionen</string>
+    <string name="verwendung_hinzuf_gen">Verwendung hinzufügen</string>
+    <string name="sonderdienste_hinzuf_gen">Sonderdienst hinzufügen</string>
+    <string name="sonderdienst">Sonderdienst</string>
+    <string name="schichtdetails">Schichtdetails</string>
+    <string name="schicht_">Schicht:</string>
+    <string name="suchen">Suchen</string>
+    <string name="datum_">Datum:</string>
+    <string name="dd_mm_jjjj">DD.MM.JJJJ</string>
+    <string name="einsatzstelle_">Einsatzstelle:</string>
+    <string name="anreise_mit_zug">Anreise mit Zug</string>
+    <string name="funktion_">Funktion:</string>
+    <string name="dienstbeginn_">Dienstbeginn:</string>
+    <string name="hh_mm">HH:MM</string>
+    <string name="dienstende_">Dienstende:</string>
+    <string name="pause_">Pause:</string>
+    <string name="pause_in_">Pause in:</string>
+    <string name="ril100">RIL100</string>
+    <string name="fortschritt">Fortschritt</string>
+    <string name="hinweis">Hinweis</string>
+    <string name="baureihen_">Baureihen:</string>
+    <string name="z_b_648_425_146">z.B.: 648,425,146</string>
+    <string name="l_schen">Löschen</string>
+    <string name="abweichungen">Abweichungen</string>
+    <string name="begrundung">Begründung</string>
+    <string name="start_ver_info">## VERSION INFO ###</string>
+    <string name="benutzername_">Benutzername</string>
+    <string name="passwort_">Passwort</string>
+    <string name="anmeldedaten_speichern">Das Gerät wird bei OSES als vertrauenswürdiges Gerät hinterlegt, und die Anmeldedaten werden gespeichert. Solltest du dieses Gerät verlieren, kannst du diese mobile Sitzung über die Systemeinstellungen beenden!</string>
+    <string name="anmelden">Anmelden</string>
+    <string name="aktuelles">Aktuelles</string>
+    <string name="allgemein">Allgemein</string>
+    <string name="hauptmen_">Hauptmenü</string>
+    <string name="_bersicht">Übersicht</string>
+    <string name="erfassung">Erfassung</string>
+    <string name="referenzschichten">Referenzschichten</string>
+    <string name="werkzeuge">Werkzeuge</string>
+    <string name="sonderleistung">Sonderleistung</string>
+    <string name="ausbleibezeiten">Ausbleibezeiten</string>
+    <string name="fahrauslagen">Fahrauslagen</string>
+    <string name="sonstiges">Sonstiges</string>
+    <string name="einstellungen">Einstellungen</string>
+    <string name="abmelden">Abmelden</string>
+    <string name="impressum">Impressum</string>
+    <string name="faxversand">Faxversand</string>
+    <string name="dokumentinformationen">Dokumentinformationen</string>
+    <string name="typ_">Typ:</string>
+    <string name="ziel">Ziel</string>
+    <string name="oder">ODER</string>
+    <string name="faxnummer_">Faxnummer:</string>
+    <string name="_491234567890">+491234567890</string>
+    <string name="senden">Senden</string>
+    <string name="filter">Filter</string>
+    <string name="einsatzstelle">Einsatzstelle</string>
+    <string name="funktion">Funktion</string>
+    <string name="zeitraum_w_hlen">Zeitraum auswählen</string>
+    <string name="kopie_f_r_eigene_unterlagen_anh_ngen">Kopie für eigene Unterlagen anhängen</string>
+    <string name="error_config">error</string>
+    <string name="Ereignisse">Ereignisse</string>
+    <string name="Information">Information</string>
+    <string name="Placeholder">### PLACEHOLDER ###</string>
+    <string name="verschlsslte_ubertragung">verschlüsselte Übertragung</string>
+    <string name="lock_icon">Schloss-Symbol</string>
+    <string name="datsch_hinweise">Hinweise &amp; Datenschutz</string>
+    <string name="Datenschutz">Datenschutz</string>
+    <string name="Hinweise">Hinweise</string>
+    <string name="Datenschutz_Text">Die Anmeldung und jegliche weitere Kommunikation dieser Anwendung erfolgt über eine vollständig verschlüsselte Verbindung. Es werden keinerlei sicherheitsrelevante Benutzerdaten (z.B. Passwort) auf diesem Gerät gespeichert. Die Authentifizierung nach erfolgreicher Anmeldung erfolgt ausschließlich über die Gerätekennung und eine Sitzungsschlüssel. Es gelten die Nutzungsbedingungen der Hauptseite.</string>
+    <string name="Hinweise_Text">Bei erfolgreicher Anmeldung wird dieses Gerät gegenüber OSES als vertrauenswürdig eingestuft. Dazu indentifiziert es sich mit einer eindeutigen Gerätekennung und einem bei der Anmeldung erzeugten Sitzungsschlüssel gegenüber dem System. Sollte es nötig sein, die Vertrauenswürdigkeit für dieses Gerät zu entfernen, so kannst du dich im Hauptmenü abmelden, oder die dazugehörige Sitzung in den Systemeinstellungen von OSES deaktivieren (z.B. bei Verlust des Gerätes). Dadurch sind ohne erneute Eingabe von Benutzername und Passwort keinerlei Aktionen mit dieser Anwendung mehr möglich!</string>
+    <string name="Nutzungsbedingungen">Nutzungsbedingungen</string>
+    <string name="vertical_line">|</string>
+    <string name="dokumente">Dokumente</string>
+    <string name="erstellen">Erstellen</string>
+    <string name="dokumententyp">Dokumententyp</string>
+    <string name="zeitraum">Zeitraum</string>
+    <string name="Aktion">Aktion</string>
+    <string name="faxwarteschlange">Faxwarteschlange</string>
+    <string name="diese_funktion_ist_derzeit_noch_nicht_verf_gbar_">Diese Funktion ist derzeit noch nicht verfügbar!</string>
+    <string name="basisangaben">Basisangaben</string>
+    <string name="zusatzangaben">Zusatzangaben</string>
+    <string name="tage_auschliessen">Tage\nausschließen</string>
+    <string name="komma_getrennt">durch KOMMA getrennte Liste, der nicht aufzuführenden Tage</string>
+    <string name="Basisinformationen">Basisinformationen</string>
+    <string name="dienst">Dienst:</string>
+    <string name="zeitraum_">Zeitraum?</string>
+    <string name="bis_datum">bis Datum:</string>
+    <string name="Optionen">Optionen</string>
+    <string name="Arbeitszeit">Arbeitszeit</string>
+    <string name="AbweichungenvomDienstauftrag">Abweichungen vom Dienstauftrag</string>
+    <string name="zaitraum_double_dot">Zeitraum:</string>
+    <string name="protokoll">Faxprotokoll</string>
+    <string name="Ladevorgang">Ladevorgang…</string>
+    <string name="faxnummer">Faxnummer</string>
+    <string name="_fpl_n_">[Fpl/N/</string>
+    <string name="close_bracket">]</string>
+    <string name="geschäftsbereich">Geschäftsbereich</string>
+    <string name="no_verwendung">Es wurde keine Verwendung im angegebenen Monat gefunden!</string>
+    <string name="wiederholen">Wiederholen</string>
+    <string name="aktualisieren">Aktualisieren</string>
+    <string name="Löschen">Löschen</string>
+    <string name="speichern">Speichern</string>
+    <string name="abbrechen">Verwerfen</string>
+    <string name="title_activity_verwendung_add_all">VerwendungAddAll</string>
+    <string name="title_section1">Section 1</string>
+    <string name="title_section2">Section 2</string>
+    <string name="title_section3">Section 3</string>
+    <string name="action_settings">Settings</string>
+    <string name="select_est">Einsatzstelle auswählen</string>
+    <string name="select_funktion">Funktion auswählen</string>
+    <string name="select_pause">Pausenzeit auswählen</string>
+    <string name="select_fax">Faxziel auswählen</string>
+    <string name="verwendung_verwerfen">Verwendung verwerfen</string>
+    <string name="verwendung_speichern">Verwendung speichern</string>
+    <string name="save_many">Mehrfachspeicherung</string>
+    <string name="save_date_plus">Datum automatisch erhöhen</string>
+    <string name="select_sonder">Sonderdienst auswählen</string>
+    <string name="zugang_vergessen">Zugangsdaten vergessen?</string>
+    <string name="register">Registrieren</string>
+    <string name="referenz_add">Referenzschicht hinzufügen</string>
+    <string name="schichtadd_gkzr">Gültigkeitszeitraum</string>
+    <string name="schicht_gv">Gültig von:</string>
+    <string name="schicht_gb">Gültig bis:</string>
+    <string name="select_gb">Geschäftsbereich auswählen</string>
+    <string name="aufenthalt">Aufenthaltszeiten</string>
+    <string name="nach_db">-&gt; bei Beginn:</string>
+    <string name="vor_de">-&gt; bei Ende:</string>
+    <string name="auf_dz">-&gt; während S.:</string>
+    <string name="kategorie">Kategorie</string>
+    <string name="select_kategorie">Kategorie auswählen</string>
+    <string name="select_utyp">Urlaubstyp wählen</string>
+    <string name="select_zeitfenster">Zeitfenster auswählen</string>
+    <string name="aufenthalt_in">Aufenthalt in</string>
+    <string name="aufenthalt_erste">Aufenthalt in erster Tätigkeitsstätte</string>
+    <string name="berech_art">Berechnungsart wählen</string>
+    <string name="guthabenkonto">Guthabenkonto</string>
+    <string name="kontostand">Kontostand:</string>
+    <string name="faxguthaben">Faxguthaben:</string>
+    <string name="title_activity_payment">Zahlungen</string>
+
+</resources>
