@@ -89,4 +89,16 @@
 
 
 </android.support.v4.widget.DrawerLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="DEVMODE"
+        android:id="@+id/devModeText"
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:background="#fff98c"
+        android:visibility="gone" />
 </RelativeLayout>

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.preference.PreferenceManager;
 import android.view.ContextThemeWrapper;
 
 import org.json.JSONArray;
@@ -13,14 +14,28 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.Authenticator;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
+import java.net.PasswordAuthentication;
+import java.net.Socket;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.net.UnknownHostException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import de.stm.oses.R;
 
@@ -57,11 +72,13 @@ public class OSESBase {
     }
 
     public ListAdapter getEstAdapter() throws JSONException {
-       return getEstAdapter(-1, false);
+        return getEstAdapter(-1, false);
     }
+
     public ListAdapter getEstAdapter(int selected) throws JSONException {
         return getEstAdapter(selected, false);
     }
+
     public ListAdapter getEstAdapter(int selected, boolean isSpinner) throws JSONException {
 
         SharedPreferences settings = context.getSharedPreferences("OSESPrefs", 0);
@@ -72,17 +89,17 @@ public class OSESBase {
         JSONArray JSONDataEstOwn = new JSONArray(DataEstOwn);
         ArrayList<ListClass> ests = new ArrayList<ListClass>();
 
-        ests.add(new ListClass(true,"Eigene"));
-        for ( int i = 0; i < JSONDataEstOwn.length() ; i ++ )
+        ests.add(new ListClass(true, "Eigene"));
+        for (int i = 0; i < JSONDataEstOwn.length(); i++)
             if (session.getEst() == JSONDataEstOwn.getJSONObject(i).getInt("est"))
                 ests.add(new ListClass(JSONDataEstOwn.getJSONObject(i).getInt("est"), JSONDataEstOwn.getJSONObject(i).getString("ort"), R.drawable.ic_home));
             else
                 ests.add(new ListClass(JSONDataEstOwn.getJSONObject(i).getInt("est"), JSONDataEstOwn.getJSONObject(i).getString("ort"), 0));
 
-        JSONArray  JSONDataEstAll = new JSONArray(DataEstAll);
+        JSONArray JSONDataEstAll = new JSONArray(DataEstAll);
 
-        ests.add(new ListClass(true,"Alle"));
-        for ( int i = 0; i < JSONDataEstAll.length() ; i ++ )
+        ests.add(new ListClass(true, "Alle"));
+        for (int i = 0; i < JSONDataEstAll.length(); i++)
             if (session.getEst() == JSONDataEstAll.getJSONObject(i).getInt("id"))
                 ests.add(new ListClass(JSONDataEstAll.getJSONObject(i).getInt("id"), JSONDataEstAll.getJSONObject(i).getString("ort"), R.drawable.ic_home));
             else
@@ -95,18 +112,20 @@ public class OSESBase {
             }
 
         if (isSpinner)
-            return new ListSpinnerAdapter(new ContextThemeWrapper(context, R.style.Theme_AppCompat_Light_Dialog),ests);
+            return new ListSpinnerAdapter(new ContextThemeWrapper(context, R.style.Theme_AppCompat_Light_Dialog), ests);
         else
-            return new ListAdapter(new ContextThemeWrapper(context, R.style.Theme_AppCompat_Light_Dialog),ests);
+            return new ListAdapter(new ContextThemeWrapper(context, R.style.Theme_AppCompat_Light_Dialog), ests);
 
     }
 
     public ListAdapter getFunktionAdapter() throws JSONException {
         return getFunktionAdapter(-1);
     }
+
     public ListAdapter getFunktionAdapter(int selected) throws JSONException {
         return getFunktionAdapter(selected, false);
     }
+
     public ListAdapter getFunktionAdapter(int selected, boolean isSpinner) throws JSONException {
 
         SharedPreferences settings = context.getSharedPreferences("OSESPrefs", 0);
@@ -117,8 +136,8 @@ public class OSESBase {
         ArrayList<ListClass> funktionen = new ArrayList<ListClass>();
 
 
-        for ( int i = 0; i < JSONDataFunktionen.length() ; i ++ )
-           funktionen.add(new ListClass(JSONDataFunktionen.getJSONObject(i).getInt("id"), JSONDataFunktionen.getJSONObject(i).getString("name")));
+        for (int i = 0; i < JSONDataFunktionen.length(); i++)
+            funktionen.add(new ListClass(JSONDataFunktionen.getJSONObject(i).getInt("id"), JSONDataFunktionen.getJSONObject(i).getString("name")));
 
 
         for (int i = 0; i < funktionen.size(); i++)
@@ -136,9 +155,11 @@ public class OSESBase {
     public ListAdapter getGBAdapter() throws JSONException {
         return getGBAdapter(-1);
     }
+
     public ListAdapter getGBAdapter(int selected) throws JSONException {
         return getGBAdapter(selected, false);
     }
+
     public ListAdapter getGBAdapter(int selected, boolean isSpinner) throws JSONException {
 
         SharedPreferences settings = context.getSharedPreferences("OSESPrefs", 0);
@@ -149,7 +170,7 @@ public class OSESBase {
         ArrayList<ListClass> GB = new ArrayList<ListClass>();
 
 
-        for ( int i = 0; i < JSONDataGB.length() ; i ++ )
+        for (int i = 0; i < JSONDataGB.length(); i++)
             GB.add(new ListClass(JSONDataGB.getJSONObject(i).getInt("id"), JSONDataGB.getJSONObject(i).getString("name")));
 
 
@@ -160,17 +181,18 @@ public class OSESBase {
             }
 
         if (isSpinner)
-            return new ListSpinnerAdapter(new ContextThemeWrapper(context, R.style.Theme_AppCompat_Light_Dialog),GB);
+            return new ListSpinnerAdapter(new ContextThemeWrapper(context, R.style.Theme_AppCompat_Light_Dialog), GB);
         else
-            return new ListAdapter(new ContextThemeWrapper(context,  R.style.Theme_AppCompat_Light_Dialog),GB);
+            return new ListAdapter(new ContextThemeWrapper(context, R.style.Theme_AppCompat_Light_Dialog), GB);
 
 
     }
 
-    public ListAdapter getPauseAdapter(boolean showNull)  {
+    public ListAdapter getPauseAdapter(boolean showNull) {
         return getPauseAdapter(-1, showNull);
     }
-    public ListAdapter getPauseAdapter(int selected, boolean showNull)  {
+
+    public ListAdapter getPauseAdapter(int selected, boolean showNull) {
 
 
         ArrayList<ListClass> pause = new ArrayList<ListClass>();
@@ -184,19 +206,18 @@ public class OSESBase {
         pause.add(new ListClass(60, "60 Minuten"));
 
 
-
         for (int i = 0; i < pause.size(); i++)
             if (pause.get(i).getId() == selected) {
                 pause.get(i).setSelected(true);
                 break;
             }
 
-         return new ListSpinnerAdapter(new ContextThemeWrapper(context, R.style.Theme_AppCompat_Light_Dialog), pause);
+        return new ListSpinnerAdapter(new ContextThemeWrapper(context, R.style.Theme_AppCompat_Light_Dialog), pause);
 
 
     }
 
-    public ListAdapter getDokumenteAdapter()  {
+    public ListAdapter getDokumenteAdapter() {
 
         ArrayList<ListClass> dokumente = new ArrayList<ListClass>();
 
@@ -210,7 +231,7 @@ public class OSESBase {
 
     }
 
-    public ListAdapter getExcludeAdapter()  {
+    public ListAdapter getExcludeAdapter() {
 
         ArrayList<ListClass> exclude = new ArrayList<ListClass>();
 
@@ -233,7 +254,7 @@ public class OSESBase {
         kategorie.add(new ListClass("R", "Ruhe", "#FFFF00"));
         kategorie.add(new ListClass("U", "Urlaub", "#00C000"));
         kategorie.add(new ListClass("K", "Krank", "#FF8000"));
-        kategorie.add(new ListClass("T", "Streik",  "#FF0000"));
+        kategorie.add(new ListClass("T", "Streik", "#FF0000"));
         //kategorie.add(new ListClass("F", "Fortbildung",  "#5E00AA"));
         kategorie.add(new ListClass("B", "Büro", "#804000"));
         //kategorie.add(new ListClass("O", "Sonstiges",  "#282828"));
@@ -326,22 +347,77 @@ public class OSESBase {
     public String getVersion() {
         return sVersion;
     }
+
     public Integer getVersionCode() {
         return iVersionCode;
     }
+
     public Integer getSDKLevel() {
         return iSDKLevel;
     }
+
     public String getSDKString() {
         return sSDKString;
     }
 
     public String getJSON(String url, Map<String, String> params, int timeout) {
 
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean useDev = settings.getBoolean("debugUseDevServer", false);
+
+        if (useDev) {
+            url = url.replace("https://oses.mobi", "https://dev.oses.mobi");
+        }
+
         try {
             URL u = new URL(url);
             HttpsURLConnection c = (HttpsURLConnection) u.openConnection();
-            c.setRequestProperty("User-Agent", "OSES for Android "+getVersion());
+
+            if (useDev) {
+                final String devUser = settings.getString("debugDevServerUser", "");
+                final String devPass = settings.getString("debugDevServerPass", "");
+
+                if (devUser.length() == 0 || devPass.length() == 0)
+                    throw new IOException("DEV: username or password may not be empty");
+
+                Authenticator.setDefault(new Authenticator() {
+                    @Override
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(devUser, devPass.toCharArray());
+                    }
+                });
+
+                TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
+                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                        return null;
+                    }
+
+                    public void checkClientTrusted(X509Certificate[] certs, String authType) {
+                    }
+
+                    public void checkServerTrusted(X509Certificate[] certs, String authType) {
+                    }
+                }
+                };
+
+                // Install the all-trusting trust manager
+                SSLContext sc = SSLContext.getInstance("SSL");
+                sc.init(null, trustAllCerts, new java.security.SecureRandom());
+                c.setSSLSocketFactory(sc.getSocketFactory());
+
+                // Create all-trusting host name verifier
+                HostnameVerifier validHosts = new HostnameVerifier() {
+                    public boolean verify(String hostname, SSLSession session) {
+                        return (hostname.equals("dev.oses.mobi"));
+
+                    }
+                };
+
+                c.setHostnameVerifier(validHosts);
+
+            }
+
+            c.setRequestProperty("User-Agent", "OSES for Android " + getVersion());
             c.setUseCaches(false);
             c.setAllowUserInteraction(false);
             c.setConnectTimeout(timeout);
@@ -351,14 +427,12 @@ public class OSESBase {
 
                 c.setRequestMethod("POST");
 
-                StringBuffer requestParams = new StringBuffer();
+                StringBuilder requestParams = new StringBuilder();
 
                 c.setDoOutput(true); // true indicates POST request
 
                 // creates the params string, encode them using URLEncoder
-                Iterator<String> paramIterator = params.keySet().iterator();
-                while (paramIterator.hasNext()) {
-                    String key = paramIterator.next();
+                for (String key : params.keySet()) {
                     String value = params.get(key);
                     requestParams.append(URLEncoder.encode(key, "UTF-8"));
                     requestParams.append("=").append(
@@ -384,17 +458,17 @@ public class OSESBase {
                     StringBuilder sb = new StringBuilder();
                     String line;
                     while ((line = br.readLine()) != null) {
-                        sb.append(line+"\n");
+                        sb.append(line).append("\n");
                     }
                     br.close();
                     c.disconnect();
                     return sb.toString().trim();
             }
 
-        } catch (MalformedURLException ex) {
-            ex.getStackTrace();
         } catch (IOException ex) {
             ex.getStackTrace();
+        } catch (NoSuchAlgorithmException | KeyManagementException e) {
+            e.printStackTrace();
         }
         return null;
     }

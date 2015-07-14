@@ -1,20 +1,31 @@
 package de.stm.oses.helper;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.security.cert.X509Certificate;
 import java.util.Map;
 
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 public class OSESRequest extends AsyncTask<String, Integer, Object> {
     private OnRequestFinishedListener mListener;
@@ -71,6 +82,8 @@ public class OSESRequest extends AsyncTask<String, Integer, Object> {
 
     protected Object doInBackground(String... sUrl) {
 
+
+
         ConnectivityManager cm =
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
@@ -82,10 +95,62 @@ public class OSESRequest extends AsyncTask<String, Integer, Object> {
             return null;
         }
 
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean useDev = settings.getBoolean("debugUseDevServer", false);
+
+        if (useDev) {
+            url = url.replace("https://oses.mobi", "https://dev.oses.mobi");
+        }
+
 
         try {
             URL u = new URL(url);
             HttpsURLConnection c = (HttpsURLConnection) u.openConnection();
+
+            if (useDev) {
+                final String devUser = settings.getString("debugDevServerUser", "");
+                final String devPass = settings.getString("debugDevServerPass", "");
+
+                if (devUser.length() == 0 || devPass.length() == 0)
+                    throw new IOException("DEV: username or password may not be empty");
+
+                Authenticator.setDefault(new Authenticator() {
+                    @Override
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(devUser, devPass.toCharArray());
+                    }
+                });
+
+                TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
+                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                        return null;
+                    }
+
+                    public void checkClientTrusted(X509Certificate[] certs, String authType) {
+                    }
+
+                    public void checkServerTrusted(X509Certificate[] certs, String authType) {
+                    }
+                }
+                };
+
+                // Install the all-trusting trust manager
+                SSLContext sc = SSLContext.getInstance("SSL");
+                sc.init(null, trustAllCerts, new java.security.SecureRandom());
+                c.setSSLSocketFactory(sc.getSocketFactory());
+
+                // Create all-trusting host name verifier
+                HostnameVerifier validHosts = new HostnameVerifier() {
+                    public boolean verify(String hostname, SSLSession session) {
+                        return (hostname.equals("dev.oses.mobi"));
+
+                    }
+                };
+
+                c.setHostnameVerifier(validHosts);
+
+            }
+
             c.setRequestProperty("User-Agent", "OSES for Android " + getVersion());
             c.setUseCaches(false);
             c.setAllowUserInteraction(false);

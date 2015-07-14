@@ -137,4 +137,25 @@
     </PreferenceScreen>
     </PreferenceCategory>
 
+    <PreferenceCategory
+        android:title="Debug"
+        android:key="debugCategory">
+        <SwitchPreference
+            android:title="Entwicklungsserver verwenden"
+            android:summary="Benutername und Passwort ergänzen, nur für berechtigte Personen!"
+            android:defaultValue="false"
+            android:key="debugUseDevServer" />
+        <EditTextPreference
+            android:title="Benutzername"
+            android:key="debugDevServerUser"
+            android:defaultValue=""
+            android:dependency="debugUseDevServer" />
+        <EditTextPreference
+            android:title="Passwort"
+            android:key="debugDevServerPass"
+            android:defaultValue=""
+            android:dependency="debugUseDevServer"
+            android:inputType="textPassword" />
+    </PreferenceCategory>
+
 </PreferenceScreen>

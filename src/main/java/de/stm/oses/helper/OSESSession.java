@@ -17,7 +17,7 @@ public class OSESSession {
     private String SessionNachname = "";
     private int SessionGB = 0;
     private String SessionGBText;
-    private int SessionFunktion = 0;
+    private int SessionFunktion = 99;
     private String SessionIdentifier;
     private String SessionAufArt = "auto";
     private int SessionAufDb = 3;
@@ -41,7 +41,7 @@ public class OSESSession {
         SessionNachname = settings.getString("SessionNachname", "");
         SessionGB = settings.getInt("SessionGB", 0);
         SessionGBText = settings.getString("SessionGBText", "");
-        SessionFunktion = settings.getInt("SessionFunktion", 0);
+        SessionFunktion = settings.getInt("SessionFunktion", 99);
         SessionIdentifier = settings.getString("SessionIdentifier", "");
         SessionAufArt = settings.getString("SessionAufArt", "auto");
         SessionAufDb = settings.getInt("SessionAufDb", 3);
