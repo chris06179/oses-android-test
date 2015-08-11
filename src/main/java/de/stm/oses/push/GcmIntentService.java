@@ -78,7 +78,7 @@ protected void onHandleIntent(Intent intent) {
 
     if (type.equals("force")) {
 
-        generateNotification(this, intent.getExtras().getString("message"), intent.getExtras().getString("titel"), R.drawable.ic_launcher,  "force", intent.getExtras().getInt("id"), true, false);
+        generateNotification(this, intent.getExtras().getString("message"), intent.getExtras().getString("titel"), R.mipmap.ic_launcher,  "force", intent.getExtras().getInt("id"), true, false);
         return;
 
     }
@@ -106,14 +106,14 @@ protected void onHandleIntent(Intent intent) {
     }
 
     if (type.equals("update") && settings.getBoolean("updateNotification", true)) {
-        generateNotification(this, intent.getExtras().getString("message"), intent.getExtras().getString("titel"), R.drawable.ic_launcher, "update", 0, true, false);
+        generateNotification(this, intent.getExtras().getString("message"), intent.getExtras().getString("titel"), R.mipmap.ic_launcher, "update", 0, true, false);
         return;
 
     }
 
     if (type.equals("text") && settings.getBoolean("otherNotification", true)) {
 
-        generateNotification(this, intent.getExtras().getString("message"), intent.getExtras().getString("titel"), R.drawable.ic_launcher, "text", intent.getExtras().getInt("id"), true, false);
+        generateNotification(this, intent.getExtras().getString("message"), intent.getExtras().getString("titel"), R.mipmap.ic_launcher, "text", intent.getExtras().getInt("id"), true, false);
         return;
 
     }
@@ -123,7 +123,7 @@ protected void onHandleIntent(Intent intent) {
         boolean sound = intent.getExtras().getString("sound", "false").equals("true");
         boolean iprogress = intent.getExtras().getString("iprogress", "false").equals("true");
 
-        generateNotification(this, intent.getExtras().getString("message"), intent.getExtras().getString("titel"), R.drawable.ic_launcher, "FAX_"+intent.getExtras().getString("FaxID"), 0, sound, iprogress );
+        generateNotification(this, intent.getExtras().getString("message"), intent.getExtras().getString("titel"), R.mipmap.ic_launcher, "FAX_"+intent.getExtras().getString("FaxID"), 0, sound, iprogress );
         return;
 
     }
@@ -162,7 +162,7 @@ private void generateNotificationAdmin(Context context, String text, String titl
 	        .setOnlyAlertOnce(true);
 
 
-	Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
+	Bitmap bm = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
 	mBuilder.setLargeIcon(bm);
 
 	if (vibrate)
@@ -231,7 +231,7 @@ private void generateNotificationAdmin(Context context, String text, String titl
                         .setPriority(Notification.PRIORITY_DEFAULT)
                         .setSound(notificationsound);
 
-        Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
+        Bitmap bm = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
         mBuilder.setLargeIcon(bm);
 
         if (vibrate)
