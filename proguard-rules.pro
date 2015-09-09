@@ -1,1 +1,1 @@
--dontwarn com.doomonafireball.betterpickers.**
+-dontwarn com.codetroopers.betterpickers.**

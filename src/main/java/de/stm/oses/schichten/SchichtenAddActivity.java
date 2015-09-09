@@ -30,8 +30,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.doomonafireball.betterpickers.timepicker.TimePickerBuilder;
-import com.doomonafireball.betterpickers.timepicker.TimePickerDialogFragment;
+import com.codetroopers.betterpickers.timepicker.TimePickerBuilder;
+import com.codetroopers.betterpickers.timepicker.TimePickerDialogFragment;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;

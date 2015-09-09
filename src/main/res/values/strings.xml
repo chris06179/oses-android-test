@@ -53,7 +53,7 @@
     <string name="abweichungen">Abweichungen</string>
     <string name="begrundung">Begründung</string>
     <string name="start_ver_info">## VERSION INFO ###</string>
-    <string name="benutzername_">Benutzername</string>
+    <string name="benutzername_">Benutzername / e-Mail</string>
     <string name="passwort_">Passwort</string>
     <string name="anmeldedaten_speichern">Das Gerät wird bei OSES als vertrauenswürdiges Gerät hinterlegt, und die Anmeldedaten werden gespeichert. Solltest du dieses Gerät verlieren, kannst du diese mobile Sitzung über die Systemeinstellungen beenden!</string>
     <string name="anmelden">Anmelden</string>

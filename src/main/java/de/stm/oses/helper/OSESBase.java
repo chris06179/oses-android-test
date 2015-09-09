@@ -377,6 +377,8 @@ public class OSESBase {
                 final String devUser = settings.getString("debugDevServerUser", "");
                 final String devPass = settings.getString("debugDevServerPass", "");
 
+
+
                 if (devUser.length() == 0 || devPass.length() == 0)
                     throw new IOException("DEV: username or password may not be empty");
 

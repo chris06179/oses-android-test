@@ -501,7 +501,10 @@ public class SchichtenFragment extends SwipeRefreshListFragment implements Actio
 
                 item.setBaureihen(schicht.getString("baureihen"));
 
-                item.setKommentar(schicht.getString("kommentar"));
+                if (schicht.isNull("kommentar"))
+                    item.setKommentar(null);
+                else
+                    item.setKommentar(schicht.optString("kommentar", null));
 
 
                 items.add(item);

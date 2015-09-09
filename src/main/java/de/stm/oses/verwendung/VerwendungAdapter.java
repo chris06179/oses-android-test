@@ -224,7 +224,7 @@ public class VerwendungAdapter extends ArrayAdapter<VerwendungClass> {
                 itemHolder.von.setText(item.getDb());
                 itemHolder.bis.setText(item.getDe());
 
-                if (item.getNotiz().isEmpty()) {
+                if (item.getNotiz() == null) {
                     itemHolder.notiz.setText("");
                     itemHolder.notiz_container.setVisibility(View.GONE);
                 } else {

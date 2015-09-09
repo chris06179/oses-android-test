@@ -546,9 +546,13 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
                 item.setDer(schicht.getString("der"));
                 item.setApauser(schicht.getString("apauser"));
 
-                item.setNotiz(schicht.getString("notiz"));
 
-                item.setInfo(schicht.getString("info"));
+                if (schicht.isNull("notiz"))
+                    item.setNotiz(null);
+                else
+                    item.setNotiz(schicht.optString("notiz", null));
+
+                item.setInfo(schicht.optString("info", ""));
 
                 if (schicht.has("AllowSDL"))
                     item.setAllowSDL(schicht.getBoolean("AllowSDL"));

@@ -345,6 +345,10 @@ public class FaxActivity extends AppCompatActivity implements View.OnClickListen
             case R.id.action_number_fax:
                 DialogFragment newFragment = FaxNumberDialog.newInstance();
                 newFragment.show(getSupportFragmentManager(), "faxNumberDialog");
+                return true;
+            case android.R.id.home:
+                finish();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

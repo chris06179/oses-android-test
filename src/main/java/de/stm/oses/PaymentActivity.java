@@ -98,7 +98,9 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
 
                     PendingIntent pendingIntent = buyIntentBundle.getParcelable("BUY_INTENT");
 
-                    startIntentSenderForResult(pendingIntent.getIntentSender(),  1001, new Intent(), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0));
+                    if (pendingIntent != null) {
+                        startIntentSenderForResult(pendingIntent.getIntentSender(),  1001, new Intent(), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0));
+                    }
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -126,15 +128,14 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
                         String continuationToken =
                                 ownedItems.getString("INAPP_CONTINUATION_TOKEN");
 
-                        for (int i = 0; i < purchaseDataList.size(); ++i) {
-                            String purchaseData = purchaseDataList.get(i);
-                            String signature = signatureList.get(i);
-                            String sku = ownedSkus.get(i);
-
-                            getSupportActionBar();
-
-                            // do something with this purchase information
-                            // e.g. display the updated list of products owned by user
+                        if (purchaseDataList != null) {
+                            for (int i = 0; i < purchaseDataList.size(); ++i) {
+                                String purchaseData = purchaseDataList.get(i);
+                                String signature = signatureList.get(i);
+                                String sku = ownedSkus.get(i);
+                                // do something with this purchase information
+                                // e.g. display the updated list of products owned by user
+                            }
                         }
 
                         // if continuationToken != null, call getPurchases again

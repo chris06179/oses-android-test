@@ -97,7 +97,7 @@ public class SchichtenAdapter extends ArrayAdapter<SchichtenClass> {
 
                 gvgb.setText(item.getGv()+" - "+item.getGb());
 
-                if (item.getKommentar().isEmpty()) {
+                if (item.getKommentar() == null) {
                     kommentar.setText("");
                     kommentar_container.setVisibility(View.GONE);
                 } else {

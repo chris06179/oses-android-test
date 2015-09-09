@@ -540,13 +540,6 @@ public class StartActivity extends AppCompatActivity {
                         editor.clear();
                         editor.apply();
 
-                        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(StartActivity.this);
-                        SharedPreferences.Editor spe = sp.edit();
-                        spe.remove("debugUseDevServer");
-                        spe.remove("debugDevServerUser");
-                        spe.remove("debugDevServerPass");
-                        spe.apply();
-
                         Intent intent = new Intent(StartActivity.this, OSESActivity.class);
                         startActivity(intent);
                         StartActivity.this.finish();

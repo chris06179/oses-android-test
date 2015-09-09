@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.InputType;
@@ -38,8 +39,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.doomonafireball.betterpickers.timepicker.TimePickerBuilder;
-import com.doomonafireball.betterpickers.timepicker.TimePickerDialogFragment;
+import com.codetroopers.betterpickers.timepicker.TimePickerBuilder;
+import com.codetroopers.betterpickers.timepicker.TimePickerDialogFragment;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
@@ -95,20 +96,20 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
         ProgressBar searchprogress;
 
         LinearLayout scroll_linear_box;
-        LinearLayout kategorie_box;
-        LinearLayout urlaub_box;
-        LinearLayout buero_box;
-        LinearLayout dispo_box;
-        LinearLayout schicht_box;
-        LinearLayout datum_box;
+        CardView kategorie_box;
+        CardView urlaub_box;
+        CardView buero_box;
+        CardView dispo_box;
+        CardView schicht_box;
+        CardView datum_box;
         LinearLayout zeitraum_box;
         LinearLayout datumEnde_box;
-        LinearLayout az_box;
-        LinearLayout oaz_box;
-        LinearLayout auf_box;
+        CardView az_box;
+        CardView oaz_box;
+        CardView auf_box;
         LinearLayout auf_inner_box;
-        LinearLayout sonstiges_box;
-        LinearLayout abweichungen_box;
+        CardView sonstiges_box;
+        CardView abweichungen_box;
         LinearLayout baureihen_box;
         LinearLayout pausein_box;
         LinearLayout fpla_box;
@@ -172,20 +173,20 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
             searchprogress = (ProgressBar) activity.findViewById(R.id.verwendungadd_searchprogress);
 
             scroll_linear_box = (LinearLayout) activity.findViewById(R.id.verwendungadd_scroll_linear);
-            kategorie_box = (LinearLayout) activity.findViewById(R.id.verwendungadd_kategorie_box);
-            urlaub_box = (LinearLayout) activity.findViewById(R.id.verwendungadd_urlaub_box);
-            buero_box = (LinearLayout) activity.findViewById(R.id.verwendungadd_buero_box);
-            dispo_box = (LinearLayout) activity.findViewById(R.id.verwendungadd_dispo_box);
-            schicht_box = (LinearLayout) activity.findViewById(R.id.verwendungadd_schicht_box);
-            datum_box = (LinearLayout) activity.findViewById(R.id.verwendungadd_datum_box);
+            kategorie_box = (CardView) activity.findViewById(R.id.verwendungadd_kategorie_box);
+            urlaub_box = (CardView) activity.findViewById(R.id.verwendungadd_urlaub_box);
+            buero_box = (CardView) activity.findViewById(R.id.verwendungadd_buero_box);
+            dispo_box = (CardView) activity.findViewById(R.id.verwendungadd_dispo_box);
+            schicht_box = (CardView) activity.findViewById(R.id.verwendungadd_schicht_box);
+            datum_box = (CardView) activity.findViewById(R.id.verwendungadd_datum_box);
             datumEnde_box = (LinearLayout) activity.findViewById(R.id.verwendungadd_datumEnde_box);
             zeitraum_box = (LinearLayout) activity.findViewById(R.id.verwendungadd_zeitraum_box);
-            az_box = (LinearLayout) activity.findViewById(R.id.verwendungadd_az_box);
-            oaz_box = (LinearLayout) activity.findViewById(R.id.verwendungadd_oaz_box);
-            auf_box = (LinearLayout) activity.findViewById(R.id.verwendungadd_auf_box);
+            az_box = (CardView) activity.findViewById(R.id.verwendungadd_az_box);
+            oaz_box = (CardView) activity.findViewById(R.id.verwendungadd_oaz_box);
+            auf_box = (CardView) activity.findViewById(R.id.verwendungadd_auf_box);
             auf_inner_box = (LinearLayout) activity.findViewById(R.id.verwendungadd_auf_inner_box);
-            sonstiges_box = (LinearLayout) activity.findViewById(R.id.verwendungadd_sonstiges_box);
-            abweichungen_box = (LinearLayout) activity.findViewById(R.id.verwendungadd_abweichungen_box);
+            sonstiges_box = (CardView) activity.findViewById(R.id.verwendungadd_sonstiges_box);
+            abweichungen_box = (CardView) activity.findViewById(R.id.verwendungadd_abweichungen_box);
             baureihen_box = (LinearLayout) activity.findViewById(R.id.verwendungadd_baureihen_box);
             pausein_box = (LinearLayout) activity.findViewById(R.id.verwendungadd_pausein_box);
             fpla_box = (LinearLayout) activity.findViewById(R.id.verwendungadd_fpla_box);
@@ -513,6 +514,11 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
                     vAdd.ubeschreibung_box.setVisibility(View.VISIBLE);
                 } else
                     vAdd.ubeschreibung_box.setVisibility(View.GONE);
+
+                if (!((ListClass) vAdd.urlaubtyp.getSelectedItem()).getIdent().equals("U")) {
+                    vAdd.oaz_box.setVisibility(View.VISIBLE);
+                } else
+                    vAdd.oaz_box.setVisibility(View.GONE);
             }
 
             @Override
@@ -809,6 +815,7 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
                     break;
                 case "U":
                     setSelectedIdent(vAdd.urlaubtyp, edit.getKat());
+                    vAdd.oaz.setText(edit.getAz().substring(0,5));
                     if (edit.getKat().equals("UN"))
                         vAdd.ubeschreibung.setText(edit.getBezeichner());
                     break;

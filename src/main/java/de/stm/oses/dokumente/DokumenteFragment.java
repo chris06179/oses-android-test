@@ -391,8 +391,8 @@ public class DokumenteFragment extends Fragment implements View.OnClickListener 
             //balanceText.setText(String.format("%.2f", balance) + " €");
             //sitesText.setText("ca. " + String.format("%.0f", sites) + " Seiten");
 
-            balanceText.setText("0,00 €");
-            sitesText.setText("derzeit keine Abrechnung");
+            //balanceText.setText("∞ €");
+            //sitesText.setText("ca. ∞ Seiten");
 
             final LinearLayout list = (LinearLayout) getActivity().findViewById(R.id.dokumente_fax_protokoll);
             list.removeAllViews();
@@ -457,11 +457,11 @@ public class DokumenteFragment extends Fragment implements View.OnClickListener 
                     double dSum = dUnits * dCosts;
 
                     units.setText(String.format("%.1f", dUnits) + " Einheiten");
-                    costs.setText("x " + String.format("%.2f", dCosts) + " €");
+                    costs.setText("x " + String.format("%.4f", dCosts) + " €");
                     sum.setText("= " + String.format("%.2f", dSum) + " €");
 
                     details.putString("units", String.format("%.1f", dUnits));
-                    details.putString("costs", String.format("%.2f", dCosts) + " €");
+                    details.putString("costs", String.format("%.4f", dCosts) + " €");
                     details.putString("sum", String.format("%.2f", dSum) + " €");
 
 
