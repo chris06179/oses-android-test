@@ -45,6 +45,7 @@ import de.stm.oses.helper.MenuClass;
 import de.stm.oses.helper.OSESBase;
 import de.stm.oses.schichten.SchichtenFragment;
 import de.stm.oses.verwendung.VerwendungFragment;
+import de.stm.oses.verwendung.VerwendungFragmentNew;
 
 
 public class StartActivity extends AppCompatActivity {
@@ -257,7 +258,7 @@ public class StartActivity extends AppCompatActivity {
         } else if (running != null) {
             fragmentTransaction.replace(R.id.content_frame, running, running.getTag());
         } else {
-            VerwendungFragment fragment = new VerwendungFragment();
+            VerwendungFragmentNew fragment = new VerwendungFragmentNew();
             fragmentTransaction.replace(R.id.content_frame, fragment, "verwendung");
         }
 
