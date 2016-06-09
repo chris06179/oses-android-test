@@ -1,17 +1,22 @@
 package de.stm.oses.helper;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.ContextThemeWrapper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Authenticator;
@@ -24,6 +29,7 @@ import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -39,14 +45,16 @@ import javax.net.ssl.X509TrustManager;
 
 import de.stm.oses.R;
 
+@SuppressLint("PrivateResource")
 public class OSESBase {
 
     private Context context;
     private OSESSession session;
-    String sVersion;
-    Integer iVersionCode;
-    Integer iSDKLevel;
-    String sSDKString;
+    private String sVersion;
+    private Integer iVersionCode;
+    private Integer iSDKLevel;
+    private String sSDKString;
+
 
     public OSESBase(Context context) {
         this.context = context;
@@ -377,8 +385,6 @@ public class OSESBase {
                 final String devUser = settings.getString("debugDevServerUser", "");
                 final String devPass = settings.getString("debugDevServerPass", "");
 
-
-
                 if (devUser.length() == 0 || devPass.length() == 0)
                     throw new IOException("DEV: username or password may not be empty");
 
@@ -388,35 +394,6 @@ public class OSESBase {
                         return new PasswordAuthentication(devUser, devPass.toCharArray());
                     }
                 });
-
-                TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
-                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                        return null;
-                    }
-
-                    public void checkClientTrusted(X509Certificate[] certs, String authType) {
-                    }
-
-                    public void checkServerTrusted(X509Certificate[] certs, String authType) {
-                    }
-                }
-                };
-
-                // Install the all-trusting trust manager
-                SSLContext sc = SSLContext.getInstance("SSL");
-                sc.init(null, trustAllCerts, new java.security.SecureRandom());
-                c.setSSLSocketFactory(sc.getSocketFactory());
-
-                // Create all-trusting host name verifier
-                HostnameVerifier validHosts = new HostnameVerifier() {
-                    public boolean verify(String hostname, SSLSession session) {
-                        return (hostname.equals("dev.oses.mobi"));
-
-                    }
-                };
-
-                c.setHostnameVerifier(validHosts);
-
             }
 
             c.setRequestProperty("User-Agent", "OSES for Android " + getVersion());
@@ -437,8 +414,7 @@ public class OSESBase {
                 for (String key : params.keySet()) {
                     String value = params.get(key);
                     requestParams.append(URLEncoder.encode(key, "UTF-8"));
-                    requestParams.append("=").append(
-                            URLEncoder.encode(value, "UTF-8"));
+                    requestParams.append("=").append(URLEncoder.encode(value, "UTF-8"));
                     requestParams.append("&");
                 }
 
@@ -469,9 +445,8 @@ public class OSESBase {
 
         } catch (IOException ex) {
             ex.getStackTrace();
-        } catch (NoSuchAlgorithmException | KeyManagementException e) {
-            e.printStackTrace();
         }
+
         return null;
     }
 

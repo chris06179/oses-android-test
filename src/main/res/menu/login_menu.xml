@@ -1,17 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:id="@+id/action_login_register"
-        android:icon="@drawable/ic_action_person_white"
-        android:titleCondensed="Registrierung"
-        android:title="Registrierung" app:showAsAction="always|withText"/>
-    <item android:id="@+id/action_login_lostpass"
-        android:icon="@drawable/ic_action_account_white"
-        android:title="Zugangsdaten vergessen" app:showAsAction="always|withText"/>
-    <item android:id="@+id/action_login_was_ist_das"
-        android:icon="@drawable/ic_action_help_white"
-        android:titleCondensed="Beschreibung"
-        android:title="Was ist das hier?" app:showAsAction="never"/>
     <item android:id="@+id/action_login_imprint"
         android:icon="@drawable/ic_action_para_white"
         android:titleCondensed="Impressum"

@@ -164,5 +164,12 @@
     <string name="kontostand">Kontostand:</string>
     <string name="faxguthaben">Faxguthaben:</string>
     <string name="title_activity_payment">Zahlungen</string>
+    <string name="drawer_open">Menu göffnet</string>
+    <string name="drawer_closed">Menü geschlossen</string>
+    <string name="title_activity_browser">BrowserActivity</string>
+    <string name="title_activity_navigation">NavigationActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 
 </resources>

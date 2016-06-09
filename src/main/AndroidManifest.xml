@@ -1,22 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="de.stm.oses"
-    android:versionCode="332"
-    android:versionName="3.3.2" >
-
-    <permission
-        android:name="de.stm.oses.permission.C2D_MESSAGE"
-        android:protectionLevel="signature" />
+    android:versionCode="338"
+    android:versionName="3.3.8">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="de.stm.oses.permission.C2D_MESSAGE" />
-    <!-- App receives GCM messages. -->
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-    <!-- Keeps the processor from sleeping when a message is received. -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <!-- Network State Permissions to detect Internet status -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <!-- Permission to vibrate -->
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -27,7 +17,7 @@
         android:required="true" />
 
     <application
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/Theme.OSES">
@@ -38,23 +28,21 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDwPTQAcqsl_U3YMiWsayPxa59g5FClWJg" />
 
-        <receiver
-            android:name=".push.GcmBroadcastReceiver"
-            android:permission="com.google.android.c2dm.permission.SEND" >
+        <service android:name=".fcm.InstanceIdListenerService">
             <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
-
-                <category android:name="de.stm.oses" />
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
-        </receiver>
-
-        <service android:name=".push.GcmIntentService" />
+        </service>
+        <service android:name=".fcm.ListenerService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
 
         <activity
             android:name=".OSESActivity"
             android:label="@string/app_name"
-            android:windowSoftInputMode="stateHidden" >
+            android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -63,30 +51,25 @@
         </activity>
         <activity
             android:name=".StartActivity"
-            android:configChanges="keyboardHidden" >
-        </activity>
+            android:configChanges="keyboardHidden" />
         <activity
             android:name=".fax.FaxActivity"
-            android:label="@string/faxversand" >
-        </activity>
+            android:label="@string/faxversand" />
         <activity
             android:name=".verwendung.VerwendungAddActivity"
             android:label="@string/verwendung_hinzuf_gen"
             android:parentActivityName=".StartActivity"
             android:theme="@style/Theme.OSES.DialogWhenLarge"
-            android:windowSoftInputMode="stateUnchanged" >
-        </activity>
+            android:windowSoftInputMode="stateUnchanged" />
         <activity
             android:name=".schichten.SchichtenAddActivity"
             android:label="@string/referenz_add"
             android:parentActivityName=".StartActivity"
             android:theme="@style/Theme.OSES.DialogWhenLarge"
-            android:windowSoftInputMode="stateUnchanged" >
-        </activity>
+            android:windowSoftInputMode="stateUnchanged" />
         <activity
             android:name=".PaymentActivity"
-            android:label="@string/title_activity_payment" >
-        </activity>
+            android:label="@string/title_activity_payment" />
     </application>
 
 </manifest>

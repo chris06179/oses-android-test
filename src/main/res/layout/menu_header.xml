@@ -2,9 +2,22 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="6dp"
     android:paddingBottom="6dp"
     android:clickable="false">
+
+    <ImageView
+        android:src="@drawable/oses"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView2"
+        android:scaleType="centerInside"
+        android:adjustViewBounds="true"
+        android:cropToPadding="false"
+        android:background="#c3c3c3"
+        android:elevation="5dp"
+        android:layout_marginBottom="6dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp" />
 
     <TextView
         android:layout_width="wrap_content"

@@ -1,6 +1,9 @@
 package de.stm.oses;
 
+import android.content.ComponentName;
+import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
 import android.app.Dialog;
 import android.app.Fragment;
@@ -20,6 +23,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.animation.Animation;
@@ -30,6 +34,10 @@ import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import org.json.JSONObject;
 
@@ -45,14 +53,13 @@ import de.stm.oses.helper.MenuClass;
 import de.stm.oses.helper.OSESBase;
 import de.stm.oses.schichten.SchichtenFragment;
 import de.stm.oses.verwendung.VerwendungFragment;
-import de.stm.oses.verwendung.VerwendungFragmentNew;
 
 
 public class StartActivity extends AppCompatActivity {
+    private static final int PERMISSION_REQUEST_STORAGE = 5500;
 
     //Your member variable declaration here
 
-    boolean SessionChecked = false;
     private Handler mHandler = new Handler();
     private OSESBase OSES;
 
@@ -62,6 +69,9 @@ public class StartActivity extends AppCompatActivity {
     private ActionBarDrawerToggle mDrawerToggle;
 
     private OnDownloadFinishedListener onUpdateResponse;
+
+    public FileDownload CurrentFileDownload;
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -93,12 +103,16 @@ public class StartActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.start);
 
+        // Obtain the FirebaseAnalytics instance.
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(StartActivity.this);
         boolean useDev = settings.getBoolean("debugUseDevServer", false);
 
         if (useDev) {
             TextView devModeText = (TextView) findViewById(R.id.devModeText);
-            devModeText.setVisibility(View.VISIBLE);
+            if (devModeText != null)
+                devModeText.setVisibility(View.VISIBLE);
         }
 
         OSES = new OSESBase(this);
@@ -119,29 +133,38 @@ public class StartActivity extends AppCompatActivity {
                     this,                  /* host Activity */
                     mDrawerLayout,         /* DrawerLayout object */
                     toolbar,  /* nav drawer icon to replace 'Up' caret */
-                    R.string.abmelden,  /* "open drawer" description */
-                    R.string.abweichungen  /* "close drawer" description */
+                    R.string.drawer_open,  /* "open drawer" description */
+                    R.string.drawer_closed  /* "close drawer" description */
             ) {
 
-                /** Called when a drawer has settled in a completely closed state. */
+                /**
+                 * Called when a drawer has settled in a completely closed state.
+                 */
                 public void onDrawerClosed(View view) {
                     super.onDrawerClosed(view);
                 }
 
-                /** Called when a drawer has settled in a completely open state. */
+                /**
+                 * Called when a drawer has settled in a completely open state.
+                 */
                 public void onDrawerOpened(View drawerView) {
                     super.onDrawerOpened(drawerView);
                 }
             };
 
-            mDrawerLayout.setDrawerListener(mDrawerToggle);
+            mDrawerLayout.addDrawerListener(mDrawerToggle);
+
+            assert getSupportActionBar() != null;
 
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeButtonEnabled(true);
 
         }
 
+        assert mMenuList != null;
+
         mMenuList.setDividerHeight(0);
+
         View header = getLayoutInflater().inflate(R.layout.menu_header, null);
 
         mMenuList.addHeaderView(header);
@@ -154,6 +177,7 @@ public class StartActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> a, View arg1,
                                     int position, long id) {
+
 
                 if (id >= 0) {
                     Integer selected = mMenuAdapter.getItem((int) id).getID();
@@ -210,7 +234,6 @@ public class StartActivity extends AppCompatActivity {
                         case 99:
                             OpenOSES();
                             setDrawer(false);
-                            return;
                     }
                 }
             }
@@ -226,13 +249,16 @@ public class StartActivity extends AppCompatActivity {
 
 
         TextView menu_name = (TextView) findViewById(R.id.menu_name);
-        menu_name.setText(OSES.getSession().getVorname() + ' ' + OSES.getSession().getNachname());
+        if (menu_name != null)
+            menu_name.setText(OSES.getSession().getVorname() + ' ' + OSES.getSession().getNachname());
 
         TextView menu_est = (TextView) findViewById(R.id.menu_est);
-        menu_est.setText(OSES.getSession().getEstText());
+        if (menu_est != null)
+            menu_est.setText(OSES.getSession().getEstText());
 
         TextView menu_gb = (TextView) findViewById(R.id.menu_gb);
-        menu_gb.setText(OSES.getSession().getGBText());
+        if (menu_gb != null)
+            menu_gb.setText(OSES.getSession().getGBText());
 
 
         new CheckSession().execute();
@@ -248,17 +274,17 @@ public class StartActivity extends AppCompatActivity {
         if (getIntent().hasExtra("fragment")) {
             String startFragment = getIntent().getExtras().getString("fragment");
 
-            if (startFragment.equals("browser") && getIntent().hasExtra("type")) {
+            if (startFragment != null && startFragment.equals("browser") && getIntent().hasExtra("type")) {
                 String type = getIntent().getExtras().getString("type");
                 ChangeFragment(new BrowserFragment(), type);
-                if (type.equals("aktuell"))
+                if (type != null && type.equals("aktuell"))
                     setMenuSelection(0);
                 return;
             }
         } else if (running != null) {
             fragmentTransaction.replace(R.id.content_frame, running, running.getTag());
         } else {
-            VerwendungFragmentNew fragment = new VerwendungFragmentNew();
+            VerwendungFragment fragment = new VerwendungFragment();
             fragmentTransaction.replace(R.id.content_frame, fragment, "verwendung");
         }
 
@@ -282,6 +308,28 @@ public class StartActivity extends AppCompatActivity {
 
             @Override
             public void onException(Exception e) {
+
+                if (e instanceof FileDownload.NoDownloadPermissionException) {
+
+                    final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
+                    try {
+                        Toast.makeText(StartActivity.this, "Automatisches Update nicht möglich! Weiterleitung zum Google Play Store...", Toast.LENGTH_SHORT).show();
+                        Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.android.vending");
+                        ComponentName comp = new ComponentName("com.android.vending", "com.google.android.finsky.activities.LaunchUrlHandlerActivity"); // package name and activity
+                        launchIntent.setComponent(comp);
+                        launchIntent.setData(Uri.parse("market://details?id="+appPackageName));
+                        startActivity(launchIntent);
+                    } catch (android.content.ActivityNotFoundException anfe) {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+                    }
+
+                    Bundle extra = new Bundle();
+                    extra.putString("reason", "DOWNLOAD_PERMISSION_REFUSED");
+                    mFirebaseAnalytics.logEvent("OSES_force_update_gplay", extra);
+
+                    finish();
+
+                }
 
             }
 
@@ -389,44 +437,44 @@ public class StartActivity extends AppCompatActivity {
             mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
-    public void ChangeFragment(Fragment fragment, String ident, Bundle args) {
+    private void ChangeFragment(Fragment fragment, String ident, Bundle args) {
 
         mHandler.postDelayed(new ChangeFragmentRunnable(fragment, ident, args), 350);
 
     }
 
-    public void ChangeFragment(Fragment fragment, String ident) {
+    private void ChangeFragment(Fragment fragment, String ident) {
 
         mHandler.postDelayed(new ChangeFragmentRunnable(fragment, ident), 350);
 
     }
 
-    public void ChangeFragment(Fragment fragment, String ident, boolean AddToBackStack) {
+    private void ChangeFragment(Fragment fragment, String ident, boolean AddToBackStack) {
 
         mHandler.postDelayed(new ChangeFragmentRunnable(fragment, ident, AddToBackStack), 350);
 
     }
 
 
-    public class ChangeFragmentRunnable implements Runnable {
+    private class ChangeFragmentRunnable implements Runnable {
         private Fragment fragment;
         private String ident;
         private Bundle args;
         private boolean AddToBackStack = false;
 
-        public ChangeFragmentRunnable(Fragment fragment, String ident, Bundle args) {
+        ChangeFragmentRunnable(Fragment fragment, String ident, Bundle args) {
             this.fragment = fragment;
             this.ident = ident;
             this.args = args;
         }
 
-        public ChangeFragmentRunnable(Fragment fragment, String ident) {
+        ChangeFragmentRunnable(Fragment fragment, String ident) {
             this.fragment = fragment;
             this.ident = ident;
             this.args = null;
         }
 
-        public ChangeFragmentRunnable(Fragment fragment, String ident, boolean AddToBackStack) {
+        ChangeFragmentRunnable(Fragment fragment, String ident, boolean AddToBackStack) {
             this.fragment = fragment;
             this.ident = ident;
             this.args = null;
@@ -481,7 +529,7 @@ public class StartActivity extends AppCompatActivity {
     }
 
 
-    public void setMenuSelection(long id) {
+    private void setMenuSelection(long id) {
 
         for (int i = 0; i < mMenuAdapter.getCount(); i++) {
             mMenuAdapter.getItem(i).setSelected(false);
@@ -498,7 +546,7 @@ public class StartActivity extends AppCompatActivity {
 
     }
 
-    public int getMenuSelection() {
+    private int getMenuSelection() {
 
         for (int i = 0; i < mMenuAdapter.getCount(); i++) {
             if (mMenuAdapter.getItem(i).isSelected()) return i;
@@ -517,9 +565,27 @@ public class StartActivity extends AppCompatActivity {
         return super.onPrepareOptionsMenu(menu);
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_REQUEST_STORAGE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 ) {
+                    CurrentFileDownload.resumeAfterPermissionCallback(grantResults[0]);
+                } else {
+                    CurrentFileDownload.resumeAfterPermissionCallback(0);
+                }
 
-    public void OpenOSES() {
+            }
 
+
+        }
+    }
+
+
+    private void OpenOSES() {
+
+        mFirebaseAnalytics.logEvent("OSES_open_web", null);
         String url = "https://oses.mobi/";
         Intent i = new Intent(Intent.ACTION_VIEW);
         i.setData(Uri.parse(url));
@@ -527,7 +593,7 @@ public class StartActivity extends AppCompatActivity {
 
     }
 
-    public void DoLogout() {
+    private void DoLogout() {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Willst du dich wirklich Abmelden?")
@@ -559,7 +625,7 @@ public class StartActivity extends AppCompatActivity {
 
     }
 
-    public void DoWebpage(final String url, String title, String message, final String requestIdent) {
+    private void DoWebpage(final String url, String title, String message, final String requestIdent) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(message)
@@ -593,7 +659,7 @@ public class StartActivity extends AppCompatActivity {
                         SharedPreferences.Editor editor = settings.edit();
 
                         Calendar c = Calendar.getInstance();
-                        editor.putLong("DelayWebpage", c.getTimeInMillis() + 1 * 60 * 1000);
+                        editor.putLong("DelayWebpage", c.getTimeInMillis() +  60 * 1000);
 
                         editor.apply();
                     }
@@ -605,9 +671,11 @@ public class StartActivity extends AppCompatActivity {
 
     }
 
-    public void CloseInfo(View v) throws Exception {
+    private void CloseInfo(View v) throws Exception {
 
         final LinearLayout infobox = (LinearLayout) findViewById(R.id.infobox);
+
+        assert  infobox != null;
 
         Animation slide = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_up);
         slide.setAnimationListener(new Animation.AnimationListener() {
@@ -632,6 +700,41 @@ public class StartActivity extends AppCompatActivity {
 
     }
 
+    private boolean isNonPlayInstallAllowed() {
+
+        boolean isNonPlayAppAllowed = false;
+        try {
+            isNonPlayAppAllowed = Settings.Secure.getInt(getContentResolver(), Settings.Secure.INSTALL_NON_MARKET_APPS) == 1;
+        } catch (Settings.SettingNotFoundException e)
+        {
+            e.printStackTrace();
+        }
+
+        if (!isNonPlayAppAllowed) {
+
+            final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
+            try {
+                Toast.makeText(this, "Automatisches Update nicht möglich! Weiterleitung zum Google Play Store...", Toast.LENGTH_SHORT).show();
+                Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.android.vending");
+                ComponentName comp = new ComponentName("com.android.vending", "com.google.android.finsky.activities.LaunchUrlHandlerActivity"); // package name and activity
+                launchIntent.setComponent(comp);
+                launchIntent.setData(Uri.parse("market://details?id="+appPackageName));
+                startActivity(launchIntent);
+            } catch (android.content.ActivityNotFoundException anfe) {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+            }
+
+            Bundle extra = new Bundle();
+            extra.putString("reason", "NON_PLAY_INSTALL_REFUSED");
+            mFirebaseAnalytics.logEvent("OSES_force_update_gplay", extra);
+
+            finish();
+            return false;
+
+        } else
+            return true;
+    }
+
 
     private class CheckSession extends AsyncTask<String, Void, String> {
 
@@ -643,9 +746,11 @@ public class StartActivity extends AppCompatActivity {
             if (params.length > 0)
                 zusatz = params[0];
 
-            String url = "https://oses.mobi/api.php?request=checksession" + zusatz + "&androidversion=" + OSES.getVersionCode() + "&sdk=" + OSES.getSDKLevel() + "&sdkstring=" + OSES.getSDKString() + "&session=" + OSES.getSession().getIdentifier();
+            String url = "https://oses.mobi/api.php?request=checksession" + zusatz + "&androidversion=" + OSES.getVersionCode() + "&sdk=" + OSES.getSDKLevel() + "&sdkstring=" + OSES.getSDKString() + "&session=" + OSES.getSession().getIdentifier()+"&fcmid=" + OSES.getSession().getSessionFcmInstanceId();
 
             return OSES.getJSON(url, 60000);
+
+
         }
 
         protected void onPostExecute(String response) {
@@ -758,21 +863,28 @@ public class StartActivity extends AppCompatActivity {
                     TextView infotext = (TextView) findViewById(R.id.infotext);
                     LinearLayout infobox = (LinearLayout) findViewById(R.id.infobox);
 
-                    infotext.setText(Html.fromHtml(StatusMessage));
+                    if (infotext != null)
+                        infotext.setText(Html.fromHtml(StatusMessage));
+
                     Animation slide = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_down);
 
-                    infobox.startAnimation(slide);
-                    infobox.setVisibility(View.VISIBLE);
+                    if (infobox != null) {
+                        infobox.startAnimation(slide);
+                        infobox.setVisibility(View.VISIBLE);
+                    }
                 }
 
                 TextView menu_name = (TextView) findViewById(R.id.menu_name);
-                menu_name.setText(SessionVorname + ' ' + SessionNachname);
+                if (menu_name != null)
+                    menu_name.setText(SessionVorname + ' ' + SessionNachname);
 
                 TextView menu_est = (TextView) findViewById(R.id.menu_est);
-                menu_est.setText(SessionEstText);
+                if (menu_est != null)
+                    menu_est.setText(SessionEstText);
 
                 TextView menu_gb = (TextView) findViewById(R.id.menu_gb);
-                menu_gb.setText(SessionGBText);
+                if (menu_gb != null)
+                    menu_gb.setText(SessionGBText);
 
 
                 if (Webpage && !settings.getString("DontAskWebpage", "").equals(WebpageIdent)) {
@@ -794,6 +906,8 @@ public class StartActivity extends AppCompatActivity {
 
             if (StatusCode.equals("100")) {
 
+                mFirebaseAnalytics.logEvent("OSES_update_start", null);
+
                 AlertDialog.Builder alert = new AlertDialog.Builder(StartActivity.this);
 
                 alert.setCancelable(false);
@@ -801,14 +915,18 @@ public class StartActivity extends AppCompatActivity {
                 alert.setPositiveButton("Weiter", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        FileDownload download = new FileDownload(StartActivity.this);
-                        download.setTitle("Aktualisierung");
-                        download.setMessage("Installationsdatei wird heruntergeladen, dieser Vorgang kann einige Minuten dauern...");
-                        download.setURL("https://oses.mobi/android/" + UpdateFile);
-                        download.setLocalDirectory("install/");
-                        download.setLocalFilename("OSES.apk");
-                        download.setOnDownloadFinishedListener(onUpdateResponse);
-                        download.execute();
+
+                        if (isNonPlayInstallAllowed()) {
+
+                            FileDownload download = new FileDownload(StartActivity.this);
+                            download.setTitle("Aktualisierung");
+                            download.setMessage("Installationsdatei wird heruntergeladen, dieser Vorgang kann einige Minuten dauern...");
+                            download.setURL("https://oses.mobi/android/" + UpdateFile);
+                            download.setLocalDirectory("install/");
+                            download.setLocalFilename("OSES.apk");
+                            download.setOnDownloadFinishedListener(onUpdateResponse);
+                            download.execute();
+                        }
                     }
                 });
                 alert.setNegativeButton("Abbrechen", new DialogInterface.OnClickListener() {
@@ -1016,9 +1134,6 @@ public class StartActivity extends AppCompatActivity {
                 alert.show();
 
             }
-
-            SessionChecked = true;
-
 
         }
 

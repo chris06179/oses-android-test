@@ -1263,7 +1263,8 @@
                                 android:paddingLeft="8dp"
                                 android:paddingRight="8dp"
                                 android:singleLine="false"
-                                android:textSize="18sp" />
+                                android:textSize="18sp"
+                                android:breakStrategy="high_quality" />
 
                         </LinearLayout>
 
@@ -1337,13 +1338,6 @@
                                 android:singleLine="true"
                                 android:textSize="17sp" />
 
-                            <Spinner
-                                android:id="@+id/verwendungadd_adban"
-                                style="@style/Widget.AppCompat.Spinner.Underlined"
-                                android:layout_width="75dp"
-                                android:layout_height="match_parent"
-                                android:visibility="gone" />
-
                             <ImageButton
                                 android:id="@+id/verwendungadd_deladb"
                                 android:layout_width="30dp"
@@ -1358,20 +1352,29 @@
                         <LinearLayout
                             android:id="@+id/LinearLayout23"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
 
                             <EditText
                                 android:id="@+id/verwendungadd_dbr"
-                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="120dp"
-                                android:layout_weight="1"
                                 android:hint="@string/begrundung"
                                 android:inputType="textMultiLine"
                                 android:paddingLeft="8dp"
                                 android:paddingRight="8dp"
                                 android:textSize="18sp"
-                                android:visibility="gone" />
+                                android:visibility="gone"
+                                android:layout_width="match_parent"
+                                android:breakStrategy="high_quality" />
+
+                            <Spinner
+                                android:id="@+id/verwendungadd_adban"
+                                style="@style/Widget.AppCompat.Spinner.Underlined"
+                                android:layout_height="wrap_content"
+                                android:visibility="gone"
+                                android:layout_marginLeft="120dp"
+                                android:layout_width="match_parent" />
                         </LinearLayout>
 
                         <LinearLayout
@@ -1402,13 +1405,6 @@
                                 android:singleLine="true"
                                 android:textSize="17sp" />
 
-                            <Spinner
-                                android:id="@+id/verwendungadd_adean"
-                                style="@style/Widget.AppCompat.Spinner.Underlined"
-                                android:layout_width="75dp"
-                                android:layout_height="match_parent"
-                                android:visibility="gone" />
-
                             <ImageButton
                                 android:id="@+id/verwendungadd_delade"
                                 android:layout_width="30dp"
@@ -1423,20 +1419,29 @@
                         <LinearLayout
                             android:id="@+id/LinearLayout25"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
 
                             <EditText
                                 android:id="@+id/verwendungadd_der"
-                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="120dp"
-                                android:layout_weight="1"
                                 android:hint="@string/begrundung"
                                 android:inputType="textMultiLine"
                                 android:paddingLeft="8dp"
                                 android:paddingRight="8dp"
                                 android:textSize="18sp"
-                                android:visibility="gone" />
+                                android:visibility="gone"
+                                android:layout_width="match_parent"
+                                android:breakStrategy="high_quality" />
+
+                            <Spinner
+                                android:id="@+id/verwendungadd_adean"
+                                style="@style/Widget.AppCompat.Spinner.Underlined"
+                                android:layout_height="wrap_content"
+                                android:visibility="gone"
+                                android:layout_width="match_parent"
+                                android:layout_marginLeft="120dp" />
                         </LinearLayout>
 
                         <LinearLayout
@@ -1490,7 +1495,8 @@
                                 android:paddingLeft="8dp"
                                 android:paddingRight="8dp"
                                 android:textSize="18sp"
-                                android:visibility="gone" />
+                                android:visibility="gone"
+                                android:breakStrategy="high_quality" />
                         </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>

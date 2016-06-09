@@ -6,6 +6,8 @@
     <color name="kat">#fff3f3f3</color>
     <color name="kat_pressed">#ffeeeeee</color>
 
+    <color name="background">#fff1f1f1</color>
+
     <color name="mdtp_accent_color">@color/oses_green</color>
     <color name="mdtp_accent_color_dark">@color/oses_green_dark</color>
 </resources>

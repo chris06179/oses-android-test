@@ -28,16 +28,13 @@
             android:id="@+id/ScrollView1"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/oses_start_toolbar"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
             android:fillViewport="false"
             android:nestedScrollingEnabled="false">
 
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:gravity="center_horizontal">
 
                 <LinearLayout
@@ -48,29 +45,76 @@
                     android:id="@+id/login_container"
                     android:gravity="center_vertical|center_horizontal">
 
+                    <ImageView
+                        android:id="@+id/imageView1"
+                        android:layout_height="140dp"
+                        android:src="@drawable/oses"
+                        android:maxWidth="400dp"
+                        android:visibility="visible"
+                        android:scaleType="fitCenter"
+                        android:paddingLeft="8dp"
+                        android:paddingRight="8dp"
+                        android:paddingBottom="6dp"
+                        android:paddingTop="4dp"
+                        android:layout_width="match_parent"
+                        android:adjustViewBounds="false" />
+
+
                     <android.support.v7.widget.CardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:id="@+id/view2"
-                        android:elevation="2dp"
-                        card_view:cardUseCompatPadding="true">
+                        card_view:cardUseCompatPadding="true"
+                        android:visibility="gone">
 
-                        <ImageView
-                            android:id="@+id/imageView1"
+                        <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="120dp"
-                            android:src="@drawable/oseslogo"
-                            android:maxWidth="400dp"
-                            android:visibility="visible"
-                            android:scaleType="centerInside"
-                            android:paddingLeft="8dp"
-                            android:paddingRight="8dp"
-                            android:paddingBottom="6dp"
-                            android:paddingTop="4dp"
-                            android:adjustViewBounds="true" />
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:baselineAligned="false">
+
+                            <TextView
+                                android:text="Steiner Media Online Schichterfassungssystem"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/textView50"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                                android:theme="@style/Theme.OSES.ListSeparator"
+                                android:paddingTop="5dp"
+                                android:paddingLeft="10dp"
+                                android:paddingRight="10dp"
+                                android:background="#f5f5f5"
+                                android:textSize="16sp" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="#cacaca"
+                                android:id="@+id/linearlayout1234"
+                                android:layout_weight="1"
+                                android:orientation="horizontal">
+
+                            </LinearLayout>
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/textView49"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                                android:paddingTop="5dp"
+                                android:paddingLeft="10dp"
+                                android:paddingRight="10dp"
+                                android:paddingBottom="5dp"
+                                android:textSize="15sp"
+                                android:text="Zum Nutzen dieser Anwendung ist eine Anmeldung erforderlich!" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/textView51" />
+
+                        </LinearLayout>
 
                     </android.support.v7.widget.CardView>
-
 
                     <android.support.v7.widget.CardView
                         android:layout_width="wrap_content"
@@ -95,7 +139,8 @@
                                 android:layout_height="match_parent"
                                 android:gravity="left|center_horizontal"
                                 android:text="Anmeldeinformationen"
-                                style="@style/Theme.OSES.ListSeparator" />
+                                style="@style/Theme.OSES.ListSeparator"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
                             <EditText
                                 android:id="@+id/username"
@@ -124,31 +169,115 @@
                                 android:minWidth="400dp"
                                 android:imeOptions="actionDone"/>
 
-                            <Button
-                                android:id="@+id/button1"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="15dp"
-                                android:onClick="Login"
-                                android:text="@string/anmelden"
-                                android:maxWidth="400dp"
-                                android:minWidth="400dp" />
-
-                            <TextView
-                                android:id="@+id/TextView01"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="20dp"
-                                android:drawableLeft="@drawable/icon_lock"
-                                android:drawablePadding="5dp"
-                                android:gravity="center_vertical"
-                                android:text="@string/verschlsslte_ubertragung"
-                                android:textAppearance="?android:attr/textAppearanceMedium" />
                         </LinearLayout>
 
 
                         </android.support.v7.widget.CardView>
 
+
+                    <Button
+                        android:id="@+id/button1"
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:layout_marginTop="5dp"
+                        android:onClick="Login"
+                        android:text="@string/anmelden"
+                        android:maxWidth="400dp"
+                        android:minWidth="400dp"
+                        android:textColor="#ffffff"
+                        android:textSize="16sp"
+                        android:layout_marginBottom="5dp" />
+
+
+                    <android.support.v7.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        card_view:cardUseCompatPadding="true">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:baselineAligned="false">
+
+                            <TextView
+                                android:text="Menü"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/textView789"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                                android:theme="@style/Theme.OSES.ListSeparator"
+                                android:paddingTop="5dp"
+                                android:paddingLeft="10dp"
+                                android:paddingRight="10dp"
+                                android:background="#f5f5f5"
+                                android:textSize="16sp" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="#cacaca"
+                                android:baselineAligned="false">
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical">
+
+                                <Button
+                                    android:text="Was ist das hier?"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:id="@+id/login_about"
+                                    android:layout_weight="1"
+                                    style="@style/Widget.AppCompat.Button.Borderless"
+                                    android:textColor="?attr/colorPrimary"
+                                    android:drawableLeft="@drawable/ic_action_help" />
+
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="1dp"
+                                    android:background="#cacaca"
+                                    android:baselineAligned="false">
+
+                                </LinearLayout>
+
+                                <Button
+                                    android:text="Registrierung"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:id="@+id/login_registrierung"
+                                    android:layout_weight="1"
+                                    style="@style/Widget.AppCompat.Button.Borderless"
+                                    android:textColor="?attr/colorPrimary"
+                                    android:drawableLeft="@drawable/ic_action_person" />
+
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="1dp"
+                                    android:background="#cacaca"
+                                    android:baselineAligned="false">
+
+                                </LinearLayout>
+
+                                <Button
+                                    android:text="Zugangsdaten vergessen"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:id="@+id/login_lost_pass"
+                                    android:layout_weight="1"
+                                    style="@style/Widget.AppCompat.Button.Borderless"
+                                    android:textColor="?attr/colorPrimary"
+                                    android:drawableLeft="@drawable/ic_action_accounts" />
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </android.support.v7.widget.CardView>
 
                     <TextView
                         android:id="@+id/textView4"
@@ -157,7 +286,8 @@
                         android:layout_marginTop="15dp"
                         android:gravity="center_horizontal"
                         android:text="@string/start_ver_info"
-                        android:textAppearance="?android:attr/textAppearanceMedium" />
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:layout_marginBottom="15dp" />
                 </LinearLayout>
             </LinearLayout>
         </ScrollView>

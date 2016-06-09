@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "246201402657",
+    "firebase_url": "https://stm-oses.firebaseio.com",
+    "project_id": "stm-oses",
+    "storage_bucket": "stm-oses.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:246201402657:android:66d2c16727bd0a5d",
+        "android_client_info": {
+          "package_name": "de.stm.oses"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "246201402657.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD9RPQr4PZ3SdqoOp0CqaU7mfnrjTsxoVw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

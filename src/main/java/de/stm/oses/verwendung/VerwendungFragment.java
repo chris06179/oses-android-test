@@ -30,6 +30,8 @@ import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -55,6 +57,8 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
     private boolean first = true;
     private OSESBase OSES;
 
+    private FirebaseAnalytics mFirebaseAnalytics;
+
     private BroadcastReceiver receiver;
 
     public VerwendungFragment() {
@@ -69,6 +73,10 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
 
             final int lid = msg.arg2;
             int StatusCode = msg.arg1;
+
+            Bundle extra = new Bundle();
+            extra.putString("status", String.valueOf(StatusCode));
+            mFirebaseAnalytics.logEvent("OSES_verwendung_delete", extra);
 
             if (StatusCode == 200) {
 
@@ -206,6 +214,9 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         OSES = new OSESBase(getActivity());
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getActivity());
+
         setHasOptionsMenu(true);
         setRetainInstance(true);
 

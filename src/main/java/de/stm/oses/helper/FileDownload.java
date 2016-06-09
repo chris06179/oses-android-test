@@ -1,13 +1,17 @@
 package de.stm.oses.helper;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.webkit.URLUtil;
 
@@ -31,8 +35,11 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import de.stm.oses.StartActivity;
+
 public class FileDownload extends AsyncTask<String, Integer, Object> {
 
+    private static final int PERMISSION_REQUEST_STORAGE = 5500;
     private ProgressDialog mProgressDialog;
     private Context context;
     private String title = "";
@@ -42,7 +49,29 @@ public class FileDownload extends AsyncTask<String, Integer, Object> {
     private String localFilename;
     private boolean isCancelable = false;
     private boolean isCanceld = false;
+    private boolean waitForPermissionResponse = false;
     private OnDownloadFinishedListener mListener;
+    private boolean resumeRequested;
+    private int permissionReponse;
+
+    public class NoDownloadPermissionException extends Exception {
+
+        public NoDownloadPermissionException() {
+        }
+
+        public NoDownloadPermissionException(String detailMessage) {
+            super(detailMessage);
+        }
+
+        public NoDownloadPermissionException(String detailMessage, Throwable throwable) {
+            super(detailMessage, throwable);
+        }
+
+        public NoDownloadPermissionException(Throwable throwable) {
+            super(throwable);
+        }
+
+    }
 
     public interface OnDownloadFinishedListener {
         void onDownloadFinished(File file);
@@ -85,7 +114,27 @@ public class FileDownload extends AsyncTask<String, Integer, Object> {
         this.isCancelable = isCancelable;
     }
 
+    public void resumeAfterPermissionCallback(int grantResult) {
+        this.resumeRequested = true;
+        this.permissionReponse = grantResult;
+    }
+
     protected void onPreExecute() {
+
+        ((StartActivity) context).CurrentFileDownload = this;
+
+        if (ContextCompat.checkSelfPermission(context,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions((AppCompatActivity) context,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    PERMISSION_REQUEST_STORAGE);
+
+            waitForPermissionResponse = true;
+
+        }
+
 
         ((AppCompatActivity) context).setRequestedOrientation(context.getResources().getConfiguration().orientation);
         mProgressDialog = new ProgressDialog(context);
@@ -117,6 +166,21 @@ public class FileDownload extends AsyncTask<String, Integer, Object> {
 
     protected Object doInBackground(String... sUrl) {
 
+        try {  // Warte auf Berechtigung
+            while (waitForPermissionResponse) {
+                Thread.sleep(500);
+
+                if (resumeRequested) {   // Fortsetzen durch Activity angefordert
+                    if (permissionReponse == PackageManager.PERMISSION_GRANTED)
+                        break; // Fortsetzen
+                    else
+                        return new NoDownloadPermissionException(); // Abbrechen
+                }
+            }
+        } catch (InterruptedException e) {
+            return e; // Fehler auffangen und weitergeben
+        }
+
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         boolean useDev = settings.getBoolean("debugUseDevServer", false);
 
@@ -141,35 +205,6 @@ public class FileDownload extends AsyncTask<String, Integer, Object> {
                         return new PasswordAuthentication(devUser, devPass.toCharArray());
                     }
                 });
-
-                TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
-                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                        return null;
-                    }
-
-                    public void checkClientTrusted(X509Certificate[] certs, String authType) {
-                    }
-
-                    public void checkServerTrusted(X509Certificate[] certs, String authType) {
-                    }
-                }
-                };
-
-                // Install the all-trusting trust manager
-                SSLContext sc = SSLContext.getInstance("SSL");
-                sc.init(null, trustAllCerts, new java.security.SecureRandom());
-                connection.setSSLSocketFactory(sc.getSocketFactory());
-
-                // Create all-trusting host name verifier
-                HostnameVerifier validHosts = new HostnameVerifier() {
-                    public boolean verify(String hostname, SSLSession session) {
-                        return (hostname.equals("dev.oses.mobi"));
-
-                    }
-                };
-
-                connection.setHostnameVerifier(validHosts);
-
             }
 
             connection.setUseCaches(false);
@@ -225,7 +260,7 @@ public class FileDownload extends AsyncTask<String, Integer, Object> {
                         total += count;
                         publishProgress((int) total / 1024);
                         output.write(data, 0, count);
-                        if (isCanceld) {
+                        if (isCancelled()) {
                             connection.disconnect();
                             return null;
                         }

@@ -30,6 +30,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
 import org.json.JSONArray;
@@ -62,6 +63,8 @@ public class DokumenteFragment extends Fragment implements View.OnClickListener 
     private Spinner type;
     private Spinner exclude;
 
+    private FirebaseAnalytics mFirebaseAnalytics;
+
     public DokumenteFragment() {
         // Required empty public constructor
     }
@@ -74,6 +77,8 @@ public class DokumenteFragment extends Fragment implements View.OnClickListener 
 
         OSES = new OSESBase(getActivity());
         selectedDate = Calendar.getInstance();
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getActivity());
 
     }
 
@@ -192,7 +197,7 @@ public class DokumenteFragment extends Fragment implements View.OnClickListener 
 
         EditText Excludes = (EditText) getActivity().findViewById(R.id.editText1);
 
-        String typ = "";
+        final String typ;
         String zeitraum;
         Integer monat;
         Integer jahr;
@@ -217,6 +222,8 @@ public class DokumenteFragment extends Fragment implements View.OnClickListener 
             case 2:
                 typ = "steuer";
                 break;
+            default:
+                typ = "";
         }
 
         if (exclude.getSelectedItemPosition() == 1) {
@@ -239,6 +246,12 @@ public class DokumenteFragment extends Fragment implements View.OnClickListener 
             download.setOnDownloadFinishedListener(new OnDownloadFinishedListener() {
                 @Override
                 public void onDownloadFinished(File file) {
+
+                    Bundle extra = new Bundle();
+                    extra.putString("typ", typ);
+                    extra.putString("status", "200");
+                    mFirebaseAnalytics.logEvent("OSES_download_doc", extra);
+
                     Intent intent = new Intent(Intent.ACTION_VIEW);
                     intent.setDataAndType(Uri.fromFile(file), "application/pdf");
                     startActivity(intent);
@@ -260,6 +273,11 @@ public class DokumenteFragment extends Fragment implements View.OnClickListener 
 
                         if (json.has("StatusExtra1"))
                             sStatusExtra1 = json.getString("StatusExtra1");
+
+                        Bundle extra = new Bundle();
+                        extra.putString("typ", typ);
+                        extra.putString("status", String.valueOf(iStatus));
+                        mFirebaseAnalytics.logEvent("OSES_download_doc", extra);
 
 
                         switch (iStatus) {
@@ -309,11 +327,23 @@ public class DokumenteFragment extends Fragment implements View.OnClickListener 
 
                 @Override
                 public void onException(Exception e) {
+
+                    Bundle extra = new Bundle();
+                    extra.putString("typ", typ);
+                    extra.putString("status", "EXCEPTION");
+                    mFirebaseAnalytics.logEvent("OSES_download_doc", extra);
+
                     Toast.makeText(getActivity(), "Anwendungsfehler: " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
                 }
 
                 @Override
                 public void onUnknownStatus(int status) {
+
+                    Bundle extra = new Bundle();
+                    extra.putString("typ", typ);
+                    extra.putString("status", String.valueOf(status));
+                    mFirebaseAnalytics.logEvent("OSES_download_doc", extra);
+
                     Toast.makeText(getActivity(), "Anwendungsfehler: Der Server hat mit einem unbekannten Statuscode geantwortet! (" + String.valueOf(status) + ")", Toast.LENGTH_LONG).show();
                 }
             });

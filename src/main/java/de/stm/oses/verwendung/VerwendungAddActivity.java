@@ -41,6 +41,7 @@ import android.widget.ToggleButton;
 
 import com.codetroopers.betterpickers.timepicker.TimePickerBuilder;
 import com.codetroopers.betterpickers.timepicker.TimePickerDialogFragment;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
@@ -80,6 +81,7 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
     private boolean increaseDate = true;
 
     private VerwendungAddHolder vAdd;
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     static class VerwendungAddHolder {
 
@@ -262,8 +264,9 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.verwendungaddn);
 
-        OSES = new OSESBase(VerwendungAddActivity.this);
-        vAdd = new VerwendungAddHolder(VerwendungAddActivity.this);
+        OSES = new OSESBase(this);
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        vAdd = new VerwendungAddHolder(this);
 
         setSupportActionBar(vAdd.toolbar);
         assert getSupportActionBar() != null;
@@ -1209,12 +1212,13 @@ private class SucheSchicht extends AsyncTask<Void, Void, String> {
 				else
 					schichtname = schicht.getString("schicht")+" Fpl/N/"+schicht.getString("fpla");
 
-                String kommentar = schicht.getString("kommentar");
+                String kommentar = "";
 
-                if (!kommentar.isEmpty())
-                    kommentar = kommentar + "\r\n";
+                if (!schicht.isNull("kommentar")) {
+                    kommentar =   schicht.getString("kommentar") + "\r\n";
+                }
 				
-				split[i] = "\r\n"+schicht.getString("funktion")+": "+schichtname+"\r\n"+schicht.getString("ort")+"\r\n"+schicht.getString("db").substring(0, 5)+" - "+schicht.getString("de").substring(0, 5)+"  |  Pause: "+schicht.getString("pause")+" Min\r\n"+kommentar;
+				split[i] = "\r\n" + schicht.getString("funktion")+": "+schichtname+"\r\n"+schicht.getString("ort")+"\r\n"+schicht.getString("db").substring(0, 5)+" - "+schicht.getString("de").substring(0, 5)+"  |  Pause: "+schicht.getString("pause")+" Min"+ "\r\n" + kommentar;
 			}
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(VerwendungAddActivity.this);
@@ -1267,8 +1271,10 @@ private class SucheSchicht extends AsyncTask<Void, Void, String> {
 			    }
 			});
 			AlertDialog alert = builder.create();
-			
+            alert.getListView().setDivider(new ColorDrawable(Color.parseColor("#cacaca")));
+            alert.getListView().setDividerHeight(1);
 			alert.show();
+
 			
 		}
 			
@@ -1423,6 +1429,10 @@ private class SaveVerwendung extends AsyncTask<Void, Void, String> {
 		} catch (Exception e) {
 	     e.getStackTrace();
 		}
+
+        Bundle extra = new Bundle();
+        extra.putString("status", Status);
+        mFirebaseAnalytics.logEvent("OSES_verwendung_save", extra);
 		
 		if (Status.equals("200")) {
 
@@ -1592,7 +1602,7 @@ private class SaveVerwendung extends AsyncTask<Void, Void, String> {
 
             TimePickerDialog tpd = TimePickerDialog.newInstance(new TimePickerDialog.OnTimeSetListener() {
                 @Override
-                public void onTimeSet(RadialPickerLayout radialPickerLayout, int hour, int minute) {
+                public void onTimeSet(RadialPickerLayout radialPickerLayout, int hour, int minute, int seconds) {
                     Zeit.setText(pad(hour) + ":" + pad(minute));
                     Zeit.setError(null);
                 }

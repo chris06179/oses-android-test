@@ -1,187 +1,89 @@
 package de.stm.oses;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings.Secure;
+import android.support.customtabs.CustomTabsIntent;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
 import de.stm.oses.helper.OSESBase;
 
-public class OSESActivity extends AppCompatActivity {
+public class OSESActivity extends AppCompatActivity implements View.OnClickListener {
 	
-	private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
-	
-    public static final String PROPERTY_REG_ID = "registration_id";
-    private static final String PROPERTY_APP_VERSION = "appVersion";
-	
-	String TAG = "OSES Push";
-    String regid;
-    String SENDER_ID = "246201402657";
-    GoogleCloudMessaging gcm;
     private OSESBase OSES;
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
 
         OSES = new OSESBase(OSESActivity.this);
 
+        // Obtain the FirebaseAnalytics instance.
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
 
         if (!OSES.getSession().getIdentifier().equals("")) {
             Intent intent = new Intent(OSESActivity.this,StartActivity.class);
             startActivity(intent);
-            OSESActivity.this.finish();
+            finish();
         }
-
-        setContentView(R.layout.main);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.oses_start_toolbar);
         setSupportActionBar(toolbar);
-        
-        getSupportActionBar().setTitle("Anmeldung");
-        
-        if (checkPlayServices()) {
-            gcm = GoogleCloudMessaging.getInstance(this);
-            regid = getRegistrationId(getApplicationContext());
 
-            if (regid.equals("")) {
-                registerInBackground();
-            }
-        } else {
-            Log.i(TAG, "No valid Google Play Services APK found.");
+        if (getSupportActionBar() != null) {
+
+            getSupportActionBar().setTitle("Anmeldung");
+
         }
+
                 
         TextView copyright = (TextView)findViewById(R.id.textView4);
 
         Calendar c = Calendar.getInstance();
         int year = c.get(Calendar.YEAR);
-        
-        copyright.setText("© "+String.valueOf(year)+" Steiner Media - v "+OSES.getVersion());
-        
 
-    }
-    
-    private String getRegistrationId(Context context) {
-        final SharedPreferences prefs = getGCMPreferences(context);
-        String registrationId = prefs.getString(PROPERTY_REG_ID, "");
-        if (registrationId.isEmpty()) {
-            Log.i(TAG, "Registration not found.");
-            return "";
-        }
-        // Check if app was updated; if so, it must clear the registration ID
-        // since the existing regID is not guaranteed to work with the new
-        // app version.
-        int registeredVersion = prefs.getInt(PROPERTY_APP_VERSION, Integer.MIN_VALUE);
-        int currentVersion = getAppVersion(context);
-        if (registeredVersion != currentVersion) {
-            Log.i(TAG, "App version changed.");
-            return "";
-        }
-        return registrationId;
-    }
-    
-    private SharedPreferences getGCMPreferences(Context context) {
-        // This sample app persists the registration ID in shared preferences, but
-        // how you store the regID in your app is up to you.
-        return getSharedPreferences(OSESActivity.class.getSimpleName(),
-                Context.MODE_PRIVATE);
-    }
-    
-    private static int getAppVersion(Context context) {
-        try {
-            PackageInfo packageInfo = context.getPackageManager()
-                    .getPackageInfo(context.getPackageName(), 0);
-            return packageInfo.versionCode;
-        } catch (NameNotFoundException e) {
-            // should never happen
-            throw new RuntimeException("Could not get package name: " + e);
-        }
-    }
-    
-    private void registerInBackground() {
-    	new AsyncTask<Void,Void,String>() {   		
-    	    @Override
-    	    protected String doInBackground(Void... params) {
-                String msg;
-                try {
-                    if (gcm == null) {
-                        gcm = GoogleCloudMessaging.getInstance(getApplicationContext());
-                    }
-                    regid = gcm.register(SENDER_ID);
-                    msg = "Device registered, registration ID=" + regid;
-                    
-                    storeRegistrationId(getApplicationContext(), regid);
-                } catch (IOException ex) {
-                    msg = "Error :" + ex.getMessage();
-                    // If there is an error, don't just keep trying to register.
-                    // Require the user to click a button again, or perform
-                    // exponential back-off.
-                }
-                return msg;
-            }
+        if (copyright != null)
+            copyright.setText("© "+String.valueOf(year)+" Steiner Media - v "+OSES.getVersion());
 
+        Button button_about = (Button) findViewById(R.id.login_about);
+        Button button_lost_pass = (Button) findViewById(R.id.login_lost_pass);
+        Button button_registrierung = (Button) findViewById(R.id.login_registrierung);
 
-    	    @Override
-            protected void onPostExecute(String msg) {
-    	    	Log.i(TAG, "GCM: "+msg);
-            }
-            
-        }.execute(null, null, null);
-        
-    }
-    
-    private void storeRegistrationId(Context context, String regId) {
-        final SharedPreferences prefs = getGCMPreferences(context);
-        int appVersion = getAppVersion(context);
-        Log.i(TAG, "Saving regId on app version " + appVersion);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(PROPERTY_REG_ID, regId);
-        editor.putInt(PROPERTY_APP_VERSION, appVersion);
-        editor.apply();
-    }
-    
-    private boolean checkPlayServices() {
-        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-        if (resultCode != ConnectionResult.SUCCESS) {
-            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-                GooglePlayServicesUtil.getErrorDialog(resultCode, this,
-                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
-            } else {
-                Log.i(TAG, "This device is not supported.");
-                finish();
-            }
-            return false;
-        }
-        return true;
+        if (button_about != null)
+            button_about.setOnClickListener(this);
+
+        if (button_lost_pass != null)
+            button_lost_pass.setOnClickListener(this);
+
+        if (button_registrierung != null)
+            button_registrierung.setOnClickListener(this);
+
     }
 
     @Override
@@ -196,17 +98,8 @@ public class OSESActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle presses on the action bar items
         switch (item.getItemId()) {
-            case R.id.action_login_lostpass:
-                VergessenOnClick();
-                return true;
             case R.id.action_login_imprint:
                 ImprintOnClick();
-                return true;
-            case R.id.action_login_was_ist_das:
-                AboutOnClick();
-                return true;
-            case R.id.action_login_register:
-                RegisterOnClick();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -218,78 +111,113 @@ public class OSESActivity extends AppCompatActivity {
     	boolean stop = false;    	
     	
     	EditText username = (EditText)findViewById(R.id.username);
-		EditText password = (EditText)findViewById(R.id.password);		
-		
-		username.clearFocus();
-		password.clearFocus();
-		
-		if (username.getText().toString().length() == 0) {
-			username.setError("Benutzername darf nicht leer sein");
-			stop = true;
-		}
-		
-		if (password.getText().toString().length() == 0) {
-			password.setError("Passwort darf nicht leer sein");
-			stop = true;	
-		}		
-		
-		if (stop)
-		 return;
-			
-    	new DoLogin().execute(); 
+		EditText password = (EditText)findViewById(R.id.password);
+
+        if (username != null && password != null) {
+
+            username.clearFocus();
+            password.clearFocus();
+
+            if (username.getText().toString().length() == 0) {
+                username.setError("Benutzername darf nicht leer sein");
+                stop = true;
+            }
+
+            if (password.getText().toString().length() == 0) {
+                password.setError("Passwort darf nicht leer sein");
+                stop = true;
+            }
+
+            if (stop)
+                return;
+
+            new DoLogin().execute();
+        }
    	    
     }
 
 
-    public void VergessenOnClick() {
+    private void VergessenOnClick() {
 
         String url = "https://oses.mobi/index.php?action=acclost";
-        Intent i = new Intent(Intent.ACTION_VIEW);
-        i.setData(Uri.parse(url));
-        startActivity(i);
+        CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+        builder.setToolbarColor(ContextCompat.getColor(OSESActivity.this, R.color.oses_green));
+        CustomTabsIntent customTabsIntent = builder.build();
+        customTabsIntent.launchUrl(this, Uri.parse(url));
 
     }
 
-    public void RegisterOnClick() {
+    private void RegisterOnClick() {
 
         String url = "https://oses.mobi/index.php?action=register";
-        Intent i = new Intent(Intent.ACTION_VIEW);
-        i.setData(Uri.parse(url));
-        startActivity(i);
+        CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+        builder.setToolbarColor(ContextCompat.getColor(OSESActivity.this, R.color.oses_green));
+        CustomTabsIntent customTabsIntent = builder.build();
+        customTabsIntent.launchUrl(this, Uri.parse(url));
 
     }
 
-    public void ImprintOnClick() {
+    private void ImprintOnClick() {
 
         String url = "https://oses.mobi/index.php?action=imprint";
-        Intent i = new Intent(Intent.ACTION_VIEW);
-        i.setData(Uri.parse(url));
-        startActivity(i);
+        CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+        builder.setToolbarColor(ContextCompat.getColor(OSESActivity.this, R.color.oses_green));
+        CustomTabsIntent customTabsIntent = builder.build();
+        customTabsIntent.launchUrl(this, Uri.parse(url));
 
     }
 
-    public void AboutOnClick() {
+    private void AboutOnClick() {
 
         String url = "https://oses.mobi/index.php?action=about";
-        Intent i = new Intent(Intent.ACTION_VIEW);
-        i.setData(Uri.parse(url));
-        startActivity(i);
+        CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+        builder.setToolbarColor(ContextCompat.getColor(OSESActivity.this, R.color.oses_green));
+        CustomTabsIntent customTabsIntent = builder.build();
+        customTabsIntent.launchUrl(this, Uri.parse(url));
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.login_registrierung:
+                RegisterOnClick();
+                break;
+            case R.id.login_lost_pass:
+                VergessenOnClick();
+                break;
+            case R.id.login_about:
+                AboutOnClick();
+                break;
+        }
 
     }
-    
+
     private class DoLogin extends AsyncTask<Void, Void, String> {
     	
     	private ProgressDialog dialog;
-		private EditText username = (EditText)findViewById(R.id.username);
-		private EditText password = (EditText)findViewById(R.id.password);
+		private String username = "";
+		private String password = "";
 
 
     	protected void onPreExecute() {
+
+            mFirebaseAnalytics.logEvent("OSES_login_start", null);
     		
     		dialog = ProgressDialog.show(OSESActivity.this, "Bitte warten...", 
                     "", true);
     		dialog.setMessage("Anmeldung wird ausgeführt...");
-    		
+
+            EditText username = (EditText)findViewById(R.id.username);
+            EditText password = (EditText)findViewById(R.id.password);
+
+            if (username != null && password != null) {
+
+                this.username = username.getText().toString();
+                this.password = password.getText().toString();
+
+            }
+
+
         }
     	
     	protected String doInBackground(Void... params) {
@@ -297,14 +225,13 @@ public class OSESActivity extends AppCompatActivity {
             String android_id = Secure.getString(getBaseContext().getContentResolver(),
                     Secure.ANDROID_ID);
 
-
             Map<String, String> postdata = new HashMap<>();
 
-                postdata.put("username", username.getText().toString());
-                postdata.put("password", password.getText().toString());
+                postdata.put("username", username);
+                postdata.put("password", password);
                 postdata.put("device", android_id);
                 postdata.put("model", android.os.Build.MODEL+"|"+android.os.Build.PRODUCT);
-                postdata.put("gcm_regid", regid);
+                postdata.put("gcm_regid", OSES.getSession().getSessionFcmInstanceId());
                 postdata.put("androidversion", String.valueOf(OSES.getVersionCode()));
 
             return OSES.getJSON("https://oses.mobi/api.php?request=login", postdata, 60000);
@@ -338,11 +265,15 @@ public class OSESActivity extends AppCompatActivity {
 			}
     		
     		if (!StatusCode.equals("200")) {
+
+                mFirebaseAnalytics.logEvent("OSES_login_failed", null);
     			
     			Toast.makeText(OSESActivity.this, "Anmeldung fehlgeschlagen! Benutzername oder Passwort ist nicht korrekt!", Toast.LENGTH_LONG).show();
 
 
-    		}  else {   				
+    		}  else {
+
+                mFirebaseAnalytics.logEvent("OSES_login_ok", null);
     			
     			// We need an Editor object to make preference changes.
     		    // All objects are from android.context.Context
@@ -352,13 +283,12 @@ public class OSESActivity extends AppCompatActivity {
     			editor.putString("SessionIdentifier", SessionIdentifier);
 
     			// Commit the edits!
-    		    editor.commit();
+    		    editor.apply();
     		    
     		    Intent intent = new Intent(OSESActivity.this,StartActivity.class);
-    			startActivity(intent);    			
+    			startActivity(intent);
     			    			
-    			OSESActivity.this.finish();
-
+    			finish();
     			
     		}
             

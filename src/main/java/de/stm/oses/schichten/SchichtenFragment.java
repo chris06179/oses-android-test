@@ -23,6 +23,8 @@ import android.view.animation.Transformation;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -47,6 +49,8 @@ public class SchichtenFragment extends SwipeRefreshListFragment implements Actio
     private int selectedGB = 0;
 
     private OSESBase OSES;
+
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     private static final int MOVE_DURATION = 150;
 
@@ -127,12 +131,17 @@ public class SchichtenFragment extends SwipeRefreshListFragment implements Actio
         }
     }
 
+
     Handler DeleteHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
 
             final int lid = msg.arg2;
             int StatusCode = msg.arg1;
+
+            Bundle extra = new Bundle();
+            extra.putString("status", String.valueOf(StatusCode));
+            mFirebaseAnalytics.logEvent("OSES_schicht_delete", extra);
 
             if (StatusCode == 200) {
 
@@ -267,6 +276,8 @@ public class SchichtenFragment extends SwipeRefreshListFragment implements Actio
         setRetainInstance(true);
 
         OSES = new OSESBase(getActivity().getApplicationContext());
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getActivity());
 
         selectedEst = OSES.getSession().getEst();
         selectedFunktion = Integer.parseInt(Integer.toString(OSES.getSession().getFunktion()).substring(0, 1));

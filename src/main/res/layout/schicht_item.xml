@@ -33,11 +33,11 @@
 
             <RelativeLayout
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_toRightOf="@+id/schicht_schicht"
-                android:padding="5dp"
                 android:background="@drawable/verwendung_item_light"
-                android:id="@+id/relativeLayout">
+                android:id="@+id/relativeLayout"
+                android:padding="5dp">
 
                 <TextView
                     android:id="@+id/schicht_von"

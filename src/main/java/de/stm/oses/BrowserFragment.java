@@ -16,6 +16,8 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 import de.stm.oses.helper.OSESBase;
 
 
@@ -27,8 +29,9 @@ public class BrowserFragment extends Fragment {
     public int errorCode = 0;
     SwipeRefreshLayout mRefreshLayout;
     private ViewTreeObserver.OnScrollChangedListener mOnScrollChangedListener;
-	
-	public BrowserFragment() {
+    private FirebaseAnalytics mFirebaseAnalytics;
+
+    public BrowserFragment() {
 		// Required empty public constructor
 	}
 
@@ -81,6 +84,8 @@ public class BrowserFragment extends Fragment {
         setRetainInstance(true);
 
         OSES = new OSESBase(getActivity());
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getActivity());
     }
 	
 	@Override
@@ -114,6 +119,10 @@ public class BrowserFragment extends Fragment {
 
         if (request.equals("anb"))
             ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Nutzungsbedingungen");
+
+        Bundle extra = new Bundle();
+        extra.putString("request", request);
+        mFirebaseAnalytics.logEvent("OSES_view_webpage", extra);
         
      // WebView definieren
         engine = (WebView) getActivity().findViewById(R.id.browser_view);

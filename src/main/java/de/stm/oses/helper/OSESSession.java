@@ -3,6 +3,9 @@ package de.stm.oses.helper;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
+
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import de.stm.oses.R;
 
@@ -22,17 +25,17 @@ public class OSESSession {
     private String SessionAufArt = "auto";
     private int SessionAufDb = 3;
     private int SessionAufDe = 0;
+    private String SessionFcmInstanceId = "";
 
     private SharedPreferences preferences;
 
-    public OSESSession(Context context) {
+    OSESSession(Context context) {
         this.context = context;
 
         PreferenceManager.setDefaultValues(context, R.xml.preferences, true);
-
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
-        SharedPreferences settings = context.getSharedPreferences("OSESPrefs", 0);
+        SharedPreferences settings = context.getSharedPreferences("OSESPrefs", Context.MODE_PRIVATE);
         SessionUsername = settings.getString("SessionUsername", "");
         SessionGroup = settings.getInt("SessionGruppe", 0);
         SessionEst = settings.getInt("SessionEst", 0);
@@ -46,6 +49,22 @@ public class OSESSession {
         SessionAufArt = settings.getString("SessionAufArt", "auto");
         SessionAufDb = settings.getInt("SessionAufDb", 3);
         SessionAufDe = settings.getInt("SessionAufDe", 0);
+        SessionFcmInstanceId = settings.getString("SessionFcmInstanceId", "");
+
+        if (SessionFcmInstanceId.isEmpty()) {
+
+            String firebaseInstanceId = FirebaseInstanceId.getInstance().getToken();
+
+            if (firebaseInstanceId != null && !firebaseInstanceId.isEmpty())    {
+
+                SharedPreferences.Editor edit = settings.edit();
+                edit.putString("SessionFcmInstanceId", firebaseInstanceId);
+                edit.apply();
+
+                SessionFcmInstanceId = firebaseInstanceId;
+            }
+
+        }
 
     }
 
@@ -99,6 +118,9 @@ public class OSESSession {
     }
     public void setSessionAufDe(int sessionAufDe) {
         SessionAufDe = sessionAufDe;
+    }
+    public String getSessionFcmInstanceId() {
+            return SessionFcmInstanceId;
     }
     public SharedPreferences getPreferences() {
         return preferences;

@@ -1,23 +1,30 @@
 package de.stm.oses.fax;
 
+import android.Manifest;
 import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -45,6 +52,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -63,6 +71,7 @@ import de.stm.oses.helper.OSESRequest;
 
 public class FaxActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
 
+    private static final int PERMISSIONS_REQUEST_LOCATION = 4100;
     String docid;
     String doctype;
     String doctypetext;
@@ -84,6 +93,8 @@ public class FaxActivity extends AppCompatActivity implements View.OnClickListen
 
     private GoogleApiClient mGoogleApiClient;
     private FaxListFragment mFaxListFragment;
+
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -109,11 +120,64 @@ public class FaxActivity extends AppCompatActivity implements View.OnClickListen
 
     //Your member variable declaration here
 
+    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
+
+        new AlertDialog.Builder(FaxActivity.this)
+                .setMessage(message)
+                .setPositiveButton("OK", okListener)
+                .setNegativeButton("Abbrechen", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                })
+                .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        finish();
+                    }
+                })
+                .create()
+                .show();
+    }
+
     // Called when the activity is first created.
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fax);
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
+        mFirebaseAnalytics.logEvent("OSES_fax_start", null);
+
+        // Here, thisActivity is the current activity
+        if (ContextCompat.checkSelfPermission(FaxActivity.this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(FaxActivity.this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+                showMessageOKCancel("Um die in der Nähe befindlichen Faxgeräte und Drucker abzurufen, muss dein Standort abgefragt werden. Bitte gib OSES für Android die Berechtigung zur Standortabfrage.", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ActivityCompat.requestPermissions(FaxActivity.this,
+                                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                PERMISSIONS_REQUEST_LOCATION);
+                    }
+                });
+            } else {
+                // No explanation needed, we can request the permission.
+                ActivityCompat.requestPermissions(FaxActivity.this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        PERMISSIONS_REQUEST_LOCATION);
+                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
+            }
+        }
 
         FragmentManager fm = getFragmentManager();
         mFaxListFragment = (FaxListFragment) fm.findFragmentByTag("fax_list_fragment");
@@ -134,16 +198,20 @@ public class FaxActivity extends AppCompatActivity implements View.OnClickListen
         getFaxList().setHasFixedSize(true);
         LinearLayoutManager llm = new LinearLayoutManager(FaxActivity.this);
         getFaxList().setLayoutManager(llm);
-        getFaxList().getItemAnimator().setSupportsChangeAnimations(false);
+        ((SimpleItemAnimator) getFaxList().getItemAnimator()).setSupportsChangeAnimations(false);
         getFaxList().getItemAnimator().setAddDuration(500);
         getFaxList().getItemAnimator().setRemoveDuration(500);
         getFaxList().getItemAnimator().setMoveDuration(500);
+
         getFaxList().addItemDecoration(new SpacesItemDecoration(2));
 
 
         if (savedInstanceState == null) {
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.1681391, 10.2928216), 4));
-            map.setMyLocationEnabled(true);
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+            {
+                map.setMyLocationEnabled(true);
+            }
             map.getUiSettings().setMapToolbarEnabled(false);
         } else {
 
@@ -232,6 +300,29 @@ public class FaxActivity extends AppCompatActivity implements View.OnClickListen
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    map.setMyLocationEnabled(true);
+
+                } else {
+
+                    finish();
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         mFaxListFragment.setAdapter(getFaxAdapter());
         super.onSaveInstanceState(outState);
@@ -292,31 +383,30 @@ public class FaxActivity extends AppCompatActivity implements View.OnClickListen
         errorimage.setImageResource(image);
 
 
-            if (wait.getVisibility() == View.VISIBLE) {
-                wait.startAnimation(AnimationUtils.loadAnimation(FaxActivity.this, android.R.anim.fade_out));
-                wait.setVisibility(View.GONE);
-            }
+        if (wait.getVisibility() == View.VISIBLE) {
+            wait.startAnimation(AnimationUtils.loadAnimation(FaxActivity.this, android.R.anim.fade_out));
+            wait.setVisibility(View.GONE);
+        }
 
-            if (error.getVisibility() == View.GONE) {
-                error.startAnimation(AnimationUtils.loadAnimation(FaxActivity.this, android.R.anim.fade_in));
-                error.setVisibility(View.VISIBLE);
-            }
-
-
-
+        if (error.getVisibility() == View.GONE) {
+            error.startAnimation(AnimationUtils.loadAnimation(FaxActivity.this, android.R.anim.fade_in));
+            error.setVisibility(View.VISIBLE);
+        }
 
 
     }
 
     @Override
     protected void onResume() {
-        mGoogleApiClient.connect();
+        if (mGoogleApiClient != null)
+            mGoogleApiClient.connect();
         super.onResume();
     }
 
     @Override
     protected void onPause() {
-        mGoogleApiClient.disconnect();
+        if (mGoogleApiClient != null)
+            mGoogleApiClient.disconnect();
         super.onPause();
     }
 
@@ -383,13 +473,19 @@ public class FaxActivity extends AppCompatActivity implements View.OnClickListen
     @Override
     public void onConnected(Bundle bundle) {
 
-        LocationRequest mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(1000);
-        mLocationRequest.setFastestInterval(1000);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, FaxActivity.this);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
-        mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            LocationRequest mLocationRequest = new LocationRequest();
+            mLocationRequest.setInterval(1000);
+            mLocationRequest.setFastestInterval(1000);
+            mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, FaxActivity.this);
+            mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
+        }
+
+
         ProcessFax();
 
     }
@@ -455,6 +551,9 @@ public class FaxActivity extends AppCompatActivity implements View.OnClickListen
 
         if (faxRequest != null)
             faxRequest.cancel(true);
+
+        if (mCurrentLocation == null)
+            return;
 
         setWaitText("Faxgeräte werden abgerufen...");
         showFaxList(false);
@@ -582,6 +681,11 @@ public class FaxActivity extends AppCompatActivity implements View.OnClickListen
                 StatusR = json.getString("StatusR");
                 if (json.has("StatusExtra1"))
                     StatusExtra1 = json.getString("StatusExtra1");
+
+                Bundle extra = new Bundle();
+                extra.putString("doctype", doctype);
+                extra.putString("status", String.valueOf(StatusCode));
+                mFirebaseAnalytics.logEvent("OSES_fax_sent", extra);
 
 
                 switch (StatusCode) {

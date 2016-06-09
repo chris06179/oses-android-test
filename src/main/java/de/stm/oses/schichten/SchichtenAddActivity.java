@@ -32,6 +32,7 @@ import android.widget.ToggleButton;
 
 import com.codetroopers.betterpickers.timepicker.TimePickerBuilder;
 import com.codetroopers.betterpickers.timepicker.TimePickerDialogFragment;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
@@ -69,6 +70,8 @@ public class SchichtenAddActivity extends AppCompatActivity implements View.OnCl
     private ListAdapter gbereiche;
 
     private SchichtAddHolder sAdd;
+
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     static class SchichtAddHolder {
 
@@ -158,6 +161,8 @@ public class SchichtenAddActivity extends AppCompatActivity implements View.OnCl
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.schichtadd);
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         // Initiliasiere Views
         sAdd = new SchichtAddHolder(SchichtenAddActivity.this);
@@ -583,6 +588,10 @@ private class SaveSchicht extends AsyncTask<Void, Void, String> {
 
         }
 
+        Bundle extra = new Bundle();
+        extra.putString("status", Status);
+        mFirebaseAnalytics.logEvent("OSES_schicht_save", extra);
+
         if (Status.equals("200")) {
             dialog.dismiss();
             setResult(200);
@@ -733,7 +742,7 @@ private class SaveSchicht extends AsyncTask<Void, Void, String> {
 
             TimePickerDialog tpd = TimePickerDialog.newInstance(new TimePickerDialog.OnTimeSetListener() {
                 @Override
-                public void onTimeSet(RadialPickerLayout radialPickerLayout, int hour, int minute) {
+                public void onTimeSet(RadialPickerLayout radialPickerLayout, int hour, int minute, int seconds) {
                     Zeit.setText(pad(hour) + ":" + pad(minute));
                     Zeit.setError(null);
                 }

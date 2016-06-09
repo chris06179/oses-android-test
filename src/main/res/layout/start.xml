@@ -5,8 +5,6 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-   <include layout="@layout/toolbar" />
-
 <android.support.v4.widget.DrawerLayout
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
@@ -28,6 +26,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true">
     </FrameLayout>
+
+    <include layout="@layout/toolbar" />
 
     <LinearLayout
         android:orientation="horizontal"
