@@ -3,43 +3,32 @@ package de.stm.oses.fax;
 import android.Manifest;
 import android.app.FragmentManager;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.PointF;
 import android.graphics.Rect;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
-import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AnimationUtils;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ViewAnimator;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -48,6 +37,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -59,8 +49,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
 
@@ -72,15 +60,15 @@ import de.stm.oses.helper.OSESRequest;
 public class FaxActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
 
     private static final int PERMISSIONS_REQUEST_LOCATION = 4100;
-    String docid;
-    String doctype;
-    String doctypetext;
-    String docdate;
-    String docdest;
-    String docdouble = "";
-    String docmonat;
-    String docjahr;
-    String excludestring = "";
+    private String docid;
+    private String doctype;
+    private String doctypetext;
+    private String docdate;
+    private String docdest;
+    private String docdouble = "";
+    private String docmonat;
+    private String docjahr;
+    private String excludestring = "";
 
     private Button cancel;
     private Button save;
@@ -96,7 +84,7 @@ public class FaxActivity extends AppCompatActivity implements View.OnClickListen
 
     private FirebaseAnalytics mFirebaseAnalytics;
 
-    protected synchronized void buildGoogleApiClient() {
+    private synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -104,10 +92,10 @@ public class FaxActivity extends AppCompatActivity implements View.OnClickListen
                 .build();
     }
 
-    public class SpacesItemDecoration extends RecyclerView.ItemDecoration {
+    private class SpacesItemDecoration extends RecyclerView.ItemDecoration {
         private int space;
 
-        public SpacesItemDecoration(int space) {
+        SpacesItemDecoration(int space) {
             this.space = space;
         }
 
@@ -191,7 +179,34 @@ public class FaxActivity extends AppCompatActivity implements View.OnClickListen
 
         OSES = new OSESBase(FaxActivity.this);
         fm.findFragmentById(R.id.map).setRetainInstance(true);
-        map = ((MapFragment) fm.findFragmentById(R.id.map)).getMap();
+
+
+        MapFragment mapFragment = ((MapFragment) fm.findFragmentById(R.id.map));
+        mapFragment.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap googleMap) {
+                map = googleMap;
+
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.1681391, 10.2928216), 5));
+                if (ActivityCompat.checkSelfPermission(FaxActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    map.setMyLocationEnabled(true);
+                }
+                map.getUiSettings().setMapToolbarEnabled(false);
+
+                map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(Marker marker) {
+                        FaxClass item = getFaxAdapter().setSelectionByMarker(marker);
+                        getFaxList().smoothScrollToPosition(getFaxAdapter().getItems().indexOf(item));
+                        map.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
+                        marker.showInfoWindow();
+                        save.setEnabled(true);
+                        return true;
+                    }
+                });
+            }
+        });
+
         cancel = (Button) findViewById(R.id.fax_back);
         save = (Button) findViewById(R.id.fax_send);
 
@@ -207,12 +222,7 @@ public class FaxActivity extends AppCompatActivity implements View.OnClickListen
 
 
         if (savedInstanceState == null) {
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.1681391, 10.2928216), 4));
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
-            {
-                map.setMyLocationEnabled(true);
-            }
-            map.getUiSettings().setMapToolbarEnabled(false);
+
         } else {
 
             if (mFaxListFragment.getAdapter() != null) {
@@ -228,24 +238,13 @@ public class FaxActivity extends AppCompatActivity implements View.OnClickListen
         if (getFaxList().getAdapter() == null)
             getFaxList().setAdapter(new FaxAdapter(FaxActivity.this));
 
-        map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                FaxClass item = getFaxAdapter().setSelectionByMarker(marker);
-                getFaxList().smoothScrollToPosition(getFaxAdapter().getItems().indexOf(item));
-                map.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
-                marker.showInfoWindow();
-                save.setEnabled(true);
-                return true;
-            }
-        });
 
         getFaxAdapter().setOnItemClickListener(new FaxAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 FaxClass item = getFaxAdapter().getItems().get(position);
                 getFaxAdapter().getItems().updateItemAt(position, item);
-                map.animateCamera(CameraUpdateFactory.newLatLngZoom(item.getPosition(), 15));
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(item.getPosition(), 16));
                 item.getMarker().showInfoWindow();
                 save.setEnabled(true);
                 getFaxAdapter().setSelectionId(item.getId());
@@ -308,17 +307,17 @@ public class FaxActivity extends AppCompatActivity implements View.OnClickListen
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
+                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        return;
+                    }
+
                     map.setMyLocationEnabled(true);
 
                 } else {
 
                     finish();
                 }
-                return;
             }
-
-            // other 'case' lines to check for other
-            // permissions this app might request
         }
     }
 

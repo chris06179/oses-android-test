@@ -9,6 +9,8 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 
+import com.google.firebase.crash.FirebaseCrash;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -76,13 +78,11 @@ public class OSESRequest extends AsyncTask<String, Integer, Object> {
         this.timeout = timeout;
     }
 
-    public String getVersion() {
+    private String getVersion() {
         return version;
     }
 
     protected Object doInBackground(String... sUrl) {
-
-
 
         ConnectivityManager cm =
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -120,34 +120,6 @@ public class OSESRequest extends AsyncTask<String, Integer, Object> {
                         return new PasswordAuthentication(devUser, devPass.toCharArray());
                     }
                 });
-
-                TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
-                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                        return null;
-                    }
-
-                    public void checkClientTrusted(X509Certificate[] certs, String authType) {
-                    }
-
-                    public void checkServerTrusted(X509Certificate[] certs, String authType) {
-                    }
-                }
-                };
-
-                // Install the all-trusting trust manager
-                SSLContext sc = SSLContext.getInstance("SSL");
-                sc.init(null, trustAllCerts, new java.security.SecureRandom());
-                c.setSSLSocketFactory(sc.getSocketFactory());
-
-                // Create all-trusting host name verifier
-                HostnameVerifier validHosts = new HostnameVerifier() {
-                    public boolean verify(String hostname, SSLSession session) {
-                        return (hostname.equals("dev.oses.mobi"));
-
-                    }
-                };
-
-                c.setHostnameVerifier(validHosts);
 
             }
 
@@ -217,11 +189,17 @@ public class OSESRequest extends AsyncTask<String, Integer, Object> {
         if (o instanceof Integer) { // Unbekannter Status
             if (mListener != null)
                 mListener.onRequestUnknown((int) o);
+
+            FirebaseCrash.log("URL: "+url+ " - Status: "+String.valueOf((int) o));
+            FirebaseCrash.report(new Exception("Unexpected HTTP-Status-Code"));
         }
 
         if (o instanceof Exception) { // Programmfehler
             if (mListener != null)
                 mListener.onRequestException((Exception) o);
+
+            FirebaseCrash.log("URL: "+url);
+            FirebaseCrash.report((Exception) o);
         }
 
         if (o == null) { // Keine Konnektivität

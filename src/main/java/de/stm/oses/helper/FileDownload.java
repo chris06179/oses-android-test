@@ -238,15 +238,8 @@ public class FileDownload extends AsyncTask<String, Integer, Object> {
                         localFilename = URLUtil.guessFileName(surl, null, null);
                     }
 
-                    File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),"/OSES/"+localDirectory+localFilename);
-
-                        file.getParentFile().mkdirs();
-                        if (!file.exists())
-                            file.createNewFile();
-                        else {
-                            file.delete();
-                            file.createNewFile();
-                        }
+                    File file = new File(Environment.getExternalStorageDirectory(),"/OSES/"+localDirectory+localFilename);
+                    file.getParentFile().mkdirs();
 
 
                     // download the file

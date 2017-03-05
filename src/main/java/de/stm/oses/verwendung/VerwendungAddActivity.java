@@ -1092,6 +1092,9 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
 	
 	protected void onPostExecute(String response) {
 
+        if (vAdd == null || vAdd.rilprogress == null || vAdd.rilstatus == null)
+            return;
+
         vAdd.rilprogress.setVisibility(View.GONE);
 
         if (response.length() > 0) {
@@ -1602,7 +1605,7 @@ private class SaveVerwendung extends AsyncTask<Void, Void, String> {
 
             TimePickerDialog tpd = TimePickerDialog.newInstance(new TimePickerDialog.OnTimeSetListener() {
                 @Override
-                public void onTimeSet(RadialPickerLayout radialPickerLayout, int hour, int minute, int seconds) {
+                public void onTimeSet(TimePickerDialog view, int hour, int minute, int second) {
                     Zeit.setText(pad(hour) + ":" + pad(minute));
                     Zeit.setError(null);
                 }

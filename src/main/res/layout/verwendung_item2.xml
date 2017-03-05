@@ -1,4 +1,5 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:id="@+id/verwendung_container"
@@ -32,7 +33,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical|left"
-                android:paddingLeft="8dp"
+                android:paddingLeft="4dp"
                 android:paddingTop="2dp"
                 android:paddingBottom="3dp"
                 android:layout_alignParentTop="true"
@@ -41,7 +42,7 @@
                 android:layout_marginTop="1dp"
                 android:layout_marginRight="1dp"
                 android:layout_marginBottom="1dp"
-                android:paddingRight="8dp">
+                android:paddingRight="4dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -59,15 +60,31 @@
                     android:layout_alignParentRight="false"
                     android:layout_centerVertical="true" />
 
-                <TextView
+                <LinearLayout
+                    android:orientation="horizontal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="Info"
-                    android:id="@+id/verwendung_info"
                     android:layout_centerVertical="true"
                     android:layout_alignParentRight="true"
-                    android:layout_alignParentEnd="true" />
+                    android:layout_alignParentEnd="true" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="Info"
+                        android:id="@+id/verwendung_info"
+                        android:layout_weight="1" />
+
+                    <ImageView
+                        android:layout_height="18dp"
+                        app:srcCompat="@drawable/ic_timetable_black"
+                        android:id="@+id/verwendung_aa_icon"
+                        android:layout_marginLeft="4dp"
+                        android:layout_width="18dp"
+                        android:layout_weight="1" />
+                </LinearLayout>
+
             </RelativeLayout>
 
             <LinearLayout

@@ -23,11 +23,11 @@ import de.stm.oses.helper.OSESBase;
 
 public class BrowserFragment extends Fragment {
 
-	String request;
-    OSESBase OSES;
+	private String request;
+    private OSESBase OSES;
 	private WebView engine;
-    public int errorCode = 0;
-    SwipeRefreshLayout mRefreshLayout;
+    private int errorCode = 0;
+    private SwipeRefreshLayout mRefreshLayout;
     private ViewTreeObserver.OnScrollChangedListener mOnScrollChangedListener;
     private FirebaseAnalytics mFirebaseAnalytics;
 
@@ -178,7 +178,7 @@ public class BrowserFragment extends Fragment {
 	}
 
 
-    public void setBrowserShown(boolean show) {
+    private void setBrowserShown(boolean show) {
 
         LinearLayout progress = (LinearLayout)   getActivity().findViewById(R.id.progress_container_id);
 

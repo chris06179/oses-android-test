@@ -1,1 +1,3 @@
 -dontwarn com.codetroopers.betterpickers.**
+-dontwarn org.spongycastle.**
+-dontwarn com.itextpdf.**

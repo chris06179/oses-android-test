@@ -2,12 +2,14 @@ package de.stm.oses.verwendung;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -18,6 +20,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import de.stm.oses.R;
+import de.stm.oses.helper.ArbeitsauftragBuilder;
 
 
 public class VerwendungAdapter extends ArrayAdapter<VerwendungClass> {
@@ -57,6 +60,7 @@ public class VerwendungAdapter extends ArrayAdapter<VerwendungClass> {
         TextView apauser;
         TextView notiz;
         TextView info;
+        ImageView aa_icon;
     }
 
     static class SumHolder {
@@ -118,8 +122,9 @@ public class VerwendungAdapter extends ArrayAdapter<VerwendungClass> {
             return TYPE_ITEM;
     }
 
+    @NonNull
     @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(int position, View convertView, @NonNull ViewGroup parent) {
 
             int type = getItemViewType(position);
 
@@ -192,6 +197,7 @@ public class VerwendungAdapter extends ArrayAdapter<VerwendungClass> {
                     itemHolder.apauser = (TextView) rowView.findViewById(R.id.verwendung_apauser);
                     itemHolder.notiz = (TextView) rowView.findViewById(R.id.verwendung_notiz);
                     itemHolder.info = (TextView) rowView.findViewById(R.id.verwendung_info);
+                    itemHolder.aa_icon = (ImageView) rowView.findViewById(R.id.verwendung_aa_icon);
                     itemHolder.abweichung_container = (RelativeLayout) rowView.findViewById(R.id.verwendung_abweichung_container);
                     itemHolder.info_container = (RelativeLayout) rowView.findViewById(R.id.verwendung_info_container);
                     itemHolder.notiz_container = (RelativeLayout) rowView.findViewById(R.id.verwendung_notiz_container);
@@ -236,6 +242,19 @@ public class VerwendungAdapter extends ArrayAdapter<VerwendungClass> {
                     itemHolder.info.setText(item.getInfo());
                 else
                     itemHolder.info.setText("");
+
+                switch (item.isArbeitsauftragAvailable(context)) {
+                    case ArbeitsauftragBuilder.TYPE_NONE:
+                        itemHolder.aa_icon.setVisibility(View.GONE);
+                        break;
+                    case ArbeitsauftragBuilder.TYPE_CACHED:
+                        itemHolder.aa_icon.setVisibility(View.VISIBLE);
+                        itemHolder.aa_icon.setAlpha(1f);
+                        break;
+                    case ArbeitsauftragBuilder.TYPE_DILOC:
+                        itemHolder.aa_icon.setVisibility(View.VISIBLE);
+                        itemHolder.aa_icon.setAlpha(0.5f);
+                }
 
                 int countab = 0;
 

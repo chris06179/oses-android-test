@@ -1,13 +1,13 @@
 package de.stm.oses;
 
-import android.app.ProgressDialog;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings.Secure;
 import android.support.customtabs.CustomTabsIntent;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.crash.FirebaseCrash;
 
 import org.json.JSONObject;
 
@@ -29,6 +30,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.stm.oses.helper.OSESBase;
+import de.stm.oses.helper.OSESRequest;
+import de.stm.oses.helper.ProgressDialogFragment;
 
 public class OSESActivity extends AppCompatActivity implements View.OnClickListener {
 	
@@ -74,6 +77,7 @@ public class OSESActivity extends AppCompatActivity implements View.OnClickListe
         Button button_about = (Button) findViewById(R.id.login_about);
         Button button_lost_pass = (Button) findViewById(R.id.login_lost_pass);
         Button button_registrierung = (Button) findViewById(R.id.login_registrierung);
+        Button button_login = (Button) findViewById(R.id.login_login);
 
         if (button_about != null)
             button_about.setOnClickListener(this);
@@ -83,6 +87,9 @@ public class OSESActivity extends AppCompatActivity implements View.OnClickListe
 
         if (button_registrierung != null)
             button_registrierung.setOnClickListener(this);
+
+        if (button_login != null)
+            button_login.setOnClickListener(this);
 
     }
 
@@ -106,36 +113,158 @@ public class OSESActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
     
-    public void Login(View v) throws Exception {
+    private void LoginOnClick() {
     	
-    	boolean stop = false;    	
+    	boolean stop = false;
+
+        String username;
+        String password;
     	
-    	EditText username = (EditText)findViewById(R.id.username);
-		EditText password = (EditText)findViewById(R.id.password);
+    	EditText usernameEdit = (EditText)findViewById(R.id.username);
+		EditText passwordEdit = (EditText)findViewById(R.id.password);
 
-        if (username != null && password != null) {
+        if (usernameEdit != null && passwordEdit != null) {
 
-            username.clearFocus();
-            password.clearFocus();
+            usernameEdit.clearFocus();
+            passwordEdit.clearFocus();
 
-            if (username.getText().toString().length() == 0) {
-                username.setError("Benutzername darf nicht leer sein");
+            username = usernameEdit.getText().toString();
+            password = passwordEdit.getText().toString();
+
+            if (username.isEmpty()) {
+                usernameEdit.setError("Benutzername darf nicht leer sein");
                 stop = true;
             }
 
-            if (password.getText().toString().length() == 0) {
-                password.setError("Passwort darf nicht leer sein");
+            if (password.isEmpty()) {
+                passwordEdit.setError("Passwort darf nicht leer sein");
                 stop = true;
             }
 
             if (stop)
                 return;
 
-            new DoLogin().execute();
+            mFirebaseAnalytics.logEvent("OSES_login_start", null);
+
+            //dialog = new ProgressDialog(this);
+            //dialog.setTitle("Bitte warten");
+            //dialog.setMessage("Anmeldung wird ausgeführt...");
+            //dialog.setCancelable(false);
+            //dialog.show();
+
+            ShowWaitDialog();
+
+
+            @SuppressLint("HardwareIds")
+            String android_id = Secure.getString(getBaseContext().getContentResolver(),
+                    Secure.ANDROID_ID);
+
+            Map<String, String> postdata = new HashMap<>();
+            postdata.put("username", username);
+            postdata.put("password", password);
+            postdata.put("device", android_id);
+            postdata.put("model", android.os.Build.MODEL+"|"+android.os.Build.PRODUCT);
+            postdata.put("gcm_regid", OSES.getSession().getSessionFcmInstanceId());
+            postdata.put("androidversion", String.valueOf(OSES.getVersionCode()));
+
+
+            OSESRequest LoginRequest = new OSESRequest(this);
+            LoginRequest.setUrl("https://oses.mobi/api.php?request=login");
+            LoginRequest.setTimeout(30000);
+            LoginRequest.setParams(postdata);
+            LoginRequest.setOnRequestFinishedListener(new OSESRequest.OnRequestFinishedListener() {
+                @Override
+                public void onRequestFinished(String response) {
+
+                    hideWaitDialog();
+
+
+                    String SessionIdentifier = "";
+                    String StatusCode = "";
+
+                    try {
+
+                        JSONObject json = new JSONObject(response);
+
+                        if (json.has("StatusCode"))
+                            StatusCode = json.getString("StatusCode");
+
+                        if (json.has("SessionIdentifier")) {
+                            SessionIdentifier = json.getString("SessionIdentifier");
+                        }
+
+                    } catch (Exception e) {
+                        FirebaseCrash.report(e);
+                    }
+
+                    if (!StatusCode.equals("200")) {
+
+                        mFirebaseAnalytics.logEvent("OSES_login_failed", null);
+                        Toast.makeText(OSESActivity.this, "Anmeldung fehlgeschlagen! Benutzername oder Passwort ist nicht korrekt!", Toast.LENGTH_LONG).show();
+
+
+                    }  else {
+
+                        mFirebaseAnalytics.logEvent("OSES_login_ok", null);
+
+                        SharedPreferences settings = getSharedPreferences("OSESPrefs", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = settings.edit();
+
+                        editor.putString("SessionIdentifier", SessionIdentifier);
+                        editor.apply();
+
+                        Intent intent = new Intent(OSESActivity.this,StartActivity.class);
+                        startActivity(intent);
+
+                        finish();
+
+                    }
+
+
+                }
+
+                @Override
+                public void onRequestException(Exception e) {
+                    hideWaitDialog();
+                    Toast.makeText(OSESActivity.this, "Technischer Fehler beim Anmeldevorgang! Bitte versuch es erneut!", Toast.LENGTH_LONG).show();
+                }
+
+                @Override
+                public void onRequestUnknown(int status) {
+                    hideWaitDialog();
+                    Toast.makeText(OSESActivity.this, "Der Server hat eine unerwartete Antwort gesendet! Bitte versuch es erneut!", Toast.LENGTH_LONG).show();
+                }
+
+                @Override
+                public void onIsNotConnected() {
+                    hideWaitDialog();
+                    Toast.makeText(OSESActivity.this, "Bitte stelle eine Internetverbindung her um den Anmeldevorgang fortzusetzen!", Toast.LENGTH_LONG).show();
+                }
+            });
+
+            LoginRequest.execute();
+
+
         }
    	    
     }
 
+    private void ShowWaitDialog() {
+
+        ProgressDialogFragment loginWaitDialog = ProgressDialogFragment.newInstance("Anmeldung", "Bitte warten, deine Zugangsdaten werden überprüft...");
+        loginWaitDialog.show(getSupportFragmentManager(), "loginWaitDialog");
+
+    }
+
+    private void hideWaitDialog() {
+
+        Fragment f = getSupportFragmentManager().findFragmentByTag("loginWaitDialog");
+
+        if (f != null)
+            ((ProgressDialogFragment) f).dismiss();
+
+
+    }
 
     private void VergessenOnClick() {
 
@@ -188,115 +317,11 @@ public class OSESActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.login_about:
                 AboutOnClick();
                 break;
+            case R.id.login_login:
+                LoginOnClick();
+                break;
         }
 
     }
-
-    private class DoLogin extends AsyncTask<Void, Void, String> {
-    	
-    	private ProgressDialog dialog;
-		private String username = "";
-		private String password = "";
-
-
-    	protected void onPreExecute() {
-
-            mFirebaseAnalytics.logEvent("OSES_login_start", null);
-    		
-    		dialog = ProgressDialog.show(OSESActivity.this, "Bitte warten...", 
-                    "", true);
-    		dialog.setMessage("Anmeldung wird ausgeführt...");
-
-            EditText username = (EditText)findViewById(R.id.username);
-            EditText password = (EditText)findViewById(R.id.password);
-
-            if (username != null && password != null) {
-
-                this.username = username.getText().toString();
-                this.password = password.getText().toString();
-
-            }
-
-
-        }
-    	
-    	protected String doInBackground(Void... params) {
-
-            String android_id = Secure.getString(getBaseContext().getContentResolver(),
-                    Secure.ANDROID_ID);
-
-            Map<String, String> postdata = new HashMap<>();
-
-                postdata.put("username", username);
-                postdata.put("password", password);
-                postdata.put("device", android_id);
-                postdata.put("model", android.os.Build.MODEL+"|"+android.os.Build.PRODUCT);
-                postdata.put("gcm_regid", OSES.getSession().getSessionFcmInstanceId());
-                postdata.put("androidversion", String.valueOf(OSES.getVersionCode()));
-
-            return OSES.getJSON("https://oses.mobi/api.php?request=login", postdata, 60000);
-
-            
-        }
-    	
-    	protected void onPostExecute(String response) {
-    		
-    		dialog.dismiss();   
-    		
-    		String SessionIdentifier = "";		
-			String StatusCode = "";
-
-    		
-    		try {
-    			
-				JSONObject json = new JSONObject(response);
-							
-				StatusCode = json.getString("StatusCode");
-
-				if (StatusCode.equals("200") ) {
-					
-					SessionIdentifier = json.getString("SessionIdentifier");
-					
-				}
-				
-    		} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    		
-    		if (!StatusCode.equals("200")) {
-
-                mFirebaseAnalytics.logEvent("OSES_login_failed", null);
-    			
-    			Toast.makeText(OSESActivity.this, "Anmeldung fehlgeschlagen! Benutzername oder Passwort ist nicht korrekt!", Toast.LENGTH_LONG).show();
-
-
-    		}  else {
-
-                mFirebaseAnalytics.logEvent("OSES_login_ok", null);
-    			
-    			// We need an Editor object to make preference changes.
-    		    // All objects are from android.context.Context
-    		    SharedPreferences settings = getSharedPreferences("OSESPrefs", 0);
-    		    SharedPreferences.Editor editor = settings.edit();
-    			
-    			editor.putString("SessionIdentifier", SessionIdentifier);
-
-    			// Commit the edits!
-    		    editor.apply();
-    		    
-    		    Intent intent = new Intent(OSESActivity.this,StartActivity.class);
-    			startActivity(intent);
-    			    			
-    			finish();
-    			
-    		}
-            
-        }
-
-
-    }
-    
-    
     
 }

@@ -64,6 +64,9 @@ public class SchichtenFragment extends SwipeRefreshListFragment implements Actio
 
         final SchichtenClass item = ((SchichtenAdapter) getListAdapter()).getItem((int) sid);
 
+        if (item == null)
+            return;
+
         String fpla = item.getFpla();
 
         if (fpla.equals("0"))
@@ -98,7 +101,7 @@ public class SchichtenFragment extends SwipeRefreshListFragment implements Actio
         private int vid;
         private int lid;
 
-        public DeleteSchichtRun(int vid, int lid) {
+        DeleteSchichtRun(int vid, int lid) {
             this.lid = lid;
             this.vid = vid;
         }
@@ -318,7 +321,6 @@ public class SchichtenFragment extends SwipeRefreshListFragment implements Actio
 
                 mActionMode.setTitle(item.getSchicht() + fpla);
                 mActionMode.setSubtitle(item.getGv() + " - " + item.getGb());
-                Menu menu = mActionMode.getMenu();
             } else
                 mActionMode.finish();
         }

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="de.stm.oses"
-    android:versionCode="338"
-    android:versionName="3.3.8">
+    android:versionCode="343"
+    android:versionName="3.4"
+    android:installLocation="auto">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -70,6 +71,16 @@
         <activity
             android:name=".PaymentActivity"
             android:label="@string/title_activity_payment" />
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="de.stm.oses.FileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+        </provider>
     </application>
 
 </manifest>

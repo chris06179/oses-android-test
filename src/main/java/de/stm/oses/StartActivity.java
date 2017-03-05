@@ -2,8 +2,11 @@ package de.stm.oses;
 
 import android.content.ComponentName;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.app.Dialog;
 import android.app.Fragment;
@@ -165,7 +168,7 @@ public class StartActivity extends AppCompatActivity {
 
         mMenuList.setDividerHeight(0);
 
-        View header = getLayoutInflater().inflate(R.layout.menu_header, null);
+        View header = getLayoutInflater().inflate(R.layout.menu_header, mMenuList, false);
 
         mMenuList.addHeaderView(header);
         mMenuAdapter = new MenuAdapter(this, generateMenu());
@@ -294,9 +297,21 @@ public class StartActivity extends AppCompatActivity {
             @Override
             public void onDownloadFinished(File file) {
 
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
-                startActivity(intent);
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    Uri fileUri = FileProvider.getUriForFile(StartActivity.this, "de.stm.oses.FileProvider", file);
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION+Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                    intent.setDataAndType(fileUri, "application/vnd.android.package-archive");
+                    startActivity(intent);
+                } else {
+                    Uri apkUri = Uri.fromFile(file);
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                }
+
                 finish();
 
             }
@@ -351,8 +366,11 @@ public class StartActivity extends AppCompatActivity {
         download.setOnDownloadFinishedListener(new OnDownloadFinishedListener() {
             @Override
             public void onDownloadFinished(File file) {
+                Uri fileUri = FileProvider.getUriForFile(StartActivity.this, "de.stm.oses.FileProvider", file);
+
                 Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setDataAndType(Uri.fromFile(file), "application/pdf");
+                intent.setDataAndType(fileUri, "application/pdf");
+                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION+Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                 startActivity(intent);
             }
 
@@ -566,7 +584,7 @@ public class StartActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode,@NonNull String permissions[],@NonNull int[] grantResults) {
         switch (requestCode) {
             case PERMISSION_REQUEST_STORAGE: {
                 // If request is cancelled, the result arrays are empty.

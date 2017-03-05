@@ -740,9 +740,10 @@ private class SaveSchicht extends AsyncTask<Void, Void, String> {
         } else {
 
 
+
             TimePickerDialog tpd = TimePickerDialog.newInstance(new TimePickerDialog.OnTimeSetListener() {
                 @Override
-                public void onTimeSet(RadialPickerLayout radialPickerLayout, int hour, int minute, int seconds) {
+                public void onTimeSet(TimePickerDialog view, int hour, int minute, int second) {
                     Zeit.setText(pad(hour) + ":" + pad(minute));
                     Zeit.setError(null);
                 }

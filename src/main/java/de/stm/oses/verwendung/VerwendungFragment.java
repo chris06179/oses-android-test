@@ -16,6 +16,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.content.FileProvider;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -26,11 +28,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
-import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.crash.FirebaseCrash;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -39,13 +41,15 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import de.stm.oses.fax.FaxActivity;
 import de.stm.oses.R;
+import de.stm.oses.fax.FaxActivity;
+import de.stm.oses.helper.ArbeitsauftragBuilder;
 import de.stm.oses.helper.FileDownload;
 import de.stm.oses.helper.OSESBase;
+import de.stm.oses.helper.ProgressDialogFragment;
 import de.stm.oses.helper.SwipeRefreshListFragment;
-import de.stm.oses.helper.ZeitraumDialog;
 import de.stm.oses.helper.ZeitraumDialogFragment;
+
 
 public class VerwendungFragment extends SwipeRefreshListFragment implements ActionMode.Callback {
 
@@ -192,10 +196,15 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
             case R.id.action_edit_verwendung:
                 EditVerwendung(schicht);
                 return true;
+            case R.id.action_show_arbeitsauftrag:
+                new ShowArbeitsauftrag().execute(schicht);
+                return true;
             default:
                 return false;
         }
     }
+
+
 
     @Override
     public VerwendungAdapter getListAdapter() {
@@ -292,6 +301,13 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
                     menu.findItem(R.id.action_download_sdl).setVisible(false);
                     menu.findItem(R.id.action_fax_sdl).setVisible(false);
                 }
+
+                if (getListAdapter().getSelectedItem().isArbeitsauftragAvailable(getActivity()) != ArbeitsauftragBuilder.TYPE_NONE) {
+                    menu.findItem(R.id.action_show_arbeitsauftrag).setVisible(true);
+                } else {
+                    menu.findItem(R.id.action_show_arbeitsauftrag).setVisible(false);
+                }
+
             } else
                 mActionMode.finish();
         }
@@ -362,6 +378,9 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
 
         VerwendungClass item = getListAdapter().getItem((int) id);
 
+        if (item == null)
+            return;
+
         String fpla = item.getFpla();
 
         if (fpla.equals("0"))
@@ -373,12 +392,18 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
         mActionMode.setSubtitle(item.getDatumFormatted("EE, dd. MMMM yyyy"));
         Menu menu = mActionMode.getMenu();
 
-        if (getListAdapter().getItem((int) id).isAllowSDL()) {
+        if (item.isAllowSDL()) {
             menu.findItem(R.id.action_download_sdl).setVisible(true);
             menu.findItem(R.id.action_fax_sdl).setVisible(true);
         } else {
             menu.findItem(R.id.action_download_sdl).setVisible(false);
             menu.findItem(R.id.action_fax_sdl).setVisible(false);
+        }
+
+        if (item.isArbeitsauftragAvailable(getActivity()) != ArbeitsauftragBuilder.TYPE_NONE) {
+            menu.findItem(R.id.action_show_arbeitsauftrag).setVisible(true);
+        } else {
+            menu.findItem(R.id.action_show_arbeitsauftrag).setVisible(false);
         }
 
         Vibrator vibrate;
@@ -437,6 +462,9 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
 
         final VerwendungClass item = getListAdapter().getItem((int) sid);
 
+        if (item == null)
+            return;
+
         String fpla = item.getFpla();
 
         if (fpla.equals("0"))
@@ -494,7 +522,7 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
 
 
     private ArrayList<VerwendungClass> parseJSON(String json) {
-        ArrayList<VerwendungClass> items = new ArrayList<VerwendungClass>();
+        ArrayList<VerwendungClass> items = new ArrayList<>();
 
         try {
 
@@ -608,6 +636,65 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
         return items;
     }
 
+    private class ShowArbeitsauftrag extends AsyncTask<VerwendungClass, Void, File> {
+
+        VerwendungClass schicht;
+
+        protected void onPreExecute() {
+
+            mFirebaseAnalytics.logEvent("OSES_show_arbeitsauftrag", null);
+            ProgressDialogFragment loginWaitDialog = ProgressDialogFragment.newInstance("Dokument wird erzeugt...", "Bitte warten, der angeforderte Arbeitsauftrag wird extrahiert...");
+            loginWaitDialog.show(((AppCompatActivity) getActivity()).getSupportFragmentManager(), "auftragWaitDialog");
+
+        }
+
+        protected File doInBackground(VerwendungClass... params) {
+
+            schicht = params[0];
+            ArbeitsauftragBuilder auftrag = new ArbeitsauftragBuilder(params[0]);
+
+            File cache = auftrag.getExtractedCacheFile();
+            File diloc = auftrag.getDilocSourceFile();
+
+            if (cache != null && diloc != null) {
+                if (diloc.lastModified() > cache.lastModified())
+                    return auftrag.extractFromDilocSourceFile();
+                else
+                    return cache;
+            }
+
+            if (cache != null)
+                return cache;
+            else
+                return auftrag.extractFromDilocSourceFile();
+
+        }
+
+        protected void onPostExecute(File auftrag) {
+
+            Fragment f = ((AppCompatActivity) getActivity()).getSupportFragmentManager().findFragmentByTag("auftragWaitDialog");
+            if (f != null)
+                ((ProgressDialogFragment) f).dismiss();
+
+
+            if (auftrag == null) {
+                Toast.makeText(getActivity(), "Es konnte kein Arbeitsauftrag zur angegebenen Schichtnummer extrahiert werden! Bitte rufe das Dokument ggf. direkt über Diloc|Sync auf!", Toast.LENGTH_SHORT).show();
+                FirebaseCrash.log("AA = "+schicht.getBezeichner()+", "+schicht.getEst()+", "+schicht.getDatumFormatted("dd.MM.yyyy"));
+                FirebaseCrash.report(new Exception("Arbeitsauftrag, keine Extraktion möglich!"));
+                return;
+            }
+
+            Uri fileUri = FileProvider.getUriForFile(getActivity(), "de.stm.oses.FileProvider", auftrag);
+
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(fileUri, "application/pdf");
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION+Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            startActivity(intent);
+
+        }
+
+    }
+
 
     private class GetVerwendung extends AsyncTask<String, Void, VerwendungAdapter> {
 
@@ -668,7 +755,7 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
         private int vid;
         private int lid;
 
-        public DeleteVerwendungRun(int vid, int lid) {
+        DeleteVerwendungRun(int vid, int lid) {
             this.lid = lid;
             this.vid = vid;
         }
@@ -719,12 +806,16 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
         download.setTitle("Sonderleistung");
         download.setMessage("Das Dokument wird heruntergeladen, dieser Vorgang kann einen Moment dauern...");
         download.setURL(url);
-        download.setLocalDirectory("docs/");
+        download.setLocalDirectory("docs/Nebengeld");
         download.setOnDownloadFinishedListener(new FileDownload.OnDownloadFinishedListener() {
             @Override
             public void onDownloadFinished(File file) {
+
+                Uri fileUri = FileProvider.getUriForFile(getActivity(), "de.stm.oses.FileProvider", file);
+
                 Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setDataAndType(Uri.fromFile(file), "application/pdf");
+                intent.setDataAndType(fileUri, "application/pdf");
+                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION+Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                 startActivity(intent);
             }
 

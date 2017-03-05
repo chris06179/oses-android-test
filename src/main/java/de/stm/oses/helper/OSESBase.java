@@ -2,9 +2,11 @@ package de.stm.oses.helper;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.res.AssetManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -33,6 +35,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.net.ssl.HostnameVerifier;
@@ -454,6 +457,13 @@ public class OSESBase {
 
         return getJSON(url, null, timeout);
 
+    }
+
+    private boolean isAppInstalled(String packageName) {
+        Intent intent = context.getPackageManager().getLaunchIntentForPackage(packageName);
+        List<ResolveInfo> list = context.getPackageManager().queryIntentActivities(intent,
+                PackageManager.MATCH_DEFAULT_ONLY);
+        return list.size() > 0;
     }
 
 

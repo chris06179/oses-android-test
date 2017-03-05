@@ -194,7 +194,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             card_view:cardUseCompatPadding="true"
-            android:visibility="visible">
+            android:visibility="gone">
 
             <RelativeLayout
                 android:layout_width="match_parent"

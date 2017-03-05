@@ -3,6 +3,7 @@ package de.stm.oses.dokumente;
 import android.app.FragmentTransaction;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.app.Fragment;
 import android.content.Context;
@@ -242,7 +243,7 @@ public class DokumenteFragment extends Fragment implements View.OnClickListener 
             download.setTitle(((ListClass) type.getSelectedItem()).getTitle());
             download.setMessage("Das Dokument wird heruntergeladen, dieser Vorgang kann einen Moment dauern...");
             download.setURL(url);
-            download.setLocalDirectory("docs/");
+            download.setLocalDirectory("docs/Nebengeld/");
             download.setOnDownloadFinishedListener(new OnDownloadFinishedListener() {
                 @Override
                 public void onDownloadFinished(File file) {
@@ -252,8 +253,10 @@ public class DokumenteFragment extends Fragment implements View.OnClickListener 
                     extra.putString("status", "200");
                     mFirebaseAnalytics.logEvent("OSES_download_doc", extra);
 
+                    Uri fileUri = FileProvider.getUriForFile(getActivity(),"de.stm.oses.FileProvider", file);
                     Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setDataAndType(Uri.fromFile(file), "application/pdf");
+                    intent.setDataAndType(fileUri, "application/pdf");
+                    intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION+Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                     startActivity(intent);
                 }
 
@@ -333,7 +336,10 @@ public class DokumenteFragment extends Fragment implements View.OnClickListener 
                     extra.putString("status", "EXCEPTION");
                     mFirebaseAnalytics.logEvent("OSES_download_doc", extra);
 
-                    Toast.makeText(getActivity(), "Anwendungsfehler: " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                    if (e instanceof FileDownload.NoDownloadPermissionException)
+                        Toast.makeText(getActivity(), "Berechtigungsfehler: Die Datei konnte wegen fehlender Berechtigungen nicht auf das Gerät heruntergeladen werden!", Toast.LENGTH_LONG).show();
+                    else
+                        Toast.makeText(getActivity(), "Anwendungsfehler: " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
                 }
 
                 @Override

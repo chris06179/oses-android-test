@@ -34,24 +34,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_toEndOf="@+id/fax_icon"
             android:layout_toRightOf="@+id/fax_icon"
             android:text="Kreiensen"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="#000000" />
-
-        <TextView
-            android:id="@+id/fax_beschreibung"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_toEndOf="@+id/fax_icon"
-            android:layout_toRightOf="@+id/fax_icon"
-            android:text="Melderaum"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:layout_toLeftOf="@+id/fax_gb"
+            android:textColor="#000000"
+            android:layout_toLeftOf="@+id/fax_dist"
+            android:layout_toStartOf="@+id/fax_dist"
             android:layout_marginRight="16dp"
-            android:ellipsize="marquee"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:singleLine="true" />
 
         <TextView
@@ -74,6 +65,20 @@
             android:layout_alignParentRight="true"
             android:text="DB Regio"
             android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <TextView
+            android:id="@+id/fax_beschreibung"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Melderaum"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:ellipsize="marquee"
+            android:singleLine="true"
+            android:layout_alignParentBottom="true"
+            android:layout_toRightOf="@+id/fax_icon"
+            android:layout_toLeftOf="@+id/fax_gb"
+            android:layout_toStartOf="@+id/fax_gb"
+            android:layout_marginRight="16dp" />
 
         <!-- counter -->
 
