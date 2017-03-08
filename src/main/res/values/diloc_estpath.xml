@@ -1,4 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Franken -->
+
+    <!-- Nürnberg -->
     <string name="diloc_NN">/sync/data/Mitarbeiterhefte/Lokführer/08_Einsatzplanung_Tf/01_Einsatzstelle_NN/02_Arbeitsauftrag/</string>
+    <string name="diloc_NNG">/sync/data/Mitarbeiterhefte/Lokführer/08_Einsatzplanung_Tf/01_Einsatzstelle_NN/02_Arbeitsauftrag/</string>
+    <string name="diloc_NNSL">/sync/data/Mitarbeiterhefte/Lokführer/08_Einsatzplanung_Tf/01_Einsatzstelle_NN/02_Arbeitsauftrag/</string>
+    <string name="diloc_NNRO">/sync/data/Mitarbeiterhefte/Lokführer/08_Einsatzplanung_Tf/01_Einsatzstelle_NN/02_Arbeitsauftrag/</string>
+
+    <string name="diloc_MTL">/sync/data/Mitarbeiterhefte/Lokführer/08_Einsatzplanung_Tf/03_Einsatzstelle_MTL/02_Arbeitsauftrag/</string>
+    <string name="diloc_NSTN">/sync/data/Mitarbeiterhefte/Lokführer/08_Einsatzplanung_Tf/04_Einsatzstelle_NSTN/02_Arbeitsauftrag/</string>
+    <string name="diloc_NBA">/sync/data/Mitarbeiterhefte/Lokführer/08_Einsatzplanung_Tf/05_Einsatzstelle_NBA/02_Arbeitsauftrag/</string>
+    <string name="diloc_NNT">/sync/data/Mitarbeiterhefte/Lokführer/08_Einsatzplanung_Tf/07_Einsatzstelle_NNT/02_Arbeitsauftrag/</string>
+
+    <!-- Neustadt, Markt Erlbach-->
+    <string name="diloc_NNA">/sync/data/Mitarbeiterhefte/Lokführer/08_Einsatzplanung_Tf/06_Einsatzstelle_NNA/02_Arbeitsauftrag/</string>
+    <string name="diloc_NMER">/sync/data/Mitarbeiterhefte/Lokführer/08_Einsatzplanung_Tf/06_Einsatzstelle_NNA/02_Arbeitsauftrag/</string>
+
+    <!-- Neuhaus (Peg), Gräfenberg -->
+    <string name="diloc_NNP">/sync/data/Mitarbeiterhefte/Lokführer/08_Einsatzplanung_Tf/08_Einsatzstelle_NNP/02_Arbeitsauftrag/</string>
+    <string name="diloc_NGFG">/sync/data/Mitarbeiterhefte/Lokführer/08_Einsatzplanung_Tf/08_Einsatzstelle_NNP/02_Arbeitsauftrag/</string>
+
+    <!-- Ansbach, intern und extern -->
+    <string-array name="diloc_NAN">
+        <item>/sync/data/Mitarbeiterhefte/Lokführer/08_Einsatzplanung_Tf/02_Einsatzstelle_NAN/02_Arbeitsauftrag/</item>
+    </string-array>
+
+    <!-- Oberbayern Weiden, Schwandorf, Regensburg-->
+    <string name="diloc_NWDO">/sync/data/Mitarbeiterhefte/Dispobereich_NWDO/Dispobereich_NWDO/002_Arbeitsauftrag/</string>
+    <string name="diloc_NSCH">/sync/data/Mitarbeiterhefte/Dispobereich_NWDO/Dispobereich_NWDO/002_Arbeitsauftrag/</string>
+    <string name="diloc_NRH">/sync/data/Mitarbeiterhefte/Dispobereich_NWDO/Dispobereich_NWDO/002_Arbeitsauftrag/</string>
+
+
 </resources>

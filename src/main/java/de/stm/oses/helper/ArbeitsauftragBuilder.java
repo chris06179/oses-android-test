@@ -1,6 +1,8 @@
 package de.stm.oses.helper;
 
+import android.content.Context;
 import android.os.Environment;
+import android.util.Log;
 
 import com.google.firebase.crash.FirebaseCrash;
 import com.itextpdf.text.DocumentException;
@@ -14,8 +16,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
+import de.stm.oses.R;
 import de.stm.oses.verwendung.VerwendungClass;
 
 /**
@@ -24,73 +30,78 @@ import de.stm.oses.verwendung.VerwendungClass;
 
 public class ArbeitsauftragBuilder {
 
-    public static final int TYPE_NONE= 0;
+    public static final int TYPE_NONE = 0;
     public static final int TYPE_DILOC = 1;
     public static final int TYPE_CACHED = 2;
+    private final Context context;
 
     private VerwendungClass verwendung;
 
-    public ArbeitsauftragBuilder(VerwendungClass verwendung) {
+    public static int getResId(String resName, Class<?> c) {
+
+        try {
+            Field idField = c.getDeclaredField(resName);
+            return idField.getInt(idField);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    public ArbeitsauftragBuilder(VerwendungClass verwendung, Context context) {
+        this.context = context;
         this.verwendung = verwendung;
     }
 
     public File getDilocSourceFile() {
 
-        String searchest;
+        int pathResource = getResId("diloc_" + verwendung.getEst(), R.string.class);
 
-        // Prototype
-        switch (verwendung.getEst()) {
-            case "NMER":
-                searchest = "NNA";
-                break;
-            case "NGFG":
-                searchest = "NNP";
-                break;
-            default:
-                searchest = verwendung.getEst();
+        List<String> path;
+
+        if (pathResource == -1) {
+            pathResource = getResId("diloc_" + verwendung.getEst(), R.array.class);
+
+            if (pathResource == -1)
+                return null;
+
+            path = Arrays.asList(context.getResources().getStringArray(pathResource));
+        } else {
+            path = new ArrayList<>();
+            path.add(context.getResources().getString(pathResource));
         }
 
-        File directory = new File(Environment.getExternalStorageDirectory(),"/sync/data/Mitarbeiterhefte/Lokführer/08_Einsatzplanung_Tf/");
+        File pdf = null;
 
-        if (!directory.exists())
-            return null;
+        search:
+        {
+            for (String dir : path) {
 
-        File[] files = directory.listFiles();
+                File directory = new File(Environment.getExternalStorageDirectory(), dir);
 
-        String nextdir = null;
+                if (!directory.exists())
+                    continue;
 
-        for (File file : files) {
-            if (file.getName().contains(searchest)) {
-                nextdir = file.getName();
-                break;
+                File[] files = directory.listFiles();
+
+
+                String searchdate = verwendung.getDatumFormatted("dd.MM.yyyy");
+                String searchdate2 = verwendung.getDatumFormatted("dd.MM.yy");
+                String searchdate3 = verwendung.getDatumFormatted("yyyyMMdd");
+                String searchdate4 = verwendung.getDatumFormatted("yyMMdd");
+
+                for (File file : files) {
+                    if (file.getName().contains(searchdate) || file.getName().contains(searchdate2) || file.getName().contains(searchdate3) || file.getName().contains(searchdate4)) {
+                        pdf = file;
+                        break search;
+                    }
+                }
+
             }
         }
 
-        if (nextdir == null)
+        if (pdf == null)
             return null;
-
-        directory = new File(Environment.getExternalStorageDirectory(),"/sync/data/Mitarbeiterhefte/Lokführer/08_Einsatzplanung_Tf/"+nextdir+"/02_Arbeitsauftrag/");
-
-        if (!directory.exists())
-            return null;
-
-        files = directory.listFiles();
-
-        String filename = null;
-        String searchdate = verwendung.getDatumFormatted("dd.MM.yyyy");
-        String searchdate2 = verwendung.getDatumFormatted("dd.MM.yy");
-
-        for (File file : files) {
-            if (file.getName().contains(searchdate) || file.getName().contains(searchdate2)) {
-                filename = file.getName();
-                break;
-            }
-        }
-
-        if (filename == null)
-            return null;
-
-        File pdf = new File(Environment.getExternalStorageDirectory(),"/sync/data/Mitarbeiterhefte/Lokführer/08_Einsatzplanung_Tf/"+nextdir+"/02_Arbeitsauftrag/"+filename);
 
         if (pdf.exists())
             return pdf;
@@ -139,7 +150,7 @@ public class ArbeitsauftragBuilder {
 
             read.selectPages(pages);
 
-            String path = Environment.getExternalStorageDirectory().getPath()+"/OSES/docs/Arbeitsaufträge/Arbeitsauftrag_"+verwendung.getBezeichner()+"_"+verwendung.getDatumFormatted("dd.MM.yyyy")+".pdf";
+            String path = Environment.getExternalStorageDirectory().getPath() + "/OSES/docs/Arbeitsaufträge/Arbeitsauftrag_" + verwendung.getBezeichner() + "_" + verwendung.getDatumFormatted("dd.MM.yyyy") + ".pdf";
 
             File file = new File(path);
             file.getParentFile().mkdirs();
@@ -159,7 +170,7 @@ public class ArbeitsauftragBuilder {
 
     public File getExtractedCacheFile() {
 
-        File cache = new File(Environment.getExternalStorageDirectory().getPath()+"/OSES/docs/Arbeitsaufträge/Arbeitsauftrag_"+verwendung.getBezeichner()+"_"+verwendung.getDatumFormatted("dd.MM.yyyy")+".pdf");
+        File cache = new File(Environment.getExternalStorageDirectory().getPath() + "/OSES/docs/Arbeitsaufträge/Arbeitsauftrag_" + verwendung.getBezeichner() + "_" + verwendung.getDatumFormatted("dd.MM.yyyy") + ".pdf");
 
         if (cache.exists())
             return cache;

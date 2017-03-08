@@ -651,7 +651,7 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
         protected File doInBackground(VerwendungClass... params) {
 
             schicht = params[0];
-            ArbeitsauftragBuilder auftrag = new ArbeitsauftragBuilder(params[0]);
+            ArbeitsauftragBuilder auftrag = new ArbeitsauftragBuilder(params[0], getActivity());
 
             File cache = auftrag.getExtractedCacheFile();
             File diloc = auftrag.getDilocSourceFile();

@@ -437,7 +437,7 @@ public class VerwendungClass implements Serializable {
 		if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
 			return ArbeitsauftragBuilder.TYPE_NONE;
 
-		ArbeitsauftragBuilder auftrag = new ArbeitsauftragBuilder(this);
+		ArbeitsauftragBuilder auftrag = new ArbeitsauftragBuilder(this, context);
 
 		if (auftrag.getExtractedCacheFile() != null)
 			return ArbeitsauftragBuilder.TYPE_CACHED;
