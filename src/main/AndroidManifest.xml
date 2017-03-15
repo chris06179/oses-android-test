@@ -22,12 +22,9 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/Theme.OSES">
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDwPTQAcqsl_U3YMiWsayPxa59g5FClWJg" />
+
+        <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
+        <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyDwPTQAcqsl_U3YMiWsayPxa59g5FClWJg" />
 
         <service android:name=".fcm.InstanceIdListenerService">
             <intent-filter>

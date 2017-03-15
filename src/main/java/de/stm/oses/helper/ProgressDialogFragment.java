@@ -3,6 +3,7 @@ package de.stm.oses.helper;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,13 +16,15 @@ public class ProgressDialogFragment extends DialogFragment {
 
     private String mTitle;
     private String mMessage;
+    private int mStyle;
 
-    public static ProgressDialogFragment newInstance(String title, String message) {
+    public static ProgressDialogFragment newInstance(String title, String message, int style) {
         ProgressDialogFragment f = new ProgressDialogFragment();
 
         Bundle args = new Bundle();
         args.putString("title", title);
         args.putString("message", message);
+        args.putInt("style", style);
         f.setArguments(args);
 
         return f;
@@ -32,6 +35,7 @@ public class ProgressDialogFragment extends DialogFragment {
         super.onCreate(savedInstanceState);
         mTitle = getArguments().getString("title");
         mMessage = getArguments().getString("message");
+        mStyle = getArguments().getInt("style");
         setRetainInstance(true);
     }
 
@@ -44,6 +48,8 @@ public class ProgressDialogFragment extends DialogFragment {
         dialog.setMessage(mMessage);
         dialog.setCancelable(false);
         dialog.setCanceledOnTouchOutside(false);
+        dialog.setProgressStyle(mStyle);
+        dialog.setIndeterminate(true);
         return dialog;
     }
 
@@ -56,5 +62,9 @@ public class ProgressDialogFragment extends DialogFragment {
         super.onDestroyView();
     }
 
+    @Override
+    public ProgressDialog getDialog() {
+        return ((ProgressDialog) super.getDialog());
+    }
 
 }

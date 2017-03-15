@@ -1,6 +1,9 @@
 package de.stm.oses.helper;
 
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
 
@@ -36,6 +39,10 @@ public class ArbeitsauftragBuilder {
     private final Context context;
 
     private VerwendungClass verwendung;
+
+    public interface OnProgressPublisher {
+        void onPublishProgress(int progress, int found);
+    }
 
     public static int getResId(String resName, Class<?> c) {
 
@@ -110,7 +117,7 @@ public class ArbeitsauftragBuilder {
 
     }
 
-    public File extractFromDilocSourceFile() {
+    public File extractFromDilocSourceFile(OnProgressPublisher listener, ProgressDialogFragment dialogFragment) {
 
         try {
 
@@ -118,6 +125,11 @@ public class ArbeitsauftragBuilder {
 
             PdfReader read;
             read = new PdfReader(new FileInputStream(pdf));
+
+            dialogFragment.getDialog().setProgressNumberFormat("Seite %1d / %2d");
+            dialogFragment.getDialog().setMax(read.getNumberOfPages());
+            dialogFragment.getDialog().setIndeterminate(false);
+
 
             PdfReaderContentParser parser;
             parser = new PdfReaderContentParser(read);
@@ -127,8 +139,14 @@ public class ArbeitsauftragBuilder {
 
             int lastpageadded = 0;
             for (int i = 1; i <= read.getNumberOfPages(); i++) {
+                if (dialogFragment.getDialog() == null)
+                    return null;
+
+                listener.onPublishProgress(i, 0);
+
                 strategy = parser.processContent(i, new SimpleTextExtractionStrategy());
                 String text = strategy.getResultantText();
+
 
                 if (text.contains("Schicht: " + verwendung.getBezeichner())) {
                     pages.add(i);
@@ -147,6 +165,7 @@ public class ArbeitsauftragBuilder {
                     return null;
             }
 
+            listener.onPublishProgress(read.getNumberOfPages(), 1);
 
             read.selectPages(pages);
 

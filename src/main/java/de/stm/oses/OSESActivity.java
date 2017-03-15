@@ -1,6 +1,7 @@
 package de.stm.oses;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -251,7 +252,7 @@ public class OSESActivity extends AppCompatActivity implements View.OnClickListe
 
     private void ShowWaitDialog() {
 
-        ProgressDialogFragment loginWaitDialog = ProgressDialogFragment.newInstance("Anmeldung", "Bitte warten, deine Zugangsdaten werden überprüft...");
+        ProgressDialogFragment loginWaitDialog = ProgressDialogFragment.newInstance("Anmeldung", "Bitte warten, deine Zugangsdaten werden überprüft...", ProgressDialog.STYLE_SPINNER);
         loginWaitDialog.show(getSupportFragmentManager(), "loginWaitDialog");
 
     }

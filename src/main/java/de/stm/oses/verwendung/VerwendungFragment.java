@@ -1,5 +1,6 @@
 package de.stm.oses.verwendung;
 
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -22,6 +23,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -34,11 +36,10 @@ import android.widget.Toast;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.crash.FirebaseCrash;
 
-import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Calendar;
 
 import de.stm.oses.R;
@@ -205,7 +206,6 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
     }
 
 
-
     @Override
     public VerwendungAdapter getListAdapter() {
         return ((VerwendungAdapter) super.getListAdapter());
@@ -302,7 +302,7 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
                     menu.findItem(R.id.action_fax_sdl).setVisible(false);
                 }
 
-                if (getListAdapter().getSelectedItem().isArbeitsauftragAvailable(getActivity()) != ArbeitsauftragBuilder.TYPE_NONE) {
+                if (getListAdapter().getSelectedItem().getArbeitsauftragType() != ArbeitsauftragBuilder.TYPE_NONE) {
                     menu.findItem(R.id.action_show_arbeitsauftrag).setVisible(true);
                 } else {
                     menu.findItem(R.id.action_show_arbeitsauftrag).setVisible(false);
@@ -400,7 +400,7 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
             menu.findItem(R.id.action_fax_sdl).setVisible(false);
         }
 
-        if (item.isArbeitsauftragAvailable(getActivity()) != ArbeitsauftragBuilder.TYPE_NONE) {
+        if (item.getArbeitsauftragType() != ArbeitsauftragBuilder.TYPE_NONE) {
             menu.findItem(R.id.action_show_arbeitsauftrag).setVisible(true);
         } else {
             menu.findItem(R.id.action_show_arbeitsauftrag).setVisible(false);
@@ -498,7 +498,7 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
 
     public void ChangeDateOnClick() {
 
-       ZeitraumDialogFragment zeitraum = ZeitraumDialogFragment.newInstance(new ZeitraumDialogFragment.OnDateSetListener() {
+        ZeitraumDialogFragment zeitraum = ZeitraumDialogFragment.newInstance(new ZeitraumDialogFragment.OnDateSetListener() {
             @Override
             public void onDateSet(int year, int monthOfYear,
                                   int dayOfMonth) {
@@ -515,135 +515,19 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
 
         }, selectedyear, selectedmonth - 1, 1);
 
-                zeitraum.show(((AppCompatActivity) getActivity()).getSupportFragmentManager(), "zeitraumdialog");
+        zeitraum.show(((AppCompatActivity) getActivity()).getSupportFragmentManager(), "zeitraumdialog");
     }
 
 
-
-
-    private ArrayList<VerwendungClass> parseJSON(String json) {
-        ArrayList<VerwendungClass> items = new ArrayList<>();
-
-        try {
-
-            JSONObject verwendung = new JSONObject(json);
-
-            JSONObject monat = verwendung.getJSONObject(verwendung.names().getString(0));
-
-            JSONArray schichten = monat.getJSONArray("data");
-
-            for (int i = 0; i < schichten.length(); i++) {
-
-                VerwendungClass item = new VerwendungClass();
-
-                JSONObject schicht = schichten.getJSONObject(i);
-
-                item.setId(schicht.getInt("id"));
-
-                item.setKat(schicht.getString("kat"));
-
-                item.setBezeichner(schicht.getString("bezeichner"));
-                item.setFpla(schicht.getString("fpla"));
-
-                item.setDb(schicht.getString("db"));
-                item.setDe(schicht.getString("de"));
-                item.setAdb(schicht.getString("adb"));
-                item.setAde(schicht.getString("ade"));
-
-                item.setAdban(schicht.optDouble("adb_an", 1));
-                item.setAdean(schicht.optDouble("ade_an", 1));
-
-                item.setPause(schicht.getString("pause"));
-                item.setPauseInt(schicht.getInt("pauseint"));
-                item.setPauseRil(schicht.getString("pause_ril"));
-                item.setApause(schicht.getString("apause"));
-
-                item.setDatum(schicht.getInt("datum"));
-                item.setBaureihen(schicht.getString("baureihen"));
-
-                item.setAz(schicht.getString("az"));
-                item.setOaz(schicht.optInt("o_az", 0));
-
-                item.setAufart(schicht.getString("auf_art"));
-                item.setAufdb(schicht.getString("aufdb"));
-                item.setAufde(schicht.getString("aufde"));
-                item.setAufdz(schicht.optInt("aufdz", 0));
-
-                item.setMdifferenz(schicht.getString("mdifferenz"));
-
-                item.setEst(schicht.getString("est"));
-                item.setEstId(schicht.optInt("estid", 0));
-
-                item.setMsoll(schicht.getString("msoll"));
-
-                item.setMist(schicht.getString("mist"));
-
-                item.setFunktion(schicht.getString("funktion"));
-                item.setFunktionId(schicht.getInt("funktionid"));
-
-                item.setDbr(schicht.getString("dbr"));
-                item.setDer(schicht.getString("der"));
-                item.setApauser(schicht.getString("apauser"));
-
-
-                if (schicht.isNull("notiz"))
-                    item.setNotiz(null);
-                else
-                    item.setNotiz(schicht.optString("notiz", null));
-
-                item.setInfo(schicht.optString("info", ""));
-
-                if (schicht.has("AllowSDL"))
-                    item.setAllowSDL(schicht.getBoolean("AllowSDL"));
-
-                if (schicht.has("ShowTimeError"))
-                    item.setShowTimeError(schicht.getBoolean("ShowTimeError"));
-
-                items.add(item);
-
-            }
-
-            // Zusammenfassung
-
-            SharedPreferences AppSettings = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            String position = AppSettings.getString("sumPosition", "BOTTOM");
-
-            if (!position.equals("NONE")) {
-
-                VerwendungClass sumData = new VerwendungClass(true);
-
-                sumData.setLabel(verwendung.names().getString(0));
-                if (monat.has("schichten"))
-                    sumData.setSchichten(monat.getInt("schichten"));
-                if (monat.has("urlaub"))
-                    sumData.setUrlaub(monat.getInt("urlaub"));
-                sumData.setMsoll(monat.getString("msoll"));
-                sumData.setAzg(monat.getString("azg"));
-                sumData.setMdifferenz(monat.getString("mdifferenz"));
-
-                if (position.equals("BOTTOM") || position.equals("BOTH"))
-                    items.add(sumData);
-
-                if (position.equals("TOP") || position.equals("BOTH"))
-                    items.add(0, sumData);
-            }
-
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        return items;
-    }
-
-    private class ShowArbeitsauftrag extends AsyncTask<VerwendungClass, Void, File> {
+    private class ShowArbeitsauftrag extends AsyncTask<VerwendungClass, Integer, File> {
 
         VerwendungClass schicht;
+        ProgressDialogFragment loginWaitDialog;
 
         protected void onPreExecute() {
 
             mFirebaseAnalytics.logEvent("OSES_show_arbeitsauftrag", null);
-            ProgressDialogFragment loginWaitDialog = ProgressDialogFragment.newInstance("Dokument wird erzeugt...", "Bitte warten, der angeforderte Arbeitsauftrag wird extrahiert...");
+            loginWaitDialog = ProgressDialogFragment.newInstance("Dokument wird erzeugt...", "Bitte warten, der angeforderte Arbeitsauftrag wird extrahiert. Die Diloc-Quelldatei wird durchsucht...", ProgressDialog.STYLE_HORIZONTAL);
             loginWaitDialog.show(((AppCompatActivity) getActivity()).getSupportFragmentManager(), "auftragWaitDialog");
 
         }
@@ -651,23 +535,45 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
         protected File doInBackground(VerwendungClass... params) {
 
             schicht = params[0];
-            ArbeitsauftragBuilder auftrag = new ArbeitsauftragBuilder(params[0], getActivity());
 
-            File cache = auftrag.getExtractedCacheFile();
-            File diloc = auftrag.getDilocSourceFile();
+            File cache = schicht.getArbeitsauftragCacheFile();
+            File diloc = schicht.getArbeitsauftragDilocFile();
 
             if (cache != null && diloc != null) {
-                if (diloc.lastModified() > cache.lastModified())
-                    return auftrag.extractFromDilocSourceFile();
+                if (diloc.lastModified() > cache.lastModified()) {
+                    ArbeitsauftragBuilder auftrag = new ArbeitsauftragBuilder(schicht, getActivity());
+                    return auftrag.extractFromDilocSourceFile(new ArbeitsauftragBuilder.OnProgressPublisher() {
+                        @Override
+                        public void onPublishProgress(int progress, int found) {
+                            publishProgress(progress, found);
+                        }
+                    },loginWaitDialog);
+                }
                 else
                     return cache;
             }
 
             if (cache != null)
                 return cache;
-            else
-                return auftrag.extractFromDilocSourceFile();
+            else {
+                ArbeitsauftragBuilder auftrag = new ArbeitsauftragBuilder(schicht, getActivity());
+                return auftrag.extractFromDilocSourceFile(new ArbeitsauftragBuilder.OnProgressPublisher() {
+                    @Override
+                    public void onPublishProgress(int progress, int found) {
+                        publishProgress(progress, found);
+                    }
+                },loginWaitDialog);
+            }
 
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... progress) {
+            loginWaitDialog.getDialog().setProgress(progress[0]);
+            if (progress[1] == 1) {
+                loginWaitDialog.getDialog().setIndeterminate(true);
+                loginWaitDialog.getDialog().setMessage("PDF-Datei wird erstellt...");
+            }
         }
 
         protected void onPostExecute(File auftrag) {
@@ -679,7 +585,7 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
 
             if (auftrag == null) {
                 Toast.makeText(getActivity(), "Es konnte kein Arbeitsauftrag zur angegebenen Schichtnummer extrahiert werden! Bitte rufe das Dokument ggf. direkt über Diloc|Sync auf!", Toast.LENGTH_SHORT).show();
-                FirebaseCrash.log("AA = "+schicht.getBezeichner()+", "+schicht.getEst()+", "+schicht.getDatumFormatted("dd.MM.yyyy"));
+                FirebaseCrash.log("AA = " + schicht.getBezeichner() + ", " + schicht.getEst() + ", " + schicht.getDatumFormatted("dd.MM.yyyy"));
                 FirebaseCrash.report(new Exception("Arbeitsauftrag, keine Extraktion möglich!"));
                 return;
             }
@@ -688,7 +594,7 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
 
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setDataAndType(fileUri, "application/pdf");
-            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION+Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION + Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
             startActivity(intent);
 
         }
@@ -703,10 +609,15 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
 
             String response = OSES.getJSON(params[0], 60000);
 
-            if (getActivity() != null && response != null)
-                return new VerwendungAdapter(getActivity(), parseJSON(response));
-            else
+            try {
+                if (getActivity() != null && response != null)
+                    return new VerwendungAdapter(getActivity(), VerwendungClass.getNewList(response, getActivity()));
+                else
+                    return null;
+
+            } catch (JSONException e) {
                 return null;
+            }
 
         }
 
@@ -815,7 +726,7 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
 
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setDataAndType(fileUri, "application/pdf");
-                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION+Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION + Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                 startActivity(intent);
             }
 
