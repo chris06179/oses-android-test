@@ -1,11 +1,7 @@
 package de.stm.oses.helper;
 
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.os.AsyncTask;
 import android.os.Environment;
-import android.util.Log;
 
 import com.google.firebase.crash.FirebaseCrash;
 import com.itextpdf.text.DocumentException;
@@ -27,10 +23,6 @@ import java.util.List;
 import de.stm.oses.R;
 import de.stm.oses.verwendung.VerwendungClass;
 
-/**
- * Created by Christian on 30.01.2017.
- */
-
 public class ArbeitsauftragBuilder {
 
     public static final int TYPE_NONE = 0;
@@ -44,7 +36,7 @@ public class ArbeitsauftragBuilder {
         void onPublishProgress(int progress, int found);
     }
 
-    public static int getResId(String resName, Class<?> c) {
+    private static int getResId(String resName, Class<?> c) {
 
         try {
             Field idField = c.getDeclaredField(resName);
@@ -126,7 +118,7 @@ public class ArbeitsauftragBuilder {
             PdfReader read;
             read = new PdfReader(new FileInputStream(pdf));
 
-            dialogFragment.getDialog().setProgressNumberFormat("Seite %1d / %2d");
+            dialogFragment.setProgressNumberFormat("Seite %1d / %2d");
             dialogFragment.getDialog().setMax(read.getNumberOfPages());
             dialogFragment.getDialog().setIndeterminate(false);
 
@@ -169,7 +161,7 @@ public class ArbeitsauftragBuilder {
 
             read.selectPages(pages);
 
-            String path = Environment.getExternalStorageDirectory().getPath() + "/OSES/docs/Arbeitsaufträge/Arbeitsauftrag_" + verwendung.getBezeichner() + "_" + verwendung.getDatumFormatted("dd.MM.yyyy") + ".pdf";
+            String path = Environment.getExternalStorageDirectory().getPath() + "/OSES/docs/Arbeitsaufträge/"+ verwendung.getDatumFormatted("yyyy/MM - MMMM") +"/Arbeitsauftrag_" + verwendung.getDatumFormatted("dd.MM.yyyy_EE").replaceAll(".$","") + "_" + verwendung.getBezeichner() + ".pdf";
 
             File file = new File(path);
             file.getParentFile().mkdirs();
@@ -189,13 +181,17 @@ public class ArbeitsauftragBuilder {
 
     public File getExtractedCacheFile() {
 
-        File cache = new File(Environment.getExternalStorageDirectory().getPath() + "/OSES/docs/Arbeitsaufträge/Arbeitsauftrag_" + verwendung.getBezeichner() + "_" + verwendung.getDatumFormatted("dd.MM.yyyy") + ".pdf");
+        File cache = new File(Environment.getExternalStorageDirectory().getPath() +  "/OSES/docs/Arbeitsaufträge/"+ verwendung.getDatumFormatted("yyyy/MM - MMMM") +"/Arbeitsauftrag_" + verwendung.getDatumFormatted("dd.MM.yyyy_EE").replaceAll(".$","") + "_" + verwendung.getBezeichner() + ".pdf");
 
         if (cache.exists())
             return cache;
-        else
-            return null;
-
+        else {
+            cache = new File(Environment.getExternalStorageDirectory().getPath() + "/OSES/docs/Arbeitsaufträge/Arbeitsauftrag_" + verwendung.getBezeichner() + "_" + verwendung.getDatumFormatted("dd.MM.yyyy") + ".pdf");
+            if (cache.exists())
+                return  cache;
+            else
+                return null;
+        }
     }
 
 }

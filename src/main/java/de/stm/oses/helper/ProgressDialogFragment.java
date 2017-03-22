@@ -17,6 +17,7 @@ public class ProgressDialogFragment extends DialogFragment {
     private String mTitle;
     private String mMessage;
     private int mStyle;
+    private String mProgressNumberFormat = "";
 
     public static ProgressDialogFragment newInstance(String title, String message, int style) {
         ProgressDialogFragment f = new ProgressDialogFragment();
@@ -49,7 +50,15 @@ public class ProgressDialogFragment extends DialogFragment {
         dialog.setCancelable(false);
         dialog.setCanceledOnTouchOutside(false);
         dialog.setProgressStyle(mStyle);
+        dialog.setProgressNumberFormat("");
         dialog.setIndeterminate(true);
+
+        if (savedInstanceState != null) {
+            dialog.setProgressNumberFormat(savedInstanceState.getString("numberFormat"));
+            dialog.setMax(savedInstanceState.getInt("max"));
+            dialog.setProgress(savedInstanceState.getInt("progress"));
+            dialog.setIndeterminate(savedInstanceState.getBoolean("indeterminate"));
+        }
         return dialog;
     }
 
@@ -61,6 +70,22 @@ public class ProgressDialogFragment extends DialogFragment {
         }
         super.onDestroyView();
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putString("numberFormat", mProgressNumberFormat);
+        outState.putInt("max", getDialog().getMax());
+        outState.putInt("progress", getDialog().getProgress());
+        outState.putBoolean("indeterminate", getDialog().isIndeterminate());
+        super.onSaveInstanceState(outState);
+    }
+
+    public void setProgressNumberFormat(String format) {
+        mProgressNumberFormat = format;
+        getDialog().setProgressNumberFormat(mProgressNumberFormat);
+    }
+
+
 
     @Override
     public ProgressDialog getDialog() {

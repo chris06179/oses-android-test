@@ -14,6 +14,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
@@ -534,6 +535,8 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
 
         protected File doInBackground(VerwendungClass... params) {
 
+            Looper.prepare();
+
             schicht = params[0];
 
             File cache = schicht.getArbeitsauftragCacheFile();
@@ -569,11 +572,15 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
 
         @Override
         protected void onProgressUpdate(Integer... progress) {
-            loginWaitDialog.getDialog().setProgress(progress[0]);
             if (progress[1] == 1) {
                 loginWaitDialog.getDialog().setIndeterminate(true);
                 loginWaitDialog.getDialog().setMessage("PDF-Datei wird erstellt...");
-            }
+                loginWaitDialog.setProgressNumberFormat("");
+                loginWaitDialog.getDialog().setProgress(loginWaitDialog.getDialog().getMax());
+
+            } else
+                loginWaitDialog.getDialog().setProgress(progress[0]);
+
         }
 
         protected void onPostExecute(File auftrag) {
@@ -589,6 +596,9 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
                 FirebaseCrash.report(new Exception("Arbeitsauftrag, keine Extraktion möglich!"));
                 return;
             }
+
+            schicht.setArbeitsauftragCacheFile(auftrag);
+            getListAdapter().notifyDataSetChanged();
 
             Uri fileUri = FileProvider.getUriForFile(getActivity(), "de.stm.oses.FileProvider", auftrag);
 

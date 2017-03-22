@@ -235,7 +235,7 @@ public class VerwendungClass implements Serializable {
 
         long unixSeconds = datum;
         Date date = new Date((unixSeconds + 3600) * 1000L); // *1000 is to convert seconds to milliseconds
-        SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.GERMAN); // the format of your date
+        SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.GERMANY); // the format of your date
         sdf.setTimeZone(TimeZone.getTimeZone("GMT+1"));
         return sdf.format(date);
 
@@ -594,5 +594,10 @@ public class VerwendungClass implements Serializable {
 
     public File getArbeitsauftragCacheFile() {
         return arbeitsauftragCacheFile;
+    }
+
+    public void setArbeitsauftragCacheFile(File file) {
+        this.arbeitsauftragCacheFile = file;
+        this.arbeitsauftrag = ArbeitsauftragBuilder.TYPE_CACHED;
     }
 }
