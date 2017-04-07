@@ -1,12 +1,13 @@
 package de.stm.oses.verwendung;
 
+import android.app.ActivityManager;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -17,14 +18,12 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Vibrator;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -37,6 +36,9 @@ import android.widget.Toast;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.crash.FirebaseCrash;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -44,13 +46,16 @@ import java.io.File;
 import java.util.Calendar;
 
 import de.stm.oses.R;
+import de.stm.oses.arbeitsauftrag.ArbeitsauftragDilocIntentService;
 import de.stm.oses.fax.FaxActivity;
-import de.stm.oses.helper.ArbeitsauftragBuilder;
+import de.stm.oses.arbeitsauftrag.ArbeitsauftragBuilder;
 import de.stm.oses.helper.FileDownload;
 import de.stm.oses.helper.OSESBase;
 import de.stm.oses.helper.ProgressDialogFragment;
 import de.stm.oses.helper.SwipeRefreshListFragment;
 import de.stm.oses.helper.ZeitraumDialogFragment;
+
+import static android.content.Context.ACTIVITY_SERVICE;
 
 
 public class VerwendungFragment extends SwipeRefreshListFragment implements ActionMode.Callback {
@@ -199,7 +204,7 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
                 EditVerwendung(schicht);
                 return true;
             case R.id.action_show_arbeitsauftrag:
-                new ShowArbeitsauftrag().execute(schicht);
+                CheckArbeitsauftrag(schicht);
                 return true;
             default:
                 return false;
@@ -256,12 +261,33 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
 
         getActivity().registerReceiver(receiver, filter);
 
+        EventBus.getDefault().register(this);
+
+        if (!isIntentServiceRunning("de.stm.oses.arbeitsauftrag.ArbeitsauftragDilocIntentService")) {
+            if (((AppCompatActivity) getActivity()).getSupportFragmentManager().getFragments() != null)
+                for (Fragment f : ((AppCompatActivity) getActivity()).getSupportFragmentManager().getFragments()) {
+                    if (f != null && f.getTag() != null && f.getTag().contains("arbeitsauftragWaitDialog"))
+                        ((ProgressDialogFragment) f).getDialog().dismiss();
+                }
+        }
+    }
+
+    private boolean isIntentServiceRunning(String serviceName) {
+        ActivityManager manager = (ActivityManager) getActivity().getSystemService(ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceName.equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
     public void onPause() {
         super.onPause();
         getActivity().unregisterReceiver(receiver);
+
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
@@ -519,98 +545,110 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
         zeitraum.show(((AppCompatActivity) getActivity()).getSupportFragmentManager(), "zeitraumdialog");
     }
 
+    private void CheckArbeitsauftrag(VerwendungClass schicht) {
 
-    private class ShowArbeitsauftrag extends AsyncTask<VerwendungClass, Integer, File> {
+        mFirebaseAnalytics.logEvent("OSES_show_arbeitsauftrag", null);
 
-        VerwendungClass schicht;
-        ProgressDialogFragment loginWaitDialog;
+        File cache = schicht.getArbeitsauftragCacheFile();
+        File diloc = schicht.getArbeitsauftragDilocFile();
 
-        protected void onPreExecute() {
-
-            mFirebaseAnalytics.logEvent("OSES_show_arbeitsauftrag", null);
-            loginWaitDialog = ProgressDialogFragment.newInstance("Dokument wird erzeugt...", "Bitte warten, der angeforderte Arbeitsauftrag wird extrahiert. Die Diloc-Quelldatei wird durchsucht...", ProgressDialog.STYLE_HORIZONTAL);
-            loginWaitDialog.show(((AppCompatActivity) getActivity()).getSupportFragmentManager(), "auftragWaitDialog");
-
-        }
-
-        protected File doInBackground(VerwendungClass... params) {
-
-            Looper.prepare();
-
-            schicht = params[0];
-
-            File cache = schicht.getArbeitsauftragCacheFile();
-            File diloc = schicht.getArbeitsauftragDilocFile();
-
-            if (cache != null && diloc != null) {
-                if (diloc.lastModified() > cache.lastModified()) {
-                    ArbeitsauftragBuilder auftrag = new ArbeitsauftragBuilder(schicht, getActivity());
-                    return auftrag.extractFromDilocSourceFile(new ArbeitsauftragBuilder.OnProgressPublisher() {
-                        @Override
-                        public void onPublishProgress(int progress, int found) {
-                            publishProgress(progress, found);
-                        }
-                    },loginWaitDialog);
-                }
-                else
-                    return cache;
-            }
-
-            if (cache != null)
-                return cache;
-            else {
-                ArbeitsauftragBuilder auftrag = new ArbeitsauftragBuilder(schicht, getActivity());
-                return auftrag.extractFromDilocSourceFile(new ArbeitsauftragBuilder.OnProgressPublisher() {
-                    @Override
-                    public void onPublishProgress(int progress, int found) {
-                        publishProgress(progress, found);
-                    }
-                },loginWaitDialog);
-            }
-
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... progress) {
-            if (progress[1] == 1) {
-                loginWaitDialog.getDialog().setIndeterminate(true);
-                loginWaitDialog.getDialog().setMessage("PDF-Datei wird erstellt...");
-                loginWaitDialog.setProgressNumberFormat("");
-                loginWaitDialog.getDialog().setProgress(loginWaitDialog.getDialog().getMax());
-
-            } else
-                loginWaitDialog.getDialog().setProgress(progress[0]);
-
-        }
-
-        protected void onPostExecute(File auftrag) {
-
-            Fragment f = ((AppCompatActivity) getActivity()).getSupportFragmentManager().findFragmentByTag("auftragWaitDialog");
-            if (f != null)
-                ((ProgressDialogFragment) f).dismiss();
-
-
-            if (auftrag == null) {
-                Toast.makeText(getActivity(), "Es konnte kein Arbeitsauftrag zur angegebenen Schichtnummer extrahiert werden! Bitte rufe das Dokument ggf. direkt über Diloc|Sync auf!", Toast.LENGTH_SHORT).show();
-                FirebaseCrash.log("AA = " + schicht.getBezeichner() + ", " + schicht.getEst() + ", " + schicht.getDatumFormatted("dd.MM.yyyy"));
-                FirebaseCrash.report(new Exception("Arbeitsauftrag, keine Extraktion möglich!"));
+        if (cache != null && diloc != null) {
+            if (diloc.lastModified() > cache.lastModified()) {
+                GenerateArbeitsauftrag(schicht);
+                return;
+            } else {
+                ShowPDFFile(cache);
                 return;
             }
+        }
 
-            schicht.setArbeitsauftragCacheFile(auftrag);
-            getListAdapter().notifyDataSetChanged();
-
-            Uri fileUri = FileProvider.getUriForFile(getActivity(), "de.stm.oses.FileProvider", auftrag);
-
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setDataAndType(fileUri, "application/pdf");
-            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION + Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-            startActivity(intent);
-
+        if (cache != null) {
+            ShowPDFFile(cache);
+            return;
+        } else {
+            GenerateArbeitsauftrag(schicht);
         }
 
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(ArbeitsauftragDilocIntentService.ArbeitsauftragProgressEvent event) {
+        ProgressDialogFragment dialogFragment = ((ProgressDialogFragment) ((AppCompatActivity) getActivity()).getSupportFragmentManager().findFragmentByTag("arbeitsauftragWaitDialog" + event.id));
+        if (dialogFragment != null)
+            if (dialogFragment.getDialog() != null) {
+                ProgressDialog dialog = dialogFragment.getDialog();
+
+                if (event.progress == event.max) {
+                    dialogFragment.setProgressNumberFormat("");
+                    dialog.setIndeterminate(true);
+                    dialogFragment.setMessage("PDF-Datei wird erstellt...");
+                } else {
+                    dialogFragment.setProgressNumberFormat("Seite %1d / %2d");
+                    dialog.setIndeterminate(false);
+                    dialog.setMax(event.max);
+                    dialog.setProgress(event.progress);
+                }
+            }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(ArbeitsauftragDilocIntentService.ArbeitsauftragResultEvent event) {
+
+        Object result = event.result;
+        VerwendungClass schicht = event.schicht;
+
+        Fragment f = ((AppCompatActivity) getActivity()).getSupportFragmentManager().findFragmentByTag("arbeitsauftragWaitDialog"+schicht.getId());
+
+        if (result instanceof File) {
+
+            getListAdapter().getItemByID(event.schicht.getId()).setArbeitsauftragCacheFile((File) result);
+            getListAdapter().notifyDataSetChanged();
+
+            if (f != null)
+                ShowPDFFile((File) result);
+        }
+
+        if (f != null)
+            ((ProgressDialogFragment) f).dismiss();
+
+        if (result == null)
+            return;
+
+        if (result instanceof Exception) {
+            Toast.makeText(getActivity(), "Es konnte kein Arbeitsauftrag zur angegebenen Schichtnummer extrahiert werden! Bitte rufe das Dokument ggf. direkt über Diloc|Sync auf!", Toast.LENGTH_SHORT).show();
+            FirebaseCrash.log("AA = " + schicht.getBezeichner() + ", " + schicht.getEst() + ", " + schicht.getDatumFormatted("dd.MM.yyyy"));
+            FirebaseCrash.report(new Exception("Arbeitsauftrag, keine Extraktion möglich!"));
+            return;
+        }
+
+    }
+
+    public void GenerateArbeitsauftrag(VerwendungClass schicht) {
+
+        ProgressDialogFragment loginWaitDialog;
+        if (schicht.getArbeitsauftragCacheFile() == null)
+            loginWaitDialog = ProgressDialogFragment.newInstance("Dokument wird erzeugt...", "Bitte warten, der angeforderte wird Arbeitsauftrag extrahiert. Die Quelldatei aus Diloc|Sync wird durchsucht...", ProgressDialog.STYLE_HORIZONTAL);
+        else
+            loginWaitDialog = ProgressDialogFragment.newInstance("Dokument wird erzeugt...", "Bitte warten, der angeforderte Arbeitauftrag wurde aktualisiert und wird neu extrahiert. Die Quelldatei aus Diloc|Sync wird durchsucht...", ProgressDialog.STYLE_HORIZONTAL);
+        loginWaitDialog.show(((AppCompatActivity) getActivity()).getSupportFragmentManager(), "arbeitsauftragWaitDialog" + schicht.getId());
+
+
+        Intent serviceIntent = new Intent(getActivity(), ArbeitsauftragDilocIntentService.class);
+        serviceIntent.putExtra("item", schicht);
+        getActivity().startService(serviceIntent);
+
+    }
+
+    public void ShowPDFFile(File file) {
+
+        Uri fileUri = FileProvider.getUriForFile(getActivity(), "de.stm.oses.FileProvider", file);
+
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setDataAndType(fileUri, "application/pdf");
+        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION + Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        startActivity(intent);
+
+    }
 
     private class GetVerwendung extends AsyncTask<String, Void, VerwendungAdapter> {
 

@@ -747,7 +747,7 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
 
             vAdd.zeitraum_box.setVisibility(View.GONE);
 
-            VerwendungClass edit = ((VerwendungClass) getIntent().getExtras().getSerializable("item"));
+            VerwendungClass edit = getIntent().getParcelableExtra("item");
 
             sid = String.valueOf(edit.getId());
 

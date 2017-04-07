@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="de.stm.oses"
-    android:versionCode="344"
+    android:versionCode="345"
     android:versionName="3.4"
     android:installLocation="auto">
 
@@ -36,6 +36,9 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+        <service
+            android:name=".arbeitsauftrag.ArbeitsauftragDilocIntentService"
+            android:exported="false"/>
 
         <activity
             android:name=".OSESActivity"

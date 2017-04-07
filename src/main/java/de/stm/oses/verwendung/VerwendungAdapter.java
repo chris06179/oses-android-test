@@ -20,7 +20,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import de.stm.oses.R;
-import de.stm.oses.helper.ArbeitsauftragBuilder;
+import de.stm.oses.arbeitsauftrag.ArbeitsauftragBuilder;
 
 
 public class VerwendungAdapter extends ArrayAdapter<VerwendungClass> {
@@ -89,6 +89,15 @@ public class VerwendungAdapter extends ArrayAdapter<VerwendungClass> {
 
         if (item != null)
             return item;
+
+        return null;
+    }
+
+    public VerwendungClass getItemByID(int id) {
+        for (VerwendungClass schicht: VerwendungClassArrayList) {
+            if (schicht.getId() == id)
+                return schicht;
+        }
 
         return null;
     }

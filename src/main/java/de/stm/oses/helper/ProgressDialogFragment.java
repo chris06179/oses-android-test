@@ -47,7 +47,6 @@ public class ProgressDialogFragment extends DialogFragment {
         dialog = new ProgressDialog(getActivity(), getTheme());
         dialog.setTitle(mTitle);
         dialog.setMessage(mMessage);
-        dialog.setCancelable(false);
         dialog.setCanceledOnTouchOutside(false);
         dialog.setProgressStyle(mStyle);
         dialog.setProgressNumberFormat("");
@@ -58,6 +57,8 @@ public class ProgressDialogFragment extends DialogFragment {
             dialog.setMax(savedInstanceState.getInt("max"));
             dialog.setProgress(savedInstanceState.getInt("progress"));
             dialog.setIndeterminate(savedInstanceState.getBoolean("indeterminate"));
+            dialog.setTitle(savedInstanceState.getString("title"));
+            dialog.setMessage(savedInstanceState.getString("message"));
         }
         return dialog;
     }
@@ -77,6 +78,8 @@ public class ProgressDialogFragment extends DialogFragment {
         outState.putInt("max", getDialog().getMax());
         outState.putInt("progress", getDialog().getProgress());
         outState.putBoolean("indeterminate", getDialog().isIndeterminate());
+        outState.putString("title", mTitle);
+        outState.putString("message", mMessage);
         super.onSaveInstanceState(outState);
     }
 
@@ -85,7 +88,15 @@ public class ProgressDialogFragment extends DialogFragment {
         getDialog().setProgressNumberFormat(mProgressNumberFormat);
     }
 
+    public void setMessage(String message) {
+        mMessage = message;
+        getDialog().setMessage(message);
+    }
 
+    public void setTitle(String title) {
+        mTitle = title;
+        getDialog().setTitle(title);
+    }
 
     @Override
     public ProgressDialog getDialog() {

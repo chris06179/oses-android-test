@@ -1,7 +1,12 @@
-package de.stm.oses.helper;
+package de.stm.oses.arbeitsauftrag;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.pdf.PdfDocument;
 import android.os.Environment;
+import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.google.firebase.crash.FirebaseCrash;
 import com.itextpdf.text.DocumentException;
@@ -10,6 +15,13 @@ import com.itextpdf.text.pdf.PdfStamper;
 import com.itextpdf.text.pdf.parser.PdfReaderContentParser;
 import com.itextpdf.text.pdf.parser.SimpleTextExtractionStrategy;
 import com.itextpdf.text.pdf.parser.TextExtractionStrategy;
+import com.tom_roush.pdfbox.multipdf.Splitter;
+import com.tom_roush.pdfbox.pdmodel.PDDocument;
+import com.tom_roush.pdfbox.pdmodel.PDPage;
+import com.tom_roush.pdfbox.text.PDFTextStripper;
+import com.tom_roush.pdfbox.util.PDFBoxResourceLoader;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,6 +33,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import de.stm.oses.R;
+import de.stm.oses.helper.ProgressDialogFragment;
 import de.stm.oses.verwendung.VerwendungClass;
 
 public class ArbeitsauftragBuilder {
@@ -28,12 +41,18 @@ public class ArbeitsauftragBuilder {
     public static final int TYPE_NONE = 0;
     public static final int TYPE_DILOC = 1;
     public static final int TYPE_CACHED = 2;
+
     private final Context context;
+
+    private LocalBroadcastManager mBroadcastManager;
 
     private VerwendungClass verwendung;
 
-    public interface OnProgressPublisher {
-        void onPublishProgress(int progress, int found);
+    public class ArbeitsauftragNotFoundException extends Exception {
+        @Override
+        public String getMessage() {
+            return "Es wurde in der bereitgestellten PDF-Datei kein passender Arbeitsauftrag gefunden!";
+        }
     }
 
     private static int getResId(String resName, Class<?> c) {
@@ -50,6 +69,7 @@ public class ArbeitsauftragBuilder {
     public ArbeitsauftragBuilder(VerwendungClass verwendung, Context context) {
         this.context = context;
         this.verwendung = verwendung;
+        this.mBroadcastManager = LocalBroadcastManager.getInstance(this.context);
     }
 
     public File getDilocSourceFile() {
@@ -109,35 +129,37 @@ public class ArbeitsauftragBuilder {
 
     }
 
-    public File extractFromDilocSourceFile(OnProgressPublisher listener, ProgressDialogFragment dialogFragment) {
+    public Object extractFromDilocSourceFile() {
 
         try {
 
             File pdf = getDilocSourceFile();
 
-            PdfReader read;
-            read = new PdfReader(new FileInputStream(pdf));
+            //PdfReader read;
+            //read = new PdfReader(new FileInputStream(pdf));
 
-            dialogFragment.setProgressNumberFormat("Seite %1d / %2d");
-            dialogFragment.getDialog().setMax(read.getNumberOfPages());
-            dialogFragment.getDialog().setIndeterminate(false);
+            //PdfReaderContentParser parser;
+            //parser = new PdfReaderContentParser(read);
+            //TextExtractionStrategy strategy;
+            PDFBoxResourceLoader.init(context);
+            PDFTextStripper stripper = new PDFTextStripper();
 
-
-            PdfReaderContentParser parser;
-            parser = new PdfReaderContentParser(read);
-            TextExtractionStrategy strategy;
+            PDDocument doc = PDDocument.load(pdf);
 
             ArrayList<Integer> pages = new ArrayList<>();
 
             int lastpageadded = 0;
-            for (int i = 1; i <= read.getNumberOfPages(); i++) {
-                if (dialogFragment.getDialog() == null)
-                    return null;
 
-                listener.onPublishProgress(i, 0);
+            for (int i = 0; i <= doc.getNumberOfPages()-1; i++) {
 
-                strategy = parser.processContent(i, new SimpleTextExtractionStrategy());
-                String text = strategy.getResultantText();
+                EventBus.getDefault().post(new ArbeitsauftragDilocIntentService.ArbeitsauftragProgressEvent(verwendung.getId(), doc.getNumberOfPages(), i+1));
+
+                PDDocument page = new PDDocument();
+                page.addPage(doc.getPage(i));
+                String text = stripper.getText(page);
+                page.close();
+                Log.d("PDF", text);
+
 
 
                 if (text.contains("Schicht: " + verwendung.getBezeichner())) {
@@ -154,41 +176,44 @@ public class ArbeitsauftragBuilder {
                 if (cache != null)
                     return cache;
                 else
-                    return null;
+                    return new ArbeitsauftragNotFoundException();
             }
 
-            listener.onPublishProgress(read.getNumberOfPages(), 1);
+            EventBus.getDefault().post(new ArbeitsauftragDilocIntentService.ArbeitsauftragProgressEvent(verwendung.getId(), doc.getNumberOfPages(), doc.getNumberOfPages()));
 
-            read.selectPages(pages);
+            PDDocument auftrag = new PDDocument();
 
-            String path = Environment.getExternalStorageDirectory().getPath() + "/OSES/docs/Arbeitsaufträge/"+ verwendung.getDatumFormatted("yyyy/MM - MMMM") +"/Arbeitsauftrag_" + verwendung.getDatumFormatted("dd.MM.yyyy_EE").replaceAll(".$","") + "_" + verwendung.getBezeichner() + ".pdf";
+            for (int page : pages)
+                auftrag.addPage(doc.getPage(page));
+
+            String path = Environment.getExternalStorageDirectory().getPath() + "/OSES/docs/Arbeitsaufträge/" + verwendung.getDatumFormatted("yyyy/MM - MMMM") + "/Arbeitsauftrag_" + verwendung.getDatumFormatted("dd.MM.yyyy_EE").replaceAll(".$", "") + "_" + verwendung.getBezeichner() + ".pdf";
 
             File file = new File(path);
             file.getParentFile().mkdirs();
 
-            PdfStamper pdfStamper = new PdfStamper(read,
-                    new FileOutputStream(path));
-            pdfStamper.close();
+            auftrag.save(file);
+            auftrag.close();
+            doc.close();
 
             return file;
 
-        } catch (IOException | DocumentException e) {
+        } catch (IOException e) {
             FirebaseCrash.report(e);
-            return null;
+            return e;
         }
 
     }
 
     public File getExtractedCacheFile() {
 
-        File cache = new File(Environment.getExternalStorageDirectory().getPath() +  "/OSES/docs/Arbeitsaufträge/"+ verwendung.getDatumFormatted("yyyy/MM - MMMM") +"/Arbeitsauftrag_" + verwendung.getDatumFormatted("dd.MM.yyyy_EE").replaceAll(".$","") + "_" + verwendung.getBezeichner() + ".pdf");
+        File cache = new File(Environment.getExternalStorageDirectory().getPath() + "/OSES/docs/Arbeitsaufträge/" + verwendung.getDatumFormatted("yyyy/MM - MMMM") + "/Arbeitsauftrag_" + verwendung.getDatumFormatted("dd.MM.yyyy_EE").replaceAll(".$", "") + "_" + verwendung.getBezeichner() + ".pdf");
 
         if (cache.exists())
             return cache;
         else {
             cache = new File(Environment.getExternalStorageDirectory().getPath() + "/OSES/docs/Arbeitsaufträge/Arbeitsauftrag_" + verwendung.getBezeichner() + "_" + verwendung.getDatumFormatted("dd.MM.yyyy") + ".pdf");
             if (cache.exists())
-                return  cache;
+                return cache;
             else
                 return null;
         }

@@ -4,6 +4,8 @@ import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 
@@ -12,17 +14,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import de.stm.oses.helper.ArbeitsauftragBuilder;
+import de.stm.oses.arbeitsauftrag.ArbeitsauftragBuilder;
 
 
-public class VerwendungClass implements Serializable {
+public class VerwendungClass implements Parcelable {
 
     private int id;
     private String kat;
@@ -82,6 +83,142 @@ public class VerwendungClass implements Serializable {
     public VerwendungClass() {
         // to be removed
     }
+
+    protected VerwendungClass(Parcel in) {
+        id = in.readInt();
+        kat = in.readString();
+        bezeichner = in.readString();
+        fpla = in.readString();
+        datum = in.readLong();
+        db = in.readString();
+        de = in.readString();
+        est = in.readString();
+        estid = in.readInt();
+        funktion = in.readString();
+        funktionId = in.readInt();
+        pause = in.readString();
+        pauseint = in.readInt();
+        pauseRil = in.readString();
+        baureihen = in.readString();
+        adb = in.readString();
+        ade = in.readString();
+        dbr = in.readString();
+        der = in.readString();
+        adban = in.readDouble();
+        adean = in.readDouble();
+        apause = in.readString();
+        apauser = in.readString();
+        az = in.readString();
+        oaz = in.readInt();
+        aufart = in.readString();
+        aufdb = in.readString();
+        aufde = in.readString();
+        aufdz = in.readInt();
+        info = in.readString();
+        notiz = in.readString();
+        msoll = in.readString();
+        mist = in.readString();
+        mdifferenz = in.readString();
+        allowSDL = in.readByte() != 0x00;
+        ShowTimeError = in.readByte() != 0x00;
+        isVerwendungSummary = in.readByte() != 0x00;
+        label = in.readString();
+        azg = in.readString();
+        urlaub = in.readInt();
+        schichten = in.readInt();
+        monat = in.readString();
+        jahr = in.readString();
+        arbeitsauftrag = in.readInt();
+
+        String path = in.readString();
+        if (path.equals(""))
+            arbeitsauftragDilocFile = null;
+        else
+            arbeitsauftragDilocFile = new File(path);
+
+        path = in.readString();
+        if (path.equals(""))
+            arbeitsauftragCacheFile = null;
+        else
+            arbeitsauftragCacheFile = new File(path);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(kat);
+        dest.writeString(bezeichner);
+        dest.writeString(fpla);
+        dest.writeLong(datum);
+        dest.writeString(db);
+        dest.writeString(de);
+        dest.writeString(est);
+        dest.writeInt(estid);
+        dest.writeString(funktion);
+        dest.writeInt(funktionId);
+        dest.writeString(pause);
+        dest.writeInt(pauseint);
+        dest.writeString(pauseRil);
+        dest.writeString(baureihen);
+        dest.writeString(adb);
+        dest.writeString(ade);
+        dest.writeString(dbr);
+        dest.writeString(der);
+        dest.writeDouble(adban);
+        dest.writeDouble(adean);
+        dest.writeString(apause);
+        dest.writeString(apauser);
+        dest.writeString(az);
+        dest.writeInt(oaz);
+        dest.writeString(aufart);
+        dest.writeString(aufdb);
+        dest.writeString(aufde);
+        dest.writeInt(aufdz);
+        dest.writeString(info);
+        dest.writeString(notiz);
+        dest.writeString(msoll);
+        dest.writeString(mist);
+        dest.writeString(mdifferenz);
+        dest.writeByte((byte) (allowSDL ? 0x01 : 0x00));
+        dest.writeByte((byte) (ShowTimeError ? 0x01 : 0x00));
+        dest.writeByte((byte) (isVerwendungSummary ? 0x01 : 0x00));
+        dest.writeString(label);
+        dest.writeString(azg);
+        dest.writeInt(urlaub);
+        dest.writeInt(schichten);
+        dest.writeString(monat);
+        dest.writeString(jahr);
+        dest.writeInt(arbeitsauftrag);
+
+        if (arbeitsauftragDilocFile != null)
+            dest.writeString(arbeitsauftragDilocFile.getAbsolutePath());
+        else
+            dest.writeString("");
+        if (arbeitsauftragCacheFile != null)
+            dest.writeString(arbeitsauftragCacheFile.getAbsolutePath());
+        else
+            dest.writeString("");
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<VerwendungClass> CREATOR = new Parcelable.Creator<VerwendungClass>() {
+        @Override
+        public VerwendungClass createFromParcel(Parcel in) {
+            return new VerwendungClass(in);
+        }
+
+        @Override
+        public VerwendungClass[] newArray(int size) {
+            return new VerwendungClass[size];
+        }
+    };
+
+
 
     public VerwendungClass(JSONObject schicht, Context context) throws JSONException {
 
