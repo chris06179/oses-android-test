@@ -43,6 +43,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import de.stm.oses.R;
@@ -239,11 +240,9 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
         Calendar c = Calendar.getInstance();
         selectedyear = c.get(Calendar.YEAR);
         selectedmonth = c.get(Calendar.MONTH) + 1;
-
-        query = "https://oses.mobi/api.php?request=verwendung_show&json=true&session=" + OSES.getSession().getIdentifier();
-        task = new GetVerwendung().execute(query);
-
     }
+
+
 
     @Override
     public void onResume() {
@@ -379,6 +378,35 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
 
             }
         });
+
+        String lastSync = OSES.getSession().getSessionLastVerwendung();
+
+        if (lastSync != null) {
+
+            ArrayList<VerwendungClass> list = null;
+
+            try {
+                list = VerwendungClass.getNewList(lastSync, getActivity());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            if (list != null) {
+                setListAdapter(new VerwendungAdapter(getActivity(), list));
+
+                if (first && getListAdapter() != null) {
+                    first = false;
+                    getListView().setSelectionFromTop(getListAdapter().getTodayPos(), 200);
+                }
+
+                setListShown(true);
+                setRefreshing(true);
+            }
+
+        }
+
+        query = "https://oses.mobi/api.php?request=verwendung_show&json=true&session=" + OSES.getSession().getIdentifier();
+        task = new GetVerwendung().execute(query);
 
 
     }
@@ -658,8 +686,15 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
             String response = OSES.getJSON(params[0], 60000);
 
             try {
-                if (getActivity() != null && response != null)
-                    return new VerwendungAdapter(getActivity(), VerwendungClass.getNewList(response, getActivity()));
+                if (getActivity() != null && response != null){
+                    ArrayList<VerwendungClass> list = VerwendungClass.getNewList(response, getActivity());
+
+                    Calendar c = Calendar.getInstance();
+                    if (selectedyear == c.get(Calendar.YEAR) && selectedmonth == c.get(Calendar.MONTH) +1)
+                        OSES.getSession().setSessionLastVerwendung(response);
+
+                    return new VerwendungAdapter(getActivity(), list);
+                }
                 else
                     return null;
 
@@ -681,8 +716,15 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
 
             if (adapter != null && adapter.isEmpty())
                 setEmptyText("Keine Verwendung im angegebenen Zeitraum gefunden!");
-            if (adapter == null)
+
+            if (getListAdapter() == null && adapter == null)
                 setEmptyText("Keine Verbindung zu OSES!");
+
+            if (getListAdapter() != null && adapter == null) {
+                Toast.makeText(getActivity(), "Keine Verbindung zu OSES, angezeigte Daten ggf. nicht aktuell!", Toast.LENGTH_SHORT).show();
+                setRefreshing(false);
+                return;
+            }
 
             int index = getListView().getFirstVisiblePosition();
             View v = getListView().getChildAt(0);

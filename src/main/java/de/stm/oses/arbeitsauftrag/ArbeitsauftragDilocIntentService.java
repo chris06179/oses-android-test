@@ -40,7 +40,17 @@ public class ArbeitsauftragDilocIntentService extends IntentService {
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
 
-        VerwendungClass schicht = intent.getParcelableExtra("item");
+        VerwendungClass schicht;
+
+        if (intent != null) {
+            schicht = intent.getParcelableExtra("item");
+            if (schicht == null)
+                return;
+        }
+        else {
+            return;
+        }
+
 
         ArbeitsauftragBuilder auftrag = new ArbeitsauftragBuilder(schicht, getApplicationContext());
         Object result = auftrag.extractFromDilocSourceFile();

@@ -22,7 +22,16 @@ android {
     compileSdkVersion 25
     buildToolsVersion '25.0.2'
 
-   dexOptions {
+    signingConfigs {
+        release {
+            storeFile file('F:/Sonstiges/app_keys')
+            storePassword 'krypton847k1'
+            keyAlias 'chris'
+            keyPassword 'krypton847k1'
+        }
+    }
+
+    dexOptions {
         javaMaxHeapSize "4g"
     }
 
@@ -41,6 +50,7 @@ android {
     buildTypes {
         release {
             minifyEnabled true
+            signingConfig signingConfigs.release
             debuggable false
             jniDebuggable false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -68,7 +78,7 @@ dependencies {
     compile 'com.android.support:support-v4:25.3.1'
     compile 'com.android.support:customtabs:25.3.1'
     compile 'com.itextpdf:itextg:5.5.10'
-    compile 'com.tom_roush:pdfbox-android:1.8.9.1'
+    //compile 'com.tom_roush:pdfbox-android:1.8.9.1'
     compile 'org.greenrobot:eventbus:3.0.0'
 }
 

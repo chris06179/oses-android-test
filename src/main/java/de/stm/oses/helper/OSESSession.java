@@ -7,7 +7,10 @@ import android.util.Log;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 
+import java.util.ArrayList;
+
 import de.stm.oses.R;
+import de.stm.oses.verwendung.VerwendungClass;
 
 public class OSESSession {
 
@@ -26,6 +29,7 @@ public class OSESSession {
     private int SessionAufDb = 3;
     private int SessionAufDe = 0;
     private String SessionFcmInstanceId = "";
+    private String SessionLastVerwendung;
 
     private SharedPreferences preferences;
 
@@ -50,6 +54,7 @@ public class OSESSession {
         SessionAufDb = settings.getInt("SessionAufDb", 3);
         SessionAufDe = settings.getInt("SessionAufDe", 0);
         SessionFcmInstanceId = settings.getString("SessionFcmInstanceId", "");
+        SessionLastVerwendung = settings.getString("SessionLastVerwendung", null);
 
         if (SessionFcmInstanceId.isEmpty()) {
 
@@ -104,25 +109,26 @@ public class OSESSession {
     public String getSessionAufArt() {
         return SessionAufArt;
     }
-    public void setSessionAufArt(String sessionAufArt) {
-        SessionAufArt = sessionAufArt;
-    }
     public int getSessionAufDb() {
         return SessionAufDb;
     }
-    public void setSessionAufDb(int sessionAufDb) {
-        SessionAufDb = sessionAufDb;
-    }
     public int getSessionAufDe() {
         return SessionAufDe;
-    }
-    public void setSessionAufDe(int sessionAufDe) {
-        SessionAufDe = sessionAufDe;
     }
     public String getSessionFcmInstanceId() {
             return SessionFcmInstanceId;
     }
     public SharedPreferences getPreferences() {
         return preferences;
+    }
+    public String getSessionLastVerwendung() {
+        return SessionLastVerwendung;
+    }
+    public void setSessionLastVerwendung(String sessionLastVerwendung) {
+        SessionLastVerwendung = sessionLastVerwendung;
+        SharedPreferences settings = context.getSharedPreferences("OSESPrefs", context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString("SessionLastVerwendung", SessionLastVerwendung);
+        editor.apply();
     }
 }

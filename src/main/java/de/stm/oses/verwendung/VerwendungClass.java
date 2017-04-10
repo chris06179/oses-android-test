@@ -292,6 +292,8 @@ public class VerwendungClass implements Parcelable {
         ArrayList<VerwendungClass> list = new ArrayList<>();
 
         JSONObject verwendung = new JSONObject(jsonInput);
+        if (verwendung.names() == null)
+            return list;
         JSONObject monat = verwendung.getJSONObject(verwendung.names().getString(0));
 
         JSONArray schichten = monat.getJSONArray("data");
