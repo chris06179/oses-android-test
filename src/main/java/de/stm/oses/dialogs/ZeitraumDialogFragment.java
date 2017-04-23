@@ -1,4 +1,4 @@
-package de.stm.oses.helper;
+package de.stm.oses.dialogs;
 
 
 import android.app.Dialog;

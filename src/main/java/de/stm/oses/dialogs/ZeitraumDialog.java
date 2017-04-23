@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.stm.oses.helper;
+package de.stm.oses.dialogs;
 
 import android.support.v7.app.AlertDialog;
 import android.content.Context;

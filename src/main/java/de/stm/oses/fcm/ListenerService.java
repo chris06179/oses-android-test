@@ -16,6 +16,8 @@ import android.support.v4.app.NotificationCompat;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.Map;
 
 import de.stm.oses.OSESActivity;
@@ -26,11 +28,16 @@ import de.stm.oses.helper.OSESBase;
 
 public class ListenerService extends FirebaseMessagingService {
 
+    public static class RefreshVerwendungEvent {
+    }
+
     @Override
     public void onMessageReceived(RemoteMessage message){
-        String from = message.getFrom();
         Map<String, String> data = message.getData();
+        String type = data.get("type");
 
+        if (type == null)
+            return;
 
         SharedPreferences osesprefs = getSharedPreferences("OSESPrefs", 0);
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -43,24 +50,8 @@ public class ListenerService extends FirebaseMessagingService {
             return;
         }
 
-
-
-        String type = data.get("type");
-
-
-        if (type == null)
-            return;
-
-        if (type.equals("check_push")) {
-
-            OSESBase OSES = new OSESBase(getApplicationContext());
-            OSES.getJSON("https://oses.mobi/api.php?request=check_push&session="+osesprefs.getString("SessionIdentifier", ""), 10000);
-            return;
-        }
-
         if (type.equals("refresh_verwendung")) {
-            Intent i = new Intent("de.stm.oses.OSES_REFRESH_VERWENDUNG");
-            sendBroadcast(i);
+            EventBus.getDefault().post(new RefreshVerwendungEvent());
             return;
         }
 
@@ -76,14 +67,11 @@ public class ListenerService extends FirebaseMessagingService {
         }
 
         if (type.equals("force")) {
-
             generateNotification(this, data.get("message"), data.get("titel"), R.mipmap.ic_launcher,  "force", Integer.parseInt(data.get("id")), true, false);
             return;
-
         }
 
         if (type.equals("sdl") && settings.getBoolean("sdlNotification", true)) {
-
             Intent setintent = new Intent(this, FaxActivity.class);
             setintent.putExtra("type", "SDL");
             setintent.putExtra("id", data.get("id"));
@@ -91,34 +79,27 @@ public class ListenerService extends FirebaseMessagingService {
 
             generateNotificationIntent(this, data.get("message"),data.get("titel"), "sdl", Integer.parseInt(data.get("id")), setintent);
             return;
-
         }
 
         if (type.equals("news") && settings.getBoolean("newsNotification", true)) {
-
             Intent setintent = new Intent(this, StartActivity.class);
             setintent.putExtra("fragment", "browser");
             setintent.putExtra("type", "aktuell");
             generateNotificationIntent(this, data.get("message"), data.get("titel"), "news", 0, setintent);
             return;
-
         }
 
         if (type.equals("update") && settings.getBoolean("updateNotification", true)) {
             generateNotification(this, data.get("message"), data.get("titel"), R.mipmap.ic_launcher, "update", 0, true, false);
             return;
-
         }
 
         if (type.equals("text") && settings.getBoolean("otherNotification", true)) {
-
             generateNotification(this, data.get("message"), data.get("titel"), R.mipmap.ic_launcher, "text", Integer.parseInt(data.get("id")), true, false);
             return;
-
         }
 
         if (type.equals("fax") && settings.getBoolean("faxNotification", true)) {
-
             boolean iprogress = false;
             boolean sound = false;
 
@@ -130,19 +111,13 @@ public class ListenerService extends FirebaseMessagingService {
 
             generateNotification(this, data.get("message"), data.get("titel"), R.mipmap.ic_launcher, "FAX_"+data.get("FaxID"), 0, sound, iprogress );
             return;
-
         }
 
         if (type.equals("unwetter")) {
-
             generateNotification(this, data.get("message"), data.get("titel"), R.drawable.icon_warning, "unwetter",Integer.parseInt(data.get("id")), true, false);
             return;
-
         }
 
-
-//displayMessage(context, type, text);
-//generateNotification(context, text, title);
     }
 
 

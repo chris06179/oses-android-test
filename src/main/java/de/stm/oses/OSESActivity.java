@@ -32,7 +32,7 @@ import java.util.Map;
 
 import de.stm.oses.helper.OSESBase;
 import de.stm.oses.helper.OSESRequest;
-import de.stm.oses.helper.ProgressDialogFragment;
+import de.stm.oses.dialogs.ProgressDialogFragment;
 
 public class OSESActivity extends AppCompatActivity implements View.OnClickListener {
 	
@@ -49,6 +49,9 @@ public class OSESActivity extends AppCompatActivity implements View.OnClickListe
 
         // Obtain the FirebaseAnalytics instance.
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
+        // Arbeitsverzeichnis aufräumen und anpassen -> ab v345
+        OSES.rebuildWorkingDirectory();
 
 
         if (!OSES.getSession().getIdentifier().equals("")) {

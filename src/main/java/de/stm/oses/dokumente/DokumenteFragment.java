@@ -1,7 +1,5 @@
 package de.stm.oses.dokumente;
 
-import android.app.FragmentTransaction;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
@@ -19,11 +17,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -32,7 +27,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -46,15 +40,14 @@ import java.util.Locale;
 
 import de.stm.oses.PaymentActivity;
 import de.stm.oses.R;
+import de.stm.oses.dialogs.FaxProtokollDetailDialogFragment;
 import de.stm.oses.fax.FaxActivity;
 import de.stm.oses.helper.FileDownload;
 import de.stm.oses.helper.FileDownload.OnDownloadFinishedListener;
 import de.stm.oses.helper.ListClass;
 import de.stm.oses.helper.ListSpinnerAdapter;
 import de.stm.oses.helper.OSESBase;
-import de.stm.oses.helper.ZeitraumDialog;
-import de.stm.oses.helper.ZeitraumDialogFragment;
-import de.stm.oses.verwendung.VerwendungAddActivity;
+import de.stm.oses.dialogs.ZeitraumDialogFragment;
 
 public class DokumenteFragment extends Fragment implements View.OnClickListener {
 
@@ -527,7 +520,7 @@ public class DokumenteFragment extends Fragment implements View.OnClickListener 
                         @Override
                         public void onClick(View v) {
 
-                            DialogFragment faxDetail = FaxProtokollDetailDialog.newInstance(details);
+                            DialogFragment faxDetail = FaxProtokollDetailDialogFragment.newInstance(details);
                             faxDetail.show(((AppCompatActivity) getActivity()).getSupportFragmentManager(), "faxdetail");
 
                         }

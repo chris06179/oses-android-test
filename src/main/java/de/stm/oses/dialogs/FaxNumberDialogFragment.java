@@ -1,8 +1,10 @@
-package de.stm.oses.fax;
+package de.stm.oses.dialogs;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -12,13 +14,33 @@ import android.widget.EditText;
 import de.stm.oses.R;
 
 
-public class FaxNumberDialog extends DialogFragment {
+public class FaxNumberDialogFragment extends DialogFragment {
 
-    public static FaxNumberDialog newInstance() {
-        return new FaxNumberDialog();
+    public static FaxNumberDialogFragment newInstance() {
+        return new FaxNumberDialogFragment();
     }
 
+    FaxNumberDialogListener mCallback;
 
+    public interface FaxNumberDialogListener {
+        void onDialogSend(String destination);
+        void onDialogCancel();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        try {
+            mCallback = (FaxNumberDialogListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement OnHeadlineSelectedListener");
+        }
+
+    }
+
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         LayoutInflater inflater = getActivity().getLayoutInflater();
@@ -31,7 +53,7 @@ public class FaxNumberDialog extends DialogFragment {
                 .setPositiveButton("Senden", null)
                 .setNegativeButton("Abbrechen", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        // Do nothing.
+                        mCallback.onDialogCancel();
                     }
                 }).create();
         faxDialog.setOnShowListener(new DialogInterface.OnShowListener() {
@@ -45,7 +67,7 @@ public class FaxNumberDialog extends DialogFragment {
                         number = numberView.getText().toString();
 
                         if (number.startsWith("+49") && !number.startsWith("+490")) {
-                            ((FaxActivity) getActivity()).DoSend(number);
+                            mCallback.onDialogSend(number);
                             faxDialog.dismiss();
                         } else {
                             numberView.setError("Keine gültige Faxnummer im Format +49...!");

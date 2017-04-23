@@ -39,7 +39,7 @@ import de.stm.oses.StartActivity;
 
 public class FileDownload extends AsyncTask<String, Integer, Object> {
 
-    private static final int PERMISSION_REQUEST_STORAGE = 5500;
+    private static final int PERMISSION_REQUEST_STORAGE_DOWNLOAD = 5500;
     private ProgressDialog mProgressDialog;
     private Context context;
     private String title = "";
@@ -129,7 +129,7 @@ public class FileDownload extends AsyncTask<String, Integer, Object> {
 
             ActivityCompat.requestPermissions((AppCompatActivity) context,
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    PERMISSION_REQUEST_STORAGE);
+                    PERMISSION_REQUEST_STORAGE_DOWNLOAD);
 
             waitForPermissionResponse = true;
 

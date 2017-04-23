@@ -30,6 +30,7 @@ public class OSESSession {
     private int SessionAufDe = 0;
     private String SessionFcmInstanceId = "";
     private String SessionLastVerwendung;
+    private boolean SessionDilocReminder;
 
     private SharedPreferences preferences;
 
@@ -55,6 +56,7 @@ public class OSESSession {
         SessionAufDe = settings.getInt("SessionAufDe", 0);
         SessionFcmInstanceId = settings.getString("SessionFcmInstanceId", "");
         SessionLastVerwendung = settings.getString("SessionLastVerwendung", null);
+        SessionDilocReminder = settings.getBoolean("SessionDilocReminder", false);
 
         if (SessionFcmInstanceId.isEmpty()) {
 
@@ -129,6 +131,16 @@ public class OSESSession {
         SharedPreferences settings = context.getSharedPreferences("OSESPrefs", context.MODE_PRIVATE);
         SharedPreferences.Editor editor = settings.edit();
         editor.putString("SessionLastVerwendung", SessionLastVerwendung);
+        editor.apply();
+    }
+    public boolean getSessionDilocReminder() {
+        return SessionDilocReminder;
+    }
+    public void setSessionDilocReminder(boolean sessionDilocReminder) {
+        SessionDilocReminder = sessionDilocReminder;
+        SharedPreferences settings = context.getSharedPreferences("OSESPrefs", context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putBoolean("SessionDilocReminder", SessionDilocReminder);
         editor.apply();
     }
 }

@@ -59,7 +59,7 @@ import de.stm.oses.verwendung.VerwendungFragment;
 
 
 public class StartActivity extends AppCompatActivity {
-    private static final int PERMISSION_REQUEST_STORAGE = 5500;
+    private static final int PERMISSION_REQUEST_STORAGE_DOWNLOAD = 5500;
 
     //Your member variable declaration here
 
@@ -122,7 +122,6 @@ public class StartActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
-
 
         ListView mMenuList = (ListView) findViewById(R.id.menu_list);
 
@@ -586,7 +585,7 @@ public class StartActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode,@NonNull String permissions[],@NonNull int[] grantResults) {
         switch (requestCode) {
-            case PERMISSION_REQUEST_STORAGE: {
+            case PERMISSION_REQUEST_STORAGE_DOWNLOAD: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0 ) {
                     CurrentFileDownload.resumeAfterPermissionCallback(grantResults[0]);
@@ -595,8 +594,6 @@ public class StartActivity extends AppCompatActivity {
                 }
 
             }
-
-
         }
     }
 
@@ -940,7 +937,7 @@ public class StartActivity extends AppCompatActivity {
                             download.setTitle("Aktualisierung");
                             download.setMessage("Installationsdatei wird heruntergeladen, dieser Vorgang kann einige Minuten dauern...");
                             download.setURL("https://oses.mobi/android/" + UpdateFile);
-                            download.setLocalDirectory("install/");
+                            download.setLocalDirectory("APK/");
                             download.setLocalFilename("OSES.apk");
                             download.setOnDownloadFinishedListener(onUpdateResponse);
                             download.execute();
@@ -1007,7 +1004,7 @@ public class StartActivity extends AppCompatActivity {
                         download.setTitle("Aktualisierung (BETA)");
                         download.setMessage("Installationsdatei wird heruntergeladen, dieser Vorgang kann einige Minuten dauern...");
                         download.setURL("https://oses.mobi/android/" + UpdateFile);
-                        download.setLocalDirectory("install/");
+                        download.setLocalDirectory("APK/");
                         download.setLocalFilename("OSES_BETA.apk");
                         download.setOnDownloadFinishedListener(onUpdateResponse);
                         download.execute();

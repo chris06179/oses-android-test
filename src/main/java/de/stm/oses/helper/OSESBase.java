@@ -1,14 +1,22 @@
 package de.stm.oses.helper;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.AssetManager;
+import android.net.Uri;
+import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 
@@ -17,6 +25,7 @@ import org.json.JSONException;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -33,9 +42,13 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.net.ssl.HostnameVerifier;
@@ -51,6 +64,8 @@ import de.stm.oses.R;
 @SuppressLint("PrivateResource")
 public class OSESBase {
 
+    private static final int PERMISSION_REQUEST_STORAGE_DILOC = 5600;
+
     private Context context;
     private OSESSession session;
     private String sVersion;
@@ -61,7 +76,6 @@ public class OSESBase {
 
     public OSESBase(Context context) {
         this.context = context;
-        this.session = new OSESSession(context);
 
         PackageInfo packageInfo;
         try {
@@ -79,6 +93,8 @@ public class OSESBase {
     }
 
     public OSESSession getSession() {
+        if (session == null)
+            session = new OSESSession(context);
         return session;
     }
 
@@ -464,6 +480,103 @@ public class OSESBase {
         List<ResolveInfo> list = context.getPackageManager().queryIntentActivities(intent,
                 PackageManager.MATCH_DEFAULT_ONLY);
         return list.size() > 0;
+    }
+
+    public void checkDilocAndPermissionStatus() {
+
+        if (!getSession().getSessionDilocReminder() && isAppInstalled("de.diloc.DiLocSyncMobile") && ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+
+            new AlertDialog.Builder(context)
+                    .setTitle("Synchronisation mit Diloc|Sync (BETA)")
+                    .setMessage("Es wurde eine Installation von Diloc|Sync auf deinem Endgerät festgestellt. OSES kann Daten wie Arbeitsaufträge mit deinen Schichten verknüpfen, um dir deinen Arbeitsalltag zu erleichtern. Hierfür ist jedoch eine Berechtigung zum Zugriff auf den Gerätespeicher notwendig. Möchtest du diese Berechtigung jetzt erteilen?")
+                    .setPositiveButton("Ja", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            ActivityCompat.requestPermissions((AppCompatActivity) context,
+                                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                    PERMISSION_REQUEST_STORAGE_DILOC);
+                        }
+                    })
+                    .setNeutralButton("Später", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    })
+                    .setNegativeButton("Nein", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            getSession().setSessionDilocReminder(true);
+                        }
+                    })
+                    .show();
+
+
+        }
+
+
+    }
+
+    public void rebuildWorkingDirectory() {
+
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+
+            File oldpath = new File(Environment.getExternalStorageDirectory().getPath() + "/OSES/docs/");
+
+            if (oldpath.exists())
+                oldpath.renameTo(new File(Environment.getExternalStorageDirectory().getPath() + "/OSES/Dokumente/"));
+
+            oldpath = new File(Environment.getExternalStorageDirectory().getPath() + "/OSES/install/");
+
+            if (oldpath.exists())
+                oldpath.renameTo(new File(Environment.getExternalStorageDirectory().getPath() + "/OSES/APK/"));
+
+
+            File olddir = new File(Environment.getExternalStorageDirectory().getPath() + "/OSES/Dokumente/Arbeitsaufträge/");
+
+            if (!olddir.exists())
+                return;
+
+            File files[] = olddir.listFiles();
+
+            for (File file :
+                    files) {
+
+                if (file.getName().contains(".pdf")) {
+                    String split[] = file.getName().split("_");
+
+                    if (split.length != 3)
+                        continue;
+
+                    String bezeichner = split[1];
+                    String datum = split[2].substring(0, split[2].length()-4);
+
+                    SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY);
+                    try {
+                        Date date = format.parse(datum);
+
+                        SimpleDateFormat month = new SimpleDateFormat("yyyy/MM - MMMM", Locale.GERMANY);
+                        SimpleDateFormat day = new SimpleDateFormat("dd.MM.yyyy_EE", Locale.GERMANY);
+
+                        String newpath = Environment.getExternalStorageDirectory().getPath() + "/OSES/Dokumente/Arbeitsaufträge/" + month.format(date) + "/Arbeitsauftrag_" + day.format(date).replaceAll(".$", "") + "_" + bezeichner.replaceAll("\\s", "_") + ".pdf";
+                        File dest = new File(newpath);
+
+                        dest.getParentFile().mkdirs();
+                        file.renameTo(dest);
+
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                        continue;
+                    }
+
+
+                }
+
+            }
+
+        }
+
     }
 
 

@@ -1,24 +1,20 @@
-package de.stm.oses.dokumente;
+package de.stm.oses.dialogs;
 
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import de.stm.oses.R;
-import de.stm.oses.fax.FaxActivity;
 
 
-public class FaxProtokollDetailDialog extends DialogFragment {
+public class FaxProtokollDetailDialogFragment extends DialogFragment {
 
-    public static FaxProtokollDetailDialog newInstance(Bundle bundle) {
-        FaxProtokollDetailDialog f = new FaxProtokollDetailDialog();
+    public static FaxProtokollDetailDialogFragment newInstance(Bundle bundle) {
+        FaxProtokollDetailDialogFragment f = new FaxProtokollDetailDialogFragment();
         f.setArguments(bundle);
         return f;
     }

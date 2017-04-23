@@ -22,15 +22,6 @@ android {
     compileSdkVersion 25
     buildToolsVersion '25.0.2'
 
-    signingConfigs {
-        release {
-            storeFile file('F:/Sonstiges/app_keys')
-            storePassword 'krypton847k1'
-            keyAlias 'chris'
-            keyPassword 'krypton847k1'
-        }
-    }
-
     dexOptions {
         javaMaxHeapSize "4g"
     }
@@ -50,7 +41,6 @@ android {
     buildTypes {
         release {
             minifyEnabled true
-            signingConfig signingConfigs.release
             debuggable false
             jniDebuggable false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'

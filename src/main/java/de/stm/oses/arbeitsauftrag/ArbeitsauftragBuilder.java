@@ -21,6 +21,8 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import de.stm.oses.R;
 import de.stm.oses.verwendung.VerwendungClass;
@@ -163,7 +165,7 @@ public class ArbeitsauftragBuilder {
 //            for (int page : pages)
 //                auftrag.addPage(doc.getPage(page));
 //
-//            String path = Environment.getExternalStorageDirectory().getPath() + "/OSES/docs/Arbeitsaufträge/" + verwendung.getDatumFormatted("yyyy/MM - MMMM") + "/Arbeitsauftrag_" + verwendung.getDatumFormatted("dd.MM.yyyy_EE").replaceAll(".$", "") + "_" + verwendung.getBezeichner() + ".pdf";
+//            String path = Environment.getExternalStorageDirectory().getPath() + "/OSES/Dokumente/Arbeitsaufträge/" + verwendung.getDatumFormatted("yyyy/MM - MMMM") + "/Arbeitsauftrag_" + verwendung.getDatumFormatted("dd.MM.yyyy_EE").replaceAll(".$", "") + "_" + verwendung.getBezeichner() + ".pdf";
 //
 //            File file = new File(path);
 //            file.getParentFile().mkdirs();
@@ -197,6 +199,9 @@ public class ArbeitsauftragBuilder {
 
             int lastpageadded = 0;
 
+            String bezeichner = verwendung.getBezeichner().replaceAll("[^0-9]", "");
+            Pattern p = Pattern.compile(".*Schicht:\\s*[VF]?\\s*" + bezeichner + "\\s*([(][VF]\\s*[0-9]*[)])?\\n.*", Pattern.DOTALL);
+
             for (int i = 1; i <= read.getNumberOfPages(); i++) {
 
                 EventBus.getDefault().post(new ArbeitsauftragDilocIntentService.ArbeitsauftragProgressEvent(verwendung.getId(), read.getNumberOfPages(), i));
@@ -204,7 +209,7 @@ public class ArbeitsauftragBuilder {
                 strategy = parser.processContent(i, new SimpleTextExtractionStrategy());
                 String text = strategy.getResultantText();
 
-                if (text.contains("Schicht: " + verwendung.getBezeichner())) {
+                if (p.matcher(text).matches()) {
                     pages.add(i);
                     lastpageadded = i;
                 } else {
@@ -225,7 +230,7 @@ public class ArbeitsauftragBuilder {
 
             read.selectPages(pages);
 
-            String path = Environment.getExternalStorageDirectory().getPath() + "/OSES/docs/Arbeitsaufträge/" + verwendung.getDatumFormatted("yyyy/MM - MMMM") + "/Arbeitsauftrag_" + verwendung.getDatumFormatted("dd.MM.yyyy_EE").replaceAll(".$", "") + "_" + verwendung.getBezeichner() + ".pdf";
+            String path = Environment.getExternalStorageDirectory().getPath() + "/OSES/Dokumente/Arbeitsaufträge/" + verwendung.getDatumFormatted("yyyy/MM - MMMM") + "/Arbeitsauftrag_" + verwendung.getDatumFormatted("dd.MM.yyyy_EE").replaceAll(".$", "") + "_" + verwendung.getBezeichner().replaceAll("\\s", "_") + ".pdf";
 
             File file = new File(path);
             file.getParentFile().mkdirs();
@@ -245,17 +250,13 @@ public class ArbeitsauftragBuilder {
 
     public File getExtractedCacheFile() {
 
-        File cache = new File(Environment.getExternalStorageDirectory().getPath() + "/OSES/docs/Arbeitsaufträge/" + verwendung.getDatumFormatted("yyyy/MM - MMMM") + "/Arbeitsauftrag_" + verwendung.getDatumFormatted("dd.MM.yyyy_EE").replaceAll(".$", "") + "_" + verwendung.getBezeichner() + ".pdf");
+        File cache = new File(Environment.getExternalStorageDirectory().getPath() + "/OSES/Dokumente/Arbeitsaufträge/" + verwendung.getDatumFormatted("yyyy/MM - MMMM") + "/Arbeitsauftrag_" + verwendung.getDatumFormatted("dd.MM.yyyy_EE").replaceAll(".$", "") + "_" + verwendung.getBezeichner().replaceAll("\\s", "_") + ".pdf");
 
         if (cache.exists())
             return cache;
-        else {
-            cache = new File(Environment.getExternalStorageDirectory().getPath() + "/OSES/docs/Arbeitsaufträge/Arbeitsauftrag_" + verwendung.getBezeichner() + "_" + verwendung.getDatumFormatted("dd.MM.yyyy") + ".pdf");
-            if (cache.exists())
-                return cache;
-            else
-                return null;
-        }
+        else
+            return null;
+
     }
 
 }

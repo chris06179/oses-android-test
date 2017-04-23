@@ -51,7 +51,6 @@ public class ArbeitsauftragDilocIntentService extends IntentService {
             return;
         }
 
-
         ArbeitsauftragBuilder auftrag = new ArbeitsauftragBuilder(schicht, getApplicationContext());
         Object result = auftrag.extractFromDilocSourceFile();
         EventBus.getDefault().post(new ArbeitsauftragResultEvent(result, schicht));

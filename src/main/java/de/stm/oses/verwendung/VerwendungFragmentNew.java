@@ -8,7 +8,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Rect;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.Vibrator;
@@ -26,28 +25,19 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.util.Calendar;
 
 import de.stm.oses.R;
-import de.stm.oses.StartActivity;
 import de.stm.oses.fax.FaxActivity;
-import de.stm.oses.fax.FaxClass;
 import de.stm.oses.helper.FileDownload;
 import de.stm.oses.helper.OSESBase;
 import de.stm.oses.helper.OSESRequest;
 import de.stm.oses.helper.RecyclerFragment;
-import de.stm.oses.helper.ZeitraumDialogFragment;
+import de.stm.oses.dialogs.ZeitraumDialogFragment;
 
 public class VerwendungFragmentNew extends RecyclerFragment implements ActionMode.Callback {
 

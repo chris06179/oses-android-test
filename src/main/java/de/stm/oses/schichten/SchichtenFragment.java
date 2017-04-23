@@ -34,7 +34,6 @@ import java.util.ArrayList;
 import de.stm.oses.R;
 import de.stm.oses.helper.ListAdapter;
 import de.stm.oses.helper.ListClass;
-import de.stm.oses.helper.ListClassDialogFragment;
 import de.stm.oses.helper.OSESBase;
 import de.stm.oses.helper.SwipeRefreshListFragment;
 

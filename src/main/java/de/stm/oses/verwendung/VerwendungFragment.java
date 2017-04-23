@@ -1,13 +1,10 @@
 package de.stm.oses.verwendung;
 
 import android.app.ActivityManager;
-import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -15,9 +12,9 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.os.Vibrator;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -50,16 +47,19 @@ import de.stm.oses.R;
 import de.stm.oses.arbeitsauftrag.ArbeitsauftragDilocIntentService;
 import de.stm.oses.fax.FaxActivity;
 import de.stm.oses.arbeitsauftrag.ArbeitsauftragBuilder;
+import de.stm.oses.fcm.ListenerService;
 import de.stm.oses.helper.FileDownload;
 import de.stm.oses.helper.OSESBase;
-import de.stm.oses.helper.ProgressDialogFragment;
+import de.stm.oses.dialogs.ProgressDialogFragment;
 import de.stm.oses.helper.SwipeRefreshListFragment;
-import de.stm.oses.helper.ZeitraumDialogFragment;
+import de.stm.oses.dialogs.ZeitraumDialogFragment;
 
 import static android.content.Context.ACTIVITY_SERVICE;
 
 
 public class VerwendungFragment extends SwipeRefreshListFragment implements ActionMode.Callback {
+
+    private static final int PERMISSION_REQUEST_STORAGE_DILOC = 5600;
 
     public String query;
     public int selectedyear;
@@ -70,8 +70,6 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
     private OSESBase OSES;
 
     private FirebaseAnalytics mFirebaseAnalytics;
-
-    private BroadcastReceiver receiver;
 
     public VerwendungFragment() {
         // Required empty public constructor
@@ -240,25 +238,31 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
         Calendar c = Calendar.getInstance();
         selectedyear = c.get(Calendar.YEAR);
         selectedmonth = c.get(Calendar.MONTH) + 1;
+
+        // Check Diloc and permissions
+        OSES.checkDilocAndPermissionStatus();
+
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
+      switch (requestCode) {
+            case PERMISSION_REQUEST_STORAGE_DILOC: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 ) {
+                    setRefreshing(true);
+                    task = new GetVerwendung().execute(query);
+                    OSES.rebuildWorkingDirectory();
+                }
+            }
+        }
+    }
 
     @Override
     public void onResume() {
         super.onResume();
-
-        IntentFilter filter = new IntentFilter("de.stm.oses.OSES_REFRESH_VERWENDUNG");
-
-        receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                setRefreshing(true);
-                task = new GetVerwendung().execute(query);
-            }
-        };
-
-        getActivity().registerReceiver(receiver, filter);
 
         EventBus.getDefault().register(this);
 
@@ -284,8 +288,6 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
     @Override
     public void onPause() {
         super.onPause();
-        getActivity().unregisterReceiver(receiver);
-
         EventBus.getDefault().unregister(this);
     }
 
@@ -379,6 +381,9 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
             }
         });
 
+        query = "https://oses.mobi/api.php?request=verwendung_show&json=true&session=" + OSES.getSession().getIdentifier();
+        task = new GetVerwendung().execute(query);
+
         String lastSync = OSES.getSession().getSessionLastVerwendung();
 
         if (lastSync != null) {
@@ -404,10 +409,6 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
             }
 
         }
-
-        query = "https://oses.mobi/api.php?request=verwendung_show&json=true&session=" + OSES.getSession().getIdentifier();
-        task = new GetVerwendung().execute(query);
-
 
     }
 
@@ -506,8 +507,12 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
 
         intent.putExtra("item", item);
         startActivityForResult(intent, 100);
+    }
 
-
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(ListenerService.RefreshVerwendungEvent event) {
+        setRefreshing(true);
+        task = new GetVerwendung().execute(query);
     }
 
 
@@ -607,8 +612,7 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
                 ProgressDialog dialog = dialogFragment.getDialog();
 
                 if (event.progress == event.max) {
-                    dialogFragment.setProgressNumberFormat("");
-                    dialog.setIndeterminate(true);
+                    dialog.setProgress(event.max);
                     dialogFragment.setMessage("PDF-Datei wird erstellt...");
                 } else {
                     dialogFragment.setProgressNumberFormat("Seite %1d / %2d");
@@ -655,7 +659,7 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
 
         ProgressDialogFragment loginWaitDialog;
         if (schicht.getArbeitsauftragCacheFile() == null)
-            loginWaitDialog = ProgressDialogFragment.newInstance("Dokument wird erzeugt...", "Bitte warten, der angeforderte wird Arbeitsauftrag extrahiert. Die Quelldatei aus Diloc|Sync wird durchsucht...", ProgressDialog.STYLE_HORIZONTAL);
+            loginWaitDialog = ProgressDialogFragment.newInstance("Dokument wird erzeugt...", "Bitte warten, der angeforderte Arbeitsauftrag wird extrahiert. Die Quelldatei aus Diloc|Sync wird durchsucht...", ProgressDialog.STYLE_HORIZONTAL);
         else
             loginWaitDialog = ProgressDialogFragment.newInstance("Dokument wird erzeugt...", "Bitte warten, der angeforderte Arbeitauftrag wurde aktualisiert und wird neu extrahiert. Die Quelldatei aus Diloc|Sync wird durchsucht...", ProgressDialog.STYLE_HORIZONTAL);
         loginWaitDialog.show(((AppCompatActivity) getActivity()).getSupportFragmentManager(), "arbeitsauftragWaitDialog" + schicht.getId());

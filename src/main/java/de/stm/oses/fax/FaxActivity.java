@@ -11,6 +11,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
@@ -53,11 +54,17 @@ import java.util.Date;
 import java.util.Locale;
 
 import de.stm.oses.R;
+import de.stm.oses.dialogs.FaxNumberDialogFragment;
 import de.stm.oses.helper.OSESBase;
 import de.stm.oses.helper.OSESRequest;
 
 
-public class FaxActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
+public class FaxActivity extends AppCompatActivity implements
+        View.OnClickListener,
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
+        com.google.android.gms.location.LocationListener,
+        FaxNumberDialogFragment.FaxNumberDialogListener {
 
     private static final int PERMISSIONS_REQUEST_LOCATION = 4100;
     private String docid;
@@ -90,6 +97,16 @@ public class FaxActivity extends AppCompatActivity implements View.OnClickListen
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
+    }
+
+    @Override
+    public void onDialogSend(String destination) {
+        DoSend(destination);
+    }
+
+    @Override
+    public void onDialogCancel() {
+
     }
 
     private class SpacesItemDecoration extends RecyclerView.ItemDecoration {
@@ -220,10 +237,7 @@ public class FaxActivity extends AppCompatActivity implements View.OnClickListen
 
         getFaxList().addItemDecoration(new SpacesItemDecoration(2));
 
-
-        if (savedInstanceState == null) {
-
-        } else {
+        if (savedInstanceState != null) {
 
             if (mFaxListFragment.getAdapter() != null) {
                 getFaxList().setAdapter(mFaxListFragment.getAdapter());
@@ -432,7 +446,7 @@ public class FaxActivity extends AppCompatActivity implements View.OnClickListen
                 getFaxes();
                 return true;
             case R.id.action_number_fax:
-                DialogFragment newFragment = FaxNumberDialog.newInstance();
+                DialogFragment newFragment = FaxNumberDialogFragment.newInstance();
                 newFragment.show(getSupportFragmentManager(), "faxNumberDialog");
                 return true;
             case android.R.id.home:
@@ -495,7 +509,7 @@ public class FaxActivity extends AppCompatActivity implements View.OnClickListen
     }
 
     @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
 
