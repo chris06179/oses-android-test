@@ -32,6 +32,7 @@ public class ArbeitsauftragBuilder {
     public static final int TYPE_NONE = 0;
     public static final int TYPE_DILOC = 1;
     public static final int TYPE_CACHED = 2;
+    public static final int TYPE_ONLINE = 3;
 
     private final Context context;
 

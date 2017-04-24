@@ -236,7 +236,7 @@ public class DokumenteFragment extends Fragment implements View.OnClickListener 
             download.setTitle(((ListClass) type.getSelectedItem()).getTitle());
             download.setMessage("Das Dokument wird heruntergeladen, dieser Vorgang kann einen Moment dauern...");
             download.setURL(url);
-            download.setLocalDirectory("docs/Nebengeld/");
+            download.setLocalDirectory("Dokumente/Nebengeld/");
             download.setOnDownloadFinishedListener(new OnDownloadFinishedListener() {
                 @Override
                 public void onDownloadFinished(File file) {

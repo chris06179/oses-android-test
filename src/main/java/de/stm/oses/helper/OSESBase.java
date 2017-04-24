@@ -475,47 +475,13 @@ public class OSESBase {
 
     }
 
-    private boolean isAppInstalled(String packageName) {
-        Intent intent = context.getPackageManager().getLaunchIntentForPackage(packageName);
-        List<ResolveInfo> list = context.getPackageManager().queryIntentActivities(intent,
-                PackageManager.MATCH_DEFAULT_ONLY);
-        return list.size() > 0;
-    }
-
-    public void checkDilocAndPermissionStatus() {
-
-        if (!getSession().getSessionDilocReminder() && isAppInstalled("de.diloc.DiLocSyncMobile") && ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-
-
-            new AlertDialog.Builder(context)
-                    .setTitle("Synchronisation mit Diloc|Sync (BETA)")
-                    .setMessage("Es wurde eine Installation von Diloc|Sync auf deinem Endgerät festgestellt. OSES kann Daten wie Arbeitsaufträge mit deinen Schichten verknüpfen, um dir deinen Arbeitsalltag zu erleichtern. Hierfür ist jedoch eine Berechtigung zum Zugriff auf den Gerätespeicher notwendig. Möchtest du diese Berechtigung jetzt erteilen?")
-                    .setPositiveButton("Ja", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-
-                            ActivityCompat.requestPermissions((AppCompatActivity) context,
-                                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                                    PERMISSION_REQUEST_STORAGE_DILOC);
-                        }
-                    })
-                    .setNeutralButton("Später", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                        }
-                    })
-                    .setNegativeButton("Nein", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            getSession().setSessionDilocReminder(true);
-                        }
-                    })
-                    .show();
-
-
+    public boolean isPackageInstalled(String packagename, PackageManager packageManager) {
+        try {
+            packageManager.getPackageInfo(packagename, 0);
+            return true;
+        } catch (PackageManager.NameNotFoundException e) {
+            return false;
         }
-
-
     }
 
     public void rebuildWorkingDirectory() {

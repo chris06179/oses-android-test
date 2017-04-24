@@ -360,7 +360,7 @@ public class StartActivity extends AppCompatActivity {
         download.setTitle("Dokumentation");
         download.setMessage("Die Dokumentation wird heruntergeladen, dieser Vorgang kann einen Moment dauern...");
         download.setURL("https://oses.mobi/docs/oses_nutzungshinweise.pdf");
-        download.setLocalDirectory("docs/");
+        download.setLocalDirectory("Dokumente/");
         download.setCancelable(true);
         download.setOnDownloadFinishedListener(new OnDownloadFinishedListener() {
             @Override

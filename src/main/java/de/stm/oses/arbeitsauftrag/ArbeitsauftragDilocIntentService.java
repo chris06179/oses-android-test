@@ -2,10 +2,28 @@ package de.stm.oses.arbeitsauftrag;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Base64;
+import android.util.Base64OutputStream;
+import android.util.Log;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import de.stm.oses.helper.FileDownload;
+import de.stm.oses.helper.OSESBase;
+import de.stm.oses.helper.OSESRequest;
 import de.stm.oses.verwendung.VerwendungClass;
 
 
@@ -54,6 +72,7 @@ public class ArbeitsauftragDilocIntentService extends IntentService {
         ArbeitsauftragBuilder auftrag = new ArbeitsauftragBuilder(schicht, getApplicationContext());
         Object result = auftrag.extractFromDilocSourceFile();
         EventBus.getDefault().post(new ArbeitsauftragResultEvent(result, schicht));
+
 
     }
 }

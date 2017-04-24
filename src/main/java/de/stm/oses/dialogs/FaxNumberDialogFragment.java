@@ -35,7 +35,7 @@ public class FaxNumberDialogFragment extends DialogFragment {
             mCallback = (FaxNumberDialogListener) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
-                    + " must implement OnHeadlineSelectedListener");
+                    + " must implement FaxNumberDialogListener");
         }
 
     }

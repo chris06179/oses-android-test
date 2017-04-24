@@ -8,12 +8,20 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -218,6 +226,42 @@ public class VerwendungClass implements Parcelable {
         }
     };
 
+    public static String calculateMD5(File updateFile) {
+        MessageDigest digest;
+        try {
+            digest = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            return null;
+        }
+
+        InputStream is;
+        try {
+            is = new FileInputStream(updateFile);
+        } catch (FileNotFoundException e) {
+            return null;
+        }
+
+        byte[] buffer = new byte[8192];
+        int read;
+        try {
+            while ((read = is.read(buffer)) > 0) {
+                digest.update(buffer, 0, read);
+            }
+            byte[] md5sum = digest.digest();
+            BigInteger bigInt = new BigInteger(1, md5sum);
+            String output = bigInt.toString(16);
+            // Fill to 32 chars
+            output = String.format("%32s", output).replace(' ', '0');
+            return output;
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to process file for MD5", e);
+        } finally {
+            try {
+                is.close();
+            } catch (IOException e) {
+            }
+        }
+    }
 
 
     public VerwendungClass(JSONObject schicht, Context context) throws JSONException {
@@ -283,7 +327,58 @@ public class VerwendungClass implements Parcelable {
         if (schicht.has("ShowTimeError"))
             this.setShowTimeError(schicht.getBoolean("ShowTimeError"));
 
-        this.processArbeitsauftrag(context);
+
+        // Arbeitsauftrag
+
+        if (!getKat().equals("S") || ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+            if (schicht.has("hasSharedArbeitsauftrag") && schicht.getBoolean("hasSharedArbeitsauftrag")) {
+                this.arbeitsauftrag = ArbeitsauftragBuilder.TYPE_ONLINE;
+            } else {
+                this.arbeitsauftrag = ArbeitsauftragBuilder.TYPE_NONE;
+            }
+        } else {
+
+            ArbeitsauftragBuilder auftrag = new ArbeitsauftragBuilder(this, context);
+
+            if (schicht.has("dilocFilePath")) {
+                File diloc = new File(schicht.getString("dilocFilePath"));
+
+                if (diloc.exists())
+                    this.arbeitsauftragDilocFile = diloc;
+            }
+
+            if (this.arbeitsauftragDilocFile == null)
+                this.arbeitsauftragDilocFile = auftrag.getDilocSourceFile();
+
+            this.arbeitsauftragCacheFile = auftrag.getExtractedCacheFile();
+
+            if (this.arbeitsauftragCacheFile != null) {
+                this.arbeitsauftrag = ArbeitsauftragBuilder.TYPE_CACHED;
+
+            } else {
+                if (this.arbeitsauftragDilocFile != null) {
+                    this.arbeitsauftrag = ArbeitsauftragBuilder.TYPE_DILOC;
+                }
+            }
+
+            if (this.arbeitsauftragCacheFile != null && this.arbeitsauftragDilocFile == null && schicht.has("hasSharedArbeitsauftrag")) {
+
+                String hash = calculateMD5(this.arbeitsauftragCacheFile);
+
+                if (hash != null && !hash.equals(schicht.getString("SharedArbeitsauftragHash")))  {
+                    this.arbeitsauftrag = ArbeitsauftragBuilder.TYPE_ONLINE;
+                    return;
+                }
+
+            }
+
+            if (this.arbeitsauftragCacheFile == null && this.arbeitsauftragDilocFile == null && schicht.has("hasSharedArbeitsauftrag")) {
+                if (schicht.getBoolean("hasSharedArbeitsauftrag"))
+                    this.arbeitsauftrag = ArbeitsauftragBuilder.TYPE_ONLINE;
+            }
+
+        }
 
     }
 
@@ -697,34 +792,6 @@ public class VerwendungClass implements Parcelable {
 
     public int getArbeitsauftragType() {
         return arbeitsauftrag;
-    }
-
-    public void processArbeitsauftrag(Context context) {
-
-        if (!getKat().equals("S")) {
-            this.arbeitsauftrag = ArbeitsauftragBuilder.TYPE_NONE;
-            return;
-        }
-
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            this.arbeitsauftrag = ArbeitsauftragBuilder.TYPE_NONE;
-            return;
-        }
-
-        ArbeitsauftragBuilder auftrag = new ArbeitsauftragBuilder(this, context);
-        this.arbeitsauftragDilocFile = auftrag.getDilocSourceFile();
-        this.arbeitsauftragCacheFile = auftrag.getExtractedCacheFile();
-
-        if (auftrag.getExtractedCacheFile() != null) {
-            this.arbeitsauftrag = ArbeitsauftragBuilder.TYPE_CACHED;
-            return;
-        }
-
-        if (this.arbeitsauftragDilocFile != null) {
-            this.arbeitsauftrag = ArbeitsauftragBuilder.TYPE_DILOC;
-            return;
-        }
-
     }
 
     public File getArbeitsauftragDilocFile() {

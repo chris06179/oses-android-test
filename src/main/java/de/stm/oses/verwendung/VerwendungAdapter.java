@@ -261,8 +261,10 @@ public class VerwendungAdapter extends ArrayAdapter<VerwendungClass> {
                     itemHolder.aa_icon.setAlpha(1f);
                     break;
                 case ArbeitsauftragBuilder.TYPE_DILOC:
+                case ArbeitsauftragBuilder.TYPE_ONLINE:
                     itemHolder.aa_icon.setVisibility(View.VISIBLE);
                     itemHolder.aa_icon.setAlpha(0.5f);
+                    break;
             }
 
             int countab = 0;
