@@ -251,6 +251,8 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
         selectedyear = c.get(Calendar.YEAR);
         selectedmonth = c.get(Calendar.MONTH) + 1;
 
+        query = "https://oses.mobi/api.php?request=verwendung_show&json=true&session=" + OSES.getSession().getIdentifier();
+
         if (!OSES.getSession().getSessionDilocReminder() && OSES.isPackageInstalled("de.diloc.DiLocSyncMobile", getActivity().getPackageManager()) && ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
 
             DilocInfoDialogFragment dilocDialog = DilocInfoDialogFragment.newInstance();
@@ -398,33 +400,35 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
             }
         });
 
-        query = "https://oses.mobi/api.php?request=verwendung_show&json=true&session=" + OSES.getSession().getIdentifier();
-        task = new GetVerwendung().execute(query);
+        if (savedInstanceState == null) {
 
-        String lastSync = OSES.getSession().getSessionLastVerwendung();
+            task = new GetVerwendung().execute(query);
 
-        if (lastSync != null) {
+            String lastSync = OSES.getSession().getSessionLastVerwendung();
 
-            ArrayList<VerwendungClass> list = null;
+            if (lastSync != null) {
 
-            try {
-                list = VerwendungClass.getNewList(lastSync, getActivity());
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+                ArrayList<VerwendungClass> list = null;
 
-            if (list != null) {
-                setListAdapter(new VerwendungAdapter(getActivity(), list));
-
-                if (first && getListAdapter() != null) {
-                    first = false;
-                    getListView().setSelectionFromTop(getListAdapter().getTodayPos(), 200);
+                try {
+                    list = VerwendungClass.getNewList(lastSync, getActivity());
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
 
-                setListShown(true);
-                setRefreshing(true);
-            }
+                if (list != null) {
+                    setListAdapter(new VerwendungAdapter(getActivity(), list));
 
+                    if (first && getListAdapter() != null) {
+                        first = false;
+                        getListView().setSelectionFromTop(getListAdapter().getTodayPos(), 200);
+                    }
+
+                    setListShown(true);
+                    setRefreshing(true);
+                }
+
+            }
         }
 
     }
