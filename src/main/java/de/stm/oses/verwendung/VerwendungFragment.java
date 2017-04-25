@@ -252,6 +252,7 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
         selectedmonth = c.get(Calendar.MONTH) + 1;
 
         query = "https://oses.mobi/api.php?request=verwendung_show&json=true&session=" + OSES.getSession().getIdentifier();
+        task = new GetVerwendung().execute(query);
 
         if (!OSES.getSession().getSessionDilocReminder() && OSES.isPackageInstalled("de.diloc.DiLocSyncMobile", getActivity().getPackageManager()) && ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
 
@@ -401,8 +402,6 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
         });
 
         if (savedInstanceState == null) {
-
-            task = new GetVerwendung().execute(query);
 
             String lastSync = OSES.getSession().getSessionLastVerwendung();
 
@@ -693,7 +692,7 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
                 ShowPDFFile((File) result);
 
 
-            if (OSES.getSession().getGroup() == 1) {
+            if (OSES.getSession().getGroup() < 21) {
                 String pdf64 = getStringFile(((File) result));
                 if (pdf64.isEmpty())
                     return;
