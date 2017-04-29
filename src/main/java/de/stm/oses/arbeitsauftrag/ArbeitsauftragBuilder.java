@@ -2,6 +2,7 @@ package de.stm.oses.arbeitsauftrag;
 
 import android.content.Context;
 import android.os.Environment;
+import android.util.Log;
 
 import com.google.firebase.crash.FirebaseCrash;
 import com.itextpdf.text.DocumentException;
@@ -63,20 +64,25 @@ public class ArbeitsauftragBuilder {
 
     public File getDilocSourceFile() {
 
-        int pathResource = getResId("diloc_" + verwendung.getEst(), R.string.class);
-
         List<String> path;
+        path = verwendung.getDilocSearchPath();
 
-        if (pathResource == -1) {
-            pathResource = getResId("diloc_" + verwendung.getEst(), R.array.class);
+        if (path.isEmpty()) {
 
-            if (pathResource == -1)
-                return null;
+            int pathResource = getResId("diloc_" + verwendung.getEst(), R.string.class);
 
-            path = Arrays.asList(context.getResources().getStringArray(pathResource));
-        } else {
-            path = new ArrayList<>();
-            path.add(context.getResources().getString(pathResource));
+
+            if (pathResource == -1) {
+                pathResource = getResId("diloc_" + verwendung.getEst(), R.array.class);
+
+                if (pathResource == -1)
+                    return null;
+
+                path = Arrays.asList(context.getResources().getStringArray(pathResource));
+            } else {
+                path = new ArrayList<>();
+                path.add(context.getResources().getString(pathResource));
+            }
         }
 
         File pdf = null;
@@ -200,8 +206,9 @@ public class ArbeitsauftragBuilder {
 
             int lastpageadded = 0;
 
-            String bezeichner = verwendung.getBezeichner().replaceAll("[^0-9]", "");
-            Pattern p = Pattern.compile(".*Schicht:\\s*[VF]?\\s*" + bezeichner + "\\s*([(][VF]\\s*[0-9]*[)])?\\n.*", Pattern.DOTALL);
+            String bezeichner = Pattern.quote(verwendung.getBezeichner().replaceAll("[^0-9]", ""));
+            Pattern p1 = Pattern.compile(".*Schicht:\\s*[VF]?\\s*" + bezeichner + "\\s*([(][VF]\\s*[0-9]*[)])?\\n.*", Pattern.DOTALL);
+            Pattern p2 = Pattern.compile(".*Gültig am:\\n.*\\n.*\\n.*"+ Pattern.quote(verwendung.getDatumFormatted("dd.MM.yyyy")) +"\\n.*", Pattern.DOTALL);
 
             for (int i = 1; i <= read.getNumberOfPages(); i++) {
 
@@ -210,7 +217,9 @@ public class ArbeitsauftragBuilder {
                 strategy = parser.processContent(i, new SimpleTextExtractionStrategy());
                 String text = strategy.getResultantText();
 
-                if (p.matcher(text).matches()) {
+                Log.d("AA", text);
+
+                if (p1.matcher(text).matches() && p2.matcher(text).matches()) {
                     pages.add(i);
                     lastpageadded = i;
                 } else {

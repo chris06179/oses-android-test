@@ -13,13 +13,11 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.v13.app.FragmentCompat;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
@@ -51,7 +49,6 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -410,7 +407,7 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
                 ArrayList<VerwendungClass> list = null;
 
                 try {
-                    list = VerwendungClass.getNewList(lastSync, getActivity());
+                    list = VerwendungClass.getNewListFromJSON(lastSync, getActivity());
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -600,7 +597,12 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
 
     private void CheckArbeitsauftrag(VerwendungClass schicht) {
 
-        mFirebaseAnalytics.logEvent("OSES_show_arbeitsauftrag", null);
+        Bundle details = new Bundle();
+        details.putString("bezeichner", schicht.getBezeichner());
+        details.putString("datum", schicht.getDatumFormatted("dd.MM.yyyy"));
+        details.putString("est", schicht.getEst());
+        details.putInt("type", schicht.getArbeitsauftragType());
+        mFirebaseAnalytics.logEvent("OSES_show_arbeitsauftrag", details);
 
         if (schicht.getArbeitsauftragType() == ArbeitsauftragBuilder.TYPE_ONLINE) {
             downloadArbeitsauftrag(schicht);
@@ -649,7 +651,7 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
     }
 
     public String getStringFile(File f) {
-        InputStream inputStream = null;
+        InputStream inputStream;
         String encodedFile= "", lastVal;
         try {
             inputStream = new FileInputStream(f.getAbsolutePath());
@@ -664,11 +666,7 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
             }
             output64.close();
             encodedFile =  output.toString();
-        }
-        catch (FileNotFoundException e1 ) {
-            e1.printStackTrace();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         lastVal = encodedFile;
@@ -737,7 +735,6 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
 
         if (result instanceof Exception) {
             Toast.makeText(getActivity(), "Es konnte kein Arbeitsauftrag zur angegebenen Schichtnummer extrahiert werden! Bitte rufe das Dokument ggf. direkt über Diloc|Sync auf!", Toast.LENGTH_SHORT).show();
-            FirebaseCrash.log("AA = " + schicht.getBezeichner() + ", " + schicht.getEst() + ", " + schicht.getDatumFormatted("dd.MM.yyyy"));
             FirebaseCrash.report(new Exception("Arbeitsauftrag, keine Extraktion möglich!"));
             return;
         }
@@ -792,7 +789,7 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
 
             try {
                 if (getActivity() != null && response != null) {
-                    ArrayList<VerwendungClass> list = VerwendungClass.getNewList(response, getActivity());
+                    ArrayList<VerwendungClass> list = VerwendungClass.getNewListFromJSON(response, getActivity());
 
                     Calendar c = Calendar.getInstance();
                     if (selectedyear == c.get(Calendar.YEAR) && selectedmonth == c.get(Calendar.MONTH) + 1)
@@ -825,7 +822,7 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
                 setEmptyText("Keine Verbindung zu OSES!");
 
             if (getListAdapter() != null && adapter == null) {
-                Toast.makeText(getActivity(), "Keine Verbindung zu OSES, angezeigte Daten ggf. nicht aktuell!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Keine Verbindung zu OSES, angezeigte Daten ggf. nicht aktuell!", Toast.LENGTH_LONG).show();
                 setRefreshing(false);
                 return;
             }

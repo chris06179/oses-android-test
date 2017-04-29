@@ -25,11 +25,11 @@ import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
 import de.stm.oses.arbeitsauftrag.ArbeitsauftragBuilder;
-
 
 public class VerwendungClass implements Parcelable {
 
@@ -81,6 +81,7 @@ public class VerwendungClass implements Parcelable {
     private int arbeitsauftrag = ArbeitsauftragBuilder.TYPE_NONE;
     private File arbeitsauftragDilocFile;
     private File arbeitsauftragCacheFile;
+    private List<String> dilocSearchPath = new ArrayList<>();
 
     public VerwendungClass(boolean isVerwendungSummary) {
         this.isVerwendungSummary = isVerwendungSummary;
@@ -149,6 +150,8 @@ public class VerwendungClass implements Parcelable {
             arbeitsauftragCacheFile = null;
         else
             arbeitsauftragCacheFile = new File(path);
+
+        in.readStringList(dilocSearchPath);
     }
 
     @Override
@@ -211,6 +214,8 @@ public class VerwendungClass implements Parcelable {
             dest.writeString(arbeitsauftragCacheFile.getAbsolutePath());
         else
             dest.writeString("");
+
+        dest.writeStringList(dilocSearchPath);
     }
 
     @SuppressWarnings("unused")
@@ -226,7 +231,7 @@ public class VerwendungClass implements Parcelable {
         }
     };
 
-    public static String calculateMD5(File updateFile) {
+    private static String calculateMD5(File updateFile) {
         MessageDigest digest;
         try {
             digest = MessageDigest.getInstance("MD5");
@@ -332,7 +337,7 @@ public class VerwendungClass implements Parcelable {
 
         if (!getKat().equals("S") || ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
 
-            if (schicht.has("hasSharedArbeitsauftrag") && schicht.getBoolean("hasSharedArbeitsauftrag")) {
+            if (schicht.optBoolean("hasSharedArbeitsauftrag", false)) {
                 this.arbeitsauftrag = ArbeitsauftragBuilder.TYPE_ONLINE;
             } else {
                 this.arbeitsauftrag = ArbeitsauftragBuilder.TYPE_NONE;
@@ -341,16 +346,24 @@ public class VerwendungClass implements Parcelable {
 
             ArbeitsauftragBuilder auftrag = new ArbeitsauftragBuilder(this, context);
 
-            if (schicht.has("dilocFilePath")) {
-                File diloc = new File(schicht.getString("dilocFilePath"));
+            if (schicht.has("dilocSearchPath")) {
 
-                if (diloc.exists())
-                    this.arbeitsauftragDilocFile = diloc;
+                JSONArray dilocFilePath = schicht.optJSONArray("dilocSearchPath");
+
+                if (dilocFilePath != null) {
+
+                    List<String> dilocPathList = new ArrayList<>();
+                    for (int i = 0; i < dilocFilePath.length(); i++) {
+                        dilocPathList.add(dilocFilePath.getString(i));
+                    }
+
+                    dilocSearchPath = dilocPathList;
+
+                }
+
             }
 
-            if (this.arbeitsauftragDilocFile == null)
-                this.arbeitsauftragDilocFile = auftrag.getDilocSourceFile();
-
+            this.arbeitsauftragDilocFile = auftrag.getDilocSourceFile();
             this.arbeitsauftragCacheFile = auftrag.getExtractedCacheFile();
 
             if (this.arbeitsauftragCacheFile != null) {
@@ -362,27 +375,26 @@ public class VerwendungClass implements Parcelable {
                 }
             }
 
-            if (this.arbeitsauftragCacheFile != null && this.arbeitsauftragDilocFile == null && schicht.has("hasSharedArbeitsauftrag")) {
+            if (this.arbeitsauftragCacheFile != null && this.arbeitsauftragDilocFile == null && schicht.optBoolean("hasSharedArbeitsauftrag", false)) {
 
                 String hash = calculateMD5(this.arbeitsauftragCacheFile);
 
-                if (hash != null && !hash.equals(schicht.getString("SharedArbeitsauftragHash")))  {
+                if (hash != null && !hash.equals(schicht.getString("SharedArbeitsauftragHash"))) {
                     this.arbeitsauftrag = ArbeitsauftragBuilder.TYPE_ONLINE;
                     return;
                 }
 
             }
 
-            if (this.arbeitsauftragCacheFile == null && this.arbeitsauftragDilocFile == null && schicht.has("hasSharedArbeitsauftrag")) {
-                if (schicht.getBoolean("hasSharedArbeitsauftrag"))
-                    this.arbeitsauftrag = ArbeitsauftragBuilder.TYPE_ONLINE;
+            if (this.arbeitsauftragCacheFile == null && this.arbeitsauftragDilocFile == null && schicht.optBoolean("hasSharedArbeitsauftrag", false)) {
+               this.arbeitsauftrag = ArbeitsauftragBuilder.TYPE_ONLINE;
             }
 
         }
 
     }
 
-    public static ArrayList<VerwendungClass> getNewList(String jsonInput, Context context) throws JSONException {
+    public static ArrayList<VerwendungClass> getNewListFromJSON(String jsonInput, Context context) throws JSONException {
 
         ArrayList<VerwendungClass> list = new ArrayList<>();
 
@@ -806,4 +818,9 @@ public class VerwendungClass implements Parcelable {
         this.arbeitsauftragCacheFile = file;
         this.arbeitsauftrag = ArbeitsauftragBuilder.TYPE_CACHED;
     }
+
+    public List<String> getDilocSearchPath() {
+        return dilocSearchPath;
+    }
+
 }

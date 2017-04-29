@@ -1,5 +1,6 @@
 package de.stm.oses;
 
+import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -12,6 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.animation.AnimationUtils;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
@@ -133,8 +136,11 @@ public class BrowserFragment extends Fragment {
             @Override
 			public void onPageStarted (WebView view, String url, Bitmap favicon) {
 
+                if (getActivity() == null)
+                    return;
+
                 View error = getActivity().findViewById(R.id.error_container);
-                if (error.getVisibility() == View.VISIBLE) {
+                if (error != null && error.getVisibility() == View.VISIBLE) {
                     error.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_out));
                     error.setVisibility(View.GONE);
                 }
@@ -157,18 +163,21 @@ public class BrowserFragment extends Fragment {
                     error.setVisibility(View.VISIBLE);
                 }
 		        
-		    }  
+		    }
 
-			// Fehlermeldung bei Fehlschlag anzeigen
-		    @Override
-		    public void onReceivedError(WebView view, int ierrorCode, String description, String failingUrl) {
-
+            @SuppressWarnings("deprecation")
+            @Override
+            public void onReceivedError(WebView view, int ierrorCode, String description, String failingUrl) {
                 errorCode = ierrorCode;
                 super.onReceivedError(view, errorCode, description, failingUrl);
+            }
 
-
-		    }
-	        	
+            @TargetApi(android.os.Build.VERSION_CODES.M)
+            @Override
+            public void onReceivedError(WebView view, WebResourceRequest req, WebResourceError rerr) {
+                // Redirect to deprecated method, so you can use it in all SDK versions
+                errorCode = rerr.getErrorCode();
+            }
 	
 		});
 		
@@ -179,6 +188,9 @@ public class BrowserFragment extends Fragment {
 
 
     private void setBrowserShown(boolean show) {
+
+        if (getActivity() == null)
+            return;
 
         LinearLayout progress = (LinearLayout)   getActivity().findViewById(R.id.progress_container_id);
 

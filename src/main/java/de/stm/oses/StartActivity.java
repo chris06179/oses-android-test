@@ -31,6 +31,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.AdapterView;
@@ -500,24 +501,25 @@ public class StartActivity extends AppCompatActivity {
 
         public void run() {
 
-            FragmentManager fragmentManager = getFragmentManager();
-            Fragment running = fragmentManager.findFragmentByTag(ident);
 
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                FragmentManager fragmentManager = getFragmentManager();
+                Fragment running = fragmentManager.findFragmentByTag(ident);
 
-            fragmentTransaction.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-            if (running != null) {
-                fragmentTransaction.replace(R.id.content_frame, running, running.getTag());
-            } else {
-                if (args != null)
-                    fragment.setArguments(args);
+                fragmentTransaction.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
 
-                if (AddToBackStack)
-                    fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.replace(R.id.content_frame, fragment, ident);
-            }
-            fragmentTransaction.commit();
+                if (running != null && !running.isRemoving()) {
+                    fragmentTransaction.replace(R.id.content_frame, running, running.getTag());
+                } else {
+                    if (args != null)
+                        fragment.setArguments(args);
+
+                    if (AddToBackStack)
+                        fragmentTransaction.addToBackStack(null);
+                    fragmentTransaction.replace(R.id.content_frame, fragment, ident);
+                }
+                fragmentTransaction.commit();
 
         }
     }
@@ -768,6 +770,7 @@ public class StartActivity extends AppCompatActivity {
 
         }
 
+        @SuppressWarnings("deprecation")
         protected void onPostExecute(String response) {
 
             String StatusCode = "";
@@ -879,7 +882,11 @@ public class StartActivity extends AppCompatActivity {
                     LinearLayout infobox = (LinearLayout) findViewById(R.id.infobox);
 
                     if (infotext != null)
-                        infotext.setText(Html.fromHtml(StatusMessage));
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            infotext.setText(Html.fromHtml(StatusMessage, Html.FROM_HTML_MODE_LEGACY));
+                        } else
+                            infotext.setText(Html.fromHtml(StatusMessage));
+
 
                     Animation slide = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_down);
 
@@ -964,12 +971,6 @@ public class StartActivity extends AppCompatActivity {
                 wv.loadUrl("https://oses.mobi/api.php?request=changelog&androidversion=" + OSES.getVersionCode() + "&session=" + OSES.getSession().getIdentifier());
 
                 wv.setWebViewClient(new WebViewClient() {
-                    @Override
-                    public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                        view.loadUrl(url);
-
-                        return true;
-                    }
 
                     @Override
                     public void onPageFinished(WebView view, String url) {
@@ -1030,12 +1031,6 @@ public class StartActivity extends AppCompatActivity {
                 wv.loadUrl("https://oses.mobi/api.php?request=changelog&beta=1&androidversion=" + OSES.getVersionCode() + "&session=" + OSES.getSession().getIdentifier());
 
                 wv.setWebViewClient(new WebViewClient() {
-                    @Override
-                    public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                        view.loadUrl(url);
-
-                        return true;
-                    }
 
                     @Override
                     public void onPageFinished(WebView view, String url) {
@@ -1102,14 +1097,7 @@ public class StartActivity extends AppCompatActivity {
                 wv.setLayoutParams(params);
                 wv.loadUrl("https://oses.mobi/api.php?request=anb&check=true&session=" + OSES.getSession().getIdentifier());
 
-                wv.setWebViewClient(new WebViewClient() {
-                    @Override
-                    public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                        view.loadUrl(url);
-
-                        return true;
-                    }
-                });
+                wv.setWebViewClient(new WebViewClient());
 
                 linear.addView(wv);
                 alert.setView(linear);

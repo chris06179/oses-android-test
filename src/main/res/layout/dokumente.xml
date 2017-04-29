@@ -193,92 +193,41 @@
         <android.support.v7.widget.CardView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            card_view:cardUseCompatPadding="true"
-            android:visibility="gone">
+            card_view:cardUseCompatPadding="true">
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
+                android:paddingBottom="6dp"
                 android:paddingLeft="8dp"
-                android:paddingTop="4dp"
                 android:paddingRight="8dp"
-                android:paddingBottom="6dp">
+                android:paddingTop="4dp">
 
                 <TextView
 
+                    android:id="@+id/textView13"
                     style="@style/Theme.OSES.ListSeparator"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:gravity="left|center_horizontal"
-                    android:text="@string/guthabenkonto"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:textSize="15sp"
-                    android:layout_alignParentTop="true"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
-                    android:id="@+id/textView13" />
-
-                <TextView
-                    android:id="@+id/dokumente_account_sites"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="left|center_vertical"
-                    android:text="ca. 0 Seiten"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textStyle="bold"
-                    android:layout_below="@+id/dokumente_account_balance"
-                    android:layout_alignLeft="@+id/dokumente_account_balance"
-                    android:layout_alignStart="@+id/dokumente_account_balance" />
-
-                <TextView
-                    android:id="@+id/textView12"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="left|center_vertical"
-                    android:minWidth="120dp"
-                    android:text="@string/faxguthaben"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:layout_below="@+id/textView13"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true" />
-
-                <TextView
-                    android:id="@+id/dokumente_account_balance"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="left|center_vertical"
-                    android:text="0,00 €"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textColor="#00981c"
-                    android:textStyle="bold"
-                    android:layout_alignTop="@+id/textView12"
-                    android:layout_toRightOf="@+id/textView12"
-                    android:layout_toEndOf="@+id/textView12"
-                    android:layout_marginLeft="8dp"
-                    android:textAllCaps="false" />
-
-                <Button
-                    style="@style/Widget.AppCompat.Button.Small"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Aufladen"
-                    android:id="@+id/dokumente_payment"
                     android:layout_alignParentTop="true"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentEnd="true"
-                    android:enabled="false"
-                    android:textColor="#b6b6b6" />
+                    android:gravity="left|center_horizontal"
+                    android:text="Information"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textSize="15sp" />
 
                 <TextView
+                    android:id="@+id/textView48"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="Die individuelle Berechnung des Faxversandes ist derzeit in Vorbereitung und findet im Moment noch nicht statt!"
-                    android:id="@+id/textView48"
-                    android:layout_below="@+id/dokumente_account_sites"
                     android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true" />
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/textView13"
+                    android:autoLink="email"
+                    android:text="Es findet keine individuelle Berechnung des Faxversandes statt. Die Kosten für diesen Dienst werden durch Spenden finanziert. Die angezeigten Preise dienen nur der Information und als Hinweis darauf, dass diese Funktion bei übermäßiger Nutzung hohe Kosten verursacht.\n\nFür weitere Informationen, unter anderem auch zu  Spendenmöglichkeiten, kontaktiere bitte den Support unter info@oses.mobi."
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
 
             </RelativeLayout>
 

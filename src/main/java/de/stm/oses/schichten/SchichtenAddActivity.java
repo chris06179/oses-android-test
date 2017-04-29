@@ -504,6 +504,9 @@ public class SchichtenAddActivity extends AppCompatActivity implements View.OnCl
 	
 	protected void onPostExecute(String response) {
 
+        if (sAdd == null || sAdd.rilprogress == null || sAdd.rilstatus == null || response == null)
+            return;
+
         sAdd.rilprogress.setVisibility(View.GONE);
 	 
      if (response.length() > 0) {

@@ -38,7 +38,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import de.stm.oses.PaymentActivity;
 import de.stm.oses.R;
 import de.stm.oses.dialogs.FaxProtokollDetailDialogFragment;
 import de.stm.oses.fax.FaxActivity;
@@ -87,8 +86,6 @@ public class DokumenteFragment extends Fragment implements View.OnClickListener 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        getActivity().findViewById(R.id.dokumente_payment).setOnClickListener(this);
 
         type = (Spinner) getActivity().findViewById(R.id.dokumente_typ);
         exclude = (Spinner) getActivity().findViewById(R.id.dokumente_skip);
@@ -390,10 +387,6 @@ public class DokumenteFragment extends Fragment implements View.OnClickListener 
 
                 zeitraum.show(((AppCompatActivity) getActivity()).getSupportFragmentManager(), "zeitraumdialog");
                 break;
-            case R.id.dokumente_payment:
-                Intent intent = new Intent(getActivity(), PaymentActivity.class);
-                startActivityForResult(intent, 100);
-                break;
         }
     }
 
@@ -411,25 +404,16 @@ public class DokumenteFragment extends Fragment implements View.OnClickListener 
             if (getActivity() == null)
                 return;
 
-            double balance = 4.44;
-            double sites = balance / (0.09 * 1.19);
-
-            TextView balanceText = (TextView) getActivity().findViewById(R.id.dokumente_account_balance);
-            TextView sitesText = (TextView) getActivity().findViewById(R.id.dokumente_account_sites);
-
-            //balanceText.setText(String.format("%.2f", balance) + " €");
-            //sitesText.setText("ca. " + String.format("%.0f", sites) + " Seiten");
-
-            //balanceText.setText("∞ €");
-            //sitesText.setText("ca. ∞ Seiten");
-
             final LinearLayout list = (LinearLayout) getActivity().findViewById(R.id.dokumente_fax_protokoll);
+
+            if (list == null)
+                return;
+
             list.removeAllViews();
 
             LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
             inflater.inflate(R.layout.fax_protokoll_divider, list);
-
 
             try {
 

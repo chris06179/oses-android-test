@@ -1092,7 +1092,7 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
 	
 	protected void onPostExecute(String response) {
 
-        if (vAdd == null || vAdd.rilprogress == null || vAdd.rilstatus == null)
+        if (vAdd == null || vAdd.rilprogress == null || vAdd.rilstatus == null || response == null)
             return;
 
         vAdd.rilprogress.setVisibility(View.GONE);
