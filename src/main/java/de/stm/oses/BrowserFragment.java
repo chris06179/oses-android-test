@@ -153,14 +153,19 @@ public class BrowserFragment extends Fragment {
 
                 super.onPageFinished(engine, url);
 
+                if (getActivity() == null || mRefreshLayout == null)
+                    return;
+
                 mRefreshLayout.setRefreshing(false);
 
                 if (errorCode == 0)
                  setBrowserShown(true);
                 else {
                     View error = getActivity().findViewById(R.id.error_container);
-                    error.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));
-                    error.setVisibility(View.VISIBLE);
+                    if (error != null) {
+                        error.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));
+                        error.setVisibility(View.VISIBLE);
+                    }
                 }
 		        
 		    }

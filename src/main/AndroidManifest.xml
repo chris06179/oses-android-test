@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="de.stm.oses"
-    android:versionCode="353"
+    android:versionCode="354"
     android:versionName="3.5"
     android:installLocation="auto">
 

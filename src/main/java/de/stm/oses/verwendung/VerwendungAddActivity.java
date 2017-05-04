@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -43,7 +44,6 @@ import com.codetroopers.betterpickers.timepicker.TimePickerBuilder;
 import com.codetroopers.betterpickers.timepicker.TimePickerDialogFragment;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
-import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import org.json.JSONArray;
@@ -59,6 +59,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import de.stm.oses.R;
+import de.stm.oses.dialogs.ProgressDialogFragment;
 import de.stm.oses.helper.ListAdapter;
 import de.stm.oses.helper.ListClass;
 import de.stm.oses.helper.ListSpinnerAdapter;
@@ -1299,18 +1300,33 @@ private class SucheSchicht extends AsyncTask<Void, Void, String> {
         
  }
 
-private class SaveVerwendung extends AsyncTask<Void, Void, String> {
-	
-	private ProgressDialog dialog;
+    private void ShowWaitDialog() {
 
+        ProgressDialogFragment loginWaitDialog = ProgressDialogFragment.newInstance("Kommunikation", "Verwendung wird gespeichert...", ProgressDialog.STYLE_SPINNER);
+        loginWaitDialog.show(getSupportFragmentManager(), "saveVerwendungDialog");
+
+    }
+
+    private void hideWaitDialog() {
+
+        Fragment f = getSupportFragmentManager().findFragmentByTag("saveVerwendungDialog");
+
+        if (f != null)
+            ((ProgressDialogFragment) f).dismiss();
+
+
+    }
+
+private class SaveVerwendung extends AsyncTask<String, Void, String> {
+	
 	protected void onPreExecute() {
-		
-		dialog = ProgressDialog.show(VerwendungAddActivity.this, "Bitte warten...", 
-                "Verwendung wird gespeichert...", true);
+
+        ShowWaitDialog();
 
     }
 	
-	protected String doInBackground(Void... params) {
+	protected String doInBackground(String... params) {
+
 
         //Datum parsen
         String datumStart = "";
@@ -1318,9 +1334,9 @@ private class SaveVerwendung extends AsyncTask<Void, Void, String> {
 
         String[] split = vAdd.datumStart.getText().toString().substring(5).split("\\.");
 
-			if (split.length == 3) {
-                datumStart = split[2]+"-"+split[1]+"-"+split[0];
-			}
+        if (split.length == 3) {
+            datumStart = split[2]+"-"+split[1]+"-"+split[0];
+        }
 
         split = vAdd.datumEnde.getText().toString().substring(5).split("\\.");
 
@@ -1373,8 +1389,8 @@ private class SaveVerwendung extends AsyncTask<Void, Void, String> {
         postdata.put("pause",  String.valueOf(((ListClass) vAdd.pause.getSelectedItem()).getId()));
         postdata.put("pause_ort", vAdd.pausein.getText().toString());
         postdata.put("baureihen", vAdd.baureihen.getText().toString());
-            
-            // Abweichungen
+
+        // Abweichungen
         postdata.put("adb", vAdd.adb.getText().toString());
         postdata.put("ade", vAdd.ade.getText().toString());
         postdata.put("adb_an", getSelectedIdString(vAdd.adban));
@@ -1439,7 +1455,7 @@ private class SaveVerwendung extends AsyncTask<Void, Void, String> {
 		
 		if (Status.equals("200")) {
 
-		dialog.dismiss();
+		hideWaitDialog();
 
         setResult(200);
         if (saveMultiple) {
@@ -1481,14 +1497,14 @@ private class SaveVerwendung extends AsyncTask<Void, Void, String> {
 		}
 
         if (Status.equals("201")) {
-            dialog.dismiss();
+            hideWaitDialog();
             setResult(200);
             finish();
         }
 
 
         Toast.makeText(getApplicationContext(), Status + ": " + StatusBody, Toast.LENGTH_LONG).show();
-        dialog.dismiss();
+        hideWaitDialog();
 		
 	}
         

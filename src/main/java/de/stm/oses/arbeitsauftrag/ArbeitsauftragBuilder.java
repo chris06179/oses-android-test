@@ -252,7 +252,6 @@ public class ArbeitsauftragBuilder {
             return file;
 
         } catch (IOException | DocumentException e) {
-            FirebaseCrash.report(e);
             return e;
         }
 

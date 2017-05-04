@@ -427,6 +427,12 @@ public class StartActivity extends AppCompatActivity {
                 verwendungAction.finish();
                 return;
             }
+
+            Calendar c = Calendar.getInstance();
+            if (((VerwendungFragment) running).selectedyear != c.get(Calendar.YEAR) || ((VerwendungFragment) running).selectedmonth != c.get(Calendar.MONTH) + 1) {
+                ((VerwendungFragment) running).showCurrentMonth();
+                return;
+            }
         }
 
         if (!(running instanceof VerwendungFragment)) {

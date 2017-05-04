@@ -77,6 +77,8 @@ public class OSESBase {
     public OSESBase(Context context) {
         this.context = context;
 
+        session = new OSESSession(context);
+
         PackageInfo packageInfo;
         try {
             packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
@@ -93,8 +95,6 @@ public class OSESBase {
     }
 
     public OSESSession getSession() {
-        if (session == null)
-            session = new OSESSession(context);
         return session;
     }
 

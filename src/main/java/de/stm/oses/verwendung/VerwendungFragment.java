@@ -595,6 +595,19 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
         zeitraum.show(((AppCompatActivity) getActivity()).getSupportFragmentManager(), "zeitraumdialog");
     }
 
+    public void showCurrentMonth() {
+
+        Calendar c = Calendar.getInstance();
+        selectedyear = c.get(Calendar.YEAR);
+        selectedmonth = c.get(Calendar.MONTH) + 1;
+
+        first = true;
+        setListShown(false);
+        query = "https://oses.mobi/api.php?request=verwendung_show&json=true&monat=" + selectedmonth + "&jahr=" + selectedyear + "&session=" + OSES.getSession().getIdentifier();
+        task = new GetVerwendung().execute(query);
+
+    }
+
     private void CheckArbeitsauftrag(VerwendungClass schicht) {
 
         Bundle details = new Bundle();
@@ -735,11 +748,12 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
 
         if (result instanceof Exception) {
             Toast.makeText(getActivity(), "Es konnte kein Arbeitsauftrag zur angegebenen Schichtnummer extrahiert werden! Bitte rufe das Dokument ggf. direkt über Diloc|Sync auf!", Toast.LENGTH_SHORT).show();
-            FirebaseCrash.report(new Exception("Arbeitsauftrag, keine Extraktion möglich!"));
+            FirebaseCrash.report((Exception) result);
             return;
         }
 
     }
+
 
     public void GenerateArbeitsauftrag(VerwendungClass schicht) {
 
@@ -780,7 +794,7 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
         OSES.getSession().setSessionDilocReminder(true);
     }
 
-    private class GetVerwendung extends AsyncTask<String, Void, VerwendungAdapter> {
+    public class GetVerwendung extends AsyncTask<String, Void, VerwendungAdapter> {
 
 
         protected VerwendungAdapter doInBackground(String... params) {
