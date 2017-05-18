@@ -64,6 +64,7 @@ import de.stm.oses.helper.ListAdapter;
 import de.stm.oses.helper.ListClass;
 import de.stm.oses.helper.ListSpinnerAdapter;
 import de.stm.oses.helper.OSESBase;
+import de.stm.oses.helper.OSESRequest;
 
 
 public class VerwendungAddActivity extends AppCompatActivity implements View.OnClickListener {
@@ -84,7 +85,7 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
     private VerwendungAddHolder vAdd;
     private FirebaseAnalytics mFirebaseAnalytics;
 
-    static class VerwendungAddHolder {
+    private static class VerwendungAddHolder {
 
         Toolbar toolbar;
         Button back;
@@ -160,7 +161,7 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
 
         CheckBox zeitraum;
 
-        public VerwendungAddHolder(VerwendungAddActivity activity) {
+        VerwendungAddHolder(VerwendungAddActivity activity) {
             toolbar = (Toolbar) activity.findViewById(R.id.verwendungadd_toolbar);
 
             back = (Button) activity.findViewById(R.id.verwendungadd_back);
@@ -249,7 +250,7 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
             de.setOnClickListener(activity);
             adb.setOnClickListener(activity);
             ade.setOnClickListener(activity);
-            datumStart .setOnClickListener(activity);
+            datumStart.setOnClickListener(activity);
             datumEnde.setOnClickListener(activity);
             aufdz.setOnClickListener(activity);
             oaz.setOnClickListener(activity);
@@ -257,13 +258,13 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
         }
     }
 
-	//Your member variable declaration here
+    //Your member variable declaration here
 
-	// Called when the activity is first created.
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.verwendungaddn);
+    // Called when the activity is first created.
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.verwendungaddn);
 
         OSES = new OSESBase(this);
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
@@ -356,7 +357,12 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 kategorien.setSelection((int) l);
 
-                BuildForm(((ListClass) vAdd.kategorie.getSelectedItem()).getIdent());
+                ListClass item = kategorien.getItem(i);
+
+                if (item == null)
+                    return;
+
+                BuildForm(item.getIdent());
 
                 InputMethodManager inputManager =
                         (InputMethodManager) getApplicationContext().
@@ -369,9 +375,10 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
 
                 if (bChangeColor) {
 
-                    int startcolor = Color.parseColor(kategorien.getItem(i).getColor());
+                    int startcolor = Color.parseColor(item.getColor());
 
-                    if (kategorien.getItem(i).getIdent().equals("R") || kategorien.getItem(i).getIdent().equals("S")) {
+
+                    if (item.getIdent().equals("R") || item.getIdent().equals("S")) {
 
                         float[] hsv = new float[3];
                         int color = startcolor;
@@ -468,12 +475,17 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 funktionen.setSelection((int) id);
 
-                if (funktionen.getItem((int) id).getId() == 1 && getKategorie().equals("S"))
+                ListClass item = funktionen.getItem((int) id);
+
+                if (item == null)
+                    return;
+
+                if (item.getId() == 1 && getKategorie().equals("S"))
                     vAdd.baureihen_box.setVisibility(View.VISIBLE);
                 else
                     vAdd.baureihen_box.setVisibility(View.GONE);
 
-                if (funktionen.getItem((int) id).getId() == 5) {
+                if (item.getId() == 5) {
                     vAdd.fpla_box.setVisibility(View.GONE);
                     vAdd.auf_box.setVisibility(View.GONE);
                     vAdd.abcbutton.setChecked(true);
@@ -547,7 +559,12 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 pausen.setSelection((int) id);
 
-                if (pausen.getItem((int) id).getId() > 0 && !getKategorie().equals("B"))
+                ListClass item = pausen.getItem((int) id);
+
+                if (item == null)
+                    return;
+
+                if (item.getId() > 0 && !getKategorie().equals("B"))
                     vAdd.pausein_box.setVisibility(View.VISIBLE);
                 else {
                     vAdd.pausein_box.setVisibility(View.GONE);
@@ -599,7 +616,7 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
 
 
         });
-        
+
         // Abweichungen erkennen
 
 
@@ -644,8 +661,7 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
                     vAdd.delade.setVisibility(View.VISIBLE);
                     vAdd.adean.setVisibility(View.VISIBLE);
                     vAdd.der.setVisibility(View.VISIBLE);
-                }
-                else {
+                } else {
                     vAdd.der.setVisibility(View.GONE);
                     vAdd.delade.setVisibility(View.GONE);
                     vAdd.adean.setVisibility(View.GONE);
@@ -684,7 +700,7 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
                     vAdd.deloaz.setVisibility(View.GONE);
             }
         });
-        
+
         vAdd.apause.setAdapter(pausenabw);
         vAdd.apause.setSelection(pausenabw.getSelection());
 
@@ -693,7 +709,12 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 pausenabw.setSelection((int) id);
 
-                if (pausenabw.getItem((int) id).getId() > -1) {
+                ListClass item = pausenabw.getItem((int) id);
+
+                if (item == null)
+                    return;
+
+                if (item.getId() > -1) {
                     vAdd.apauser.setVisibility(View.VISIBLE);
                     vAdd.delapause.setVisibility(View.VISIBLE);
                 } else {
@@ -761,7 +782,7 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
             else
                 subtitle = edit.getBezeichner() + "\nFpl/N/" + edit.getFpla();
 
-            getSupportActionBar().setSubtitle(subtitle+" ("+edit.getDatumFormatted("E, dd.MM.yyyy")+")");
+            getSupportActionBar().setSubtitle(subtitle + " (" + edit.getDatumFormatted("E, dd.MM.yyyy") + ")");
 
             setKategorie(edit.getKat().substring(0, 1));
 
@@ -788,18 +809,18 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
                     if (!edit.getAdb().equals("null")) {
                         vAdd.adb.setText(edit.getAdb());
                         vAdd.dbr.setText(edit.getDbr());
-                        setSelectedId(vAdd.adban, (int)(edit.getAdban() * 100));
+                        setSelectedId(vAdd.adban, (int) (edit.getAdban() * 100));
                     }
                     if (!edit.getAde().equals("null")) {
                         vAdd.ade.setText(edit.getAde());
                         vAdd.der.setText(edit.getDer());
-                        setSelectedId(vAdd.adean, (int)(edit.getAdean() * 100));
+                        setSelectedId(vAdd.adean, (int) (edit.getAdean() * 100));
                     }
                     if (!edit.getApause().equals("null")) {
                         setSelectedId(vAdd.apause, edit.getApause());
                         vAdd.apauser.setText(edit.getApauser());
                     }
-                    vAdd.oaz.setText(edit.getAz().substring(0,5));
+                    vAdd.oaz.setText(edit.getAz().substring(0, 5));
                     break;
                 case "T":
                     vAdd.schicht.setText(edit.getBezeichner());
@@ -812,14 +833,14 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
                     setSelectedId(vAdd.pause, edit.getPauseInt());
                     if (edit.getPauseInt() > 0)
                         vAdd.pausein.setText(edit.getPauseRil());
-                    vAdd.oaz.setText(edit.getAz().substring(0,5));
+                    vAdd.oaz.setText(edit.getAz().substring(0, 5));
                     break;
                 case "D":
                     setSelectedIdent(vAdd.dispotyp, edit.getKat());
                     break;
                 case "U":
                     setSelectedIdent(vAdd.urlaubtyp, edit.getKat());
-                    vAdd.oaz.setText(edit.getAz().substring(0,5));
+                    vAdd.oaz.setText(edit.getAz().substring(0, 5));
                     if (edit.getKat().equals("UN"))
                         vAdd.ubeschreibung.setText(edit.getBezeichner());
                     break;
@@ -841,7 +862,7 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
             }
         }
 
-	}
+    }
 
     public String getKategorie() {
         return ((ListClass) vAdd.kategorie.getSelectedItem()).getIdent();
@@ -862,17 +883,17 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
 
     public void setSelectedId(Spinner spinner, String id) {
         ((ListSpinnerAdapter) spinner.getAdapter()).setSelectionID(Integer.parseInt(id));
-        spinner.setSelection(((ListSpinnerAdapter)spinner.getAdapter()).getSelection());
+        spinner.setSelection(((ListSpinnerAdapter) spinner.getAdapter()).getSelection());
     }
 
     public void setSelectedId(Spinner spinner, int id) {
         ((ListSpinnerAdapter) spinner.getAdapter()).setSelectionID(id);
-        spinner.setSelection(((ListSpinnerAdapter)spinner.getAdapter()).getSelection());
+        spinner.setSelection(((ListSpinnerAdapter) spinner.getAdapter()).getSelection());
     }
 
     public void setSelectedIdent(Spinner spinner, String ident) {
         ((ListSpinnerAdapter) spinner.getAdapter()).setSelectionIdent(ident);
-        spinner.setSelection(((ListSpinnerAdapter)spinner.getAdapter()).getSelection());
+        spinner.setSelection(((ListSpinnerAdapter) spinner.getAdapter()).getSelection());
     }
 
     public String getSelectedIdent(Spinner spinner) {
@@ -890,7 +911,7 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
         }
 
         // Hide all
-        for( int i = 0; i < vAdd.scroll_linear_box.getChildCount(); i++ )  {
+        for (int i = 0; i < vAdd.scroll_linear_box.getChildCount(); i++) {
             View v = vAdd.scroll_linear_box.getChildAt(i);
             if (v.getId() != R.id.verwendungadd_datum_box && v.getId() != R.id.verwendungadd_kategorie_box && v.getId() != R.id.verwendungadd_sonstiges_box)
                 v.setVisibility(View.GONE);
@@ -999,15 +1020,14 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
                 return super.onOptionsItemSelected(item);
         }
     }
-	
-	
-            
-	private static String pad(int c) {
-		if (c >= 10)
-			return String.valueOf(c);
-		else
-			return "0" + String.valueOf(c);
-	}
+
+
+    private static String pad(int c) {
+        if (c >= 10)
+            return String.valueOf(c);
+        else
+            return "0" + String.valueOf(c);
+    }
 
     @Override
     public void onClick(View view) {
@@ -1082,225 +1102,35 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
         vAdd.apause.setSelection(((ListSpinnerAdapter) vAdd.apause.getAdapter()).getSelection());
     }
 
+
     private class GetRil100 extends AsyncTask<Void, Void, String> {
 
-	
-	protected String doInBackground(Void... params) {
 
-	   	    return OSES.getJSON("https://oses.mobi/api.php?request=suche_bst&session="+OSES.getSession().getIdentifier()+"&ril100="+vAdd.pausein.getText(), 30000);
+        protected String doInBackground(Void... params) {
 
-	}
-	
-	protected void onPostExecute(String response) {
+            return OSES.getJSON("https://oses.mobi/api.php?request=suche_bst&session=" + OSES.getSession().getIdentifier() + "&ril100=" + vAdd.pausein.getText(), 30000);
 
-        if (vAdd == null || vAdd.rilprogress == null || vAdd.rilstatus == null || response == null)
-            return;
-
-        vAdd.rilprogress.setVisibility(View.GONE);
-
-        if (response.length() > 0) {
-            vAdd.rilstatus.setImageResource(R.drawable.ic_action_accept);
-            vAdd.rilstatus.setVisibility(View.VISIBLE);
         }
-        else {
-            vAdd.rilstatus.setImageResource(R.drawable.ic_action_cancel);
-            vAdd.rilstatus.setVisibility(View.VISIBLE);
+
+        protected void onPostExecute(String response) {
+
+            if (vAdd == null || vAdd.rilprogress == null || vAdd.rilstatus == null || response == null)
+                return;
+
+            vAdd.rilprogress.setVisibility(View.GONE);
+
+            if (response.length() > 0) {
+                vAdd.rilstatus.setImageResource(R.drawable.ic_action_accept);
+                vAdd.rilstatus.setVisibility(View.VISIBLE);
+            } else {
+                vAdd.rilstatus.setImageResource(R.drawable.ic_action_cancel);
+                vAdd.rilstatus.setVisibility(View.VISIBLE);
+            }
         }
-	}
-        
- }
 
-private class SucheSchicht extends AsyncTask<Void, Void, String> {
-	
-
-	protected void onPreExecute() {
-
-	    // RESET Abweichung
-        deloaz();
-        delapause();
-        deladb();
-        delade();
-	
     }
-	
-	protected String doInBackground(Void... params) {
 
-			
-			String Tag = "";
-			String Monat = "";
-			String Jahr = "";
-			
-			String DatumText = vAdd.datumStart.getText().toString().substring(5);
-			
-			String[] split = DatumText.split("\\.");
-			
-			if (split.length == 3) {
-			 Tag = split[0];
-			 Monat = split[1];
-			 Jahr = split[2];				
-			}
-			
-			return OSES.getJSON("https://oses.mobi/api.php?request=suche_schicht&session="+OSES.getSession().getIdentifier()+"&schicht="+ vAdd.schicht.getText().toString().replace(" ", "+")+"&datum="+Jahr+"-"+Monat+"-"+Tag, 30000);
-
-	}
-	
-	protected void onPostExecute(String response) {
-
-		try {
-		final JSONArray schichten = new JSONArray(response);
-		
-		if (schichten.length() == 0) {
-            vAdd.schicht.setError("Leider wurde keine Referenzschicht gefunden, du kannst das Formular jedoch manuell ausfüllen!");
-            Handler mHandler = new Handler();
-            mHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    vAdd.schicht.setError(null);
-                }
-            }, 5000);
-
-        }
-
-		if (schichten.length() == 1) {
-			
-			JSONObject schicht = schichten.getJSONObject(0);
-			
-			vAdd.schicht.setText(schicht.getString("schicht"));
-			
-			if (!schicht.getString("fpla").equals("0"))
-                vAdd.fpla.setText(schicht.getString("fpla"));
-			else
-                vAdd.fpla.setText("");
-
-            vAdd.db.setText(schicht.getString("db").substring(0, 5));
-            vAdd.de.setText(schicht.getString("de").substring(0, 5));
-            vAdd.baureihen.setText(schicht.getString("baureihen"));
-
-//                        if (schicht.getString("ril100").equals("HG")) {
-//							apause.setSelection(1);
-//							apauser.setText("Keine Abnahme Pausenraum durch Betriebsrat");
-//							Toast.makeText(getApplicationContext(), "Achtung: Kein Pausenraum in Göttingen! Abweichung automatisch erstellt!" , Toast.LENGTH_LONG).show();
-//						}
-
-            ((ListSpinnerAdapter) vAdd.pause.getAdapter()).setSelectionID(schicht.getInt("pause"));
-            vAdd.pause.setSelection(((ListSpinnerAdapter) vAdd.pause.getAdapter()).getSelection());
-
-            if (schicht.getInt("pause") > 0)
-                vAdd.pausein.setText(schicht.getString("ril100"));
-
-            ((ListSpinnerAdapter) vAdd.est.getAdapter()).setSelectionID(schicht.getInt("est"));
-            vAdd.est.setSelection(((ListSpinnerAdapter) vAdd.est.getAdapter()).getSelection());
-
-            ((ListSpinnerAdapter) vAdd.funktion.getAdapter()).setSelectionID(schicht.getInt("funktioni"));
-            vAdd.funktion.setSelection(((ListSpinnerAdapter) vAdd.funktion.getAdapter()).getSelection());
-
-            vAdd.aufdb.setText(schicht.optString("aufdb", "3"));
-            vAdd.aufde.setText(schicht.optString("aufde", "0"));
-			
-		}
-		
-		if (schichten.length() > 1) {
-			
-			
-			
-			String[] split = new String[schichten.length()];
-			
-			for (int i = 0; i < schichten.length(); i++) {
-				
-				JSONObject schicht = schichten.getJSONObject(i);
-				
-				String schichtname;
-				
-				if (schicht.getString("fpla").equals("0"))
-					schichtname = schicht.getString("schicht");
-				else
-					schichtname = schicht.getString("schicht")+" Fpl/N/"+schicht.getString("fpla");
-
-                String kommentar = "";
-
-                if (!schicht.isNull("kommentar")) {
-                    kommentar =   schicht.getString("kommentar") + "\r\n";
-                }
-				
-				split[i] = "\r\n" + schicht.getString("funktion")+": "+schichtname+"\r\n"+schicht.getString("ort")+"\r\n"+schicht.getString("db").substring(0, 5)+" - "+schicht.getString("de").substring(0, 5)+"  |  Pause: "+schicht.getString("pause")+" Min"+ "\r\n" + kommentar;
-			}
-
-			AlertDialog.Builder builder = new AlertDialog.Builder(VerwendungAddActivity.this);
-			builder.setTitle("Bitte wähle eine Schicht:");
-			builder.setSingleChoiceItems(split, -1, new DialogInterface.OnClickListener() {
-			    public void onClick(DialogInterface dialog, int item) {
-			    	try {
-			    	
-			    	JSONObject schicht = schichten.getJSONObject(item);	
-			    	
-			    	vAdd.schicht.setText(schicht.getString("schicht"));
-			    	
-			    	if (!schicht.getString("fpla").equals("0"))
-                        vAdd.fpla.setText(schicht.getString("fpla"));
-					else
-                        vAdd.fpla.setText("");
-
-                        vAdd.db.setText(schicht.getString("db").substring(0, 5));
-                        vAdd.de.setText(schicht.getString("de").substring(0, 5));
-                        vAdd.baureihen.setText(schicht.getString("baureihen"));
-
-
-//                        if (schicht.getString("ril100").equals("HG")) {
-//							apause.setSelection(1);
-//							apauser.setText("Keine Abnahme Pausenraum durch Betriebsrat");
-//							Toast.makeText(getApplicationContext(), "Achtung: Kein Pausenraum in Göttingen! Abweichung automatisch erstellt!" , Toast.LENGTH_LONG).show();
-//						}
-
-                        ((ListSpinnerAdapter) vAdd.pause.getAdapter()).setSelectionID(schicht.getInt("pause"));
-                        vAdd.pause.setSelection(((ListSpinnerAdapter) vAdd.pause.getAdapter()).getSelection());
-
-                        if (schicht.getInt("pause") > 0)
-                            vAdd.pausein.setText(schicht.getString("ril100"));
-
-                        ((ListSpinnerAdapter) vAdd.est.getAdapter()).setSelectionID(schicht.getInt("est"));
-                        vAdd.est.setSelection(((ListSpinnerAdapter) vAdd.est.getAdapter()).getSelection());
-
-                        ((ListSpinnerAdapter) vAdd.funktion.getAdapter()).setSelectionID(schicht.getInt("funktioni"));
-                        vAdd.funktion.setSelection(((ListSpinnerAdapter) vAdd.funktion.getAdapter()).getSelection());
-
-                        vAdd.aufdb.setText(schicht.optString("aufdb", "3"));
-                        vAdd.aufde.setText(schicht.optString("aufde", "0"));
-					
-			    	} catch (Exception e) {
-			    	dialog.dismiss();
-			    		
-			    	}
-			    	
-			    	dialog.dismiss();
-			    }
-			});
-			AlertDialog alert = builder.create();
-            alert.getListView().setDivider(new ColorDrawable(Color.parseColor("#cacaca")));
-            alert.getListView().setDividerHeight(1);
-			alert.show();
-
-			
-		}
-			
-						
-			
-			
-		} catch (Exception e) {
-			Toast.makeText(getApplicationContext(), "Es ist ein Fehler beim Suchen der Schicht aufgetreten: "+e.getMessage(), Toast.LENGTH_LONG).show();
-		}
-		
-		vAdd.searchprogress.setVisibility(View.GONE);
-
-        vAdd.search.setVisibility(View.VISIBLE);
-		vAdd.search.setEnabled(true);
-	 
-		
-		
-	}
-        
- }
-
-    private void ShowWaitDialog() {
+    private void showWaitDialog() {
 
         ProgressDialogFragment loginWaitDialog = ProgressDialogFragment.newInstance("Kommunikation", "Verwendung wird gespeichert...", ProgressDialog.STYLE_SPINNER);
         loginWaitDialog.show(getSupportFragmentManager(), "saveVerwendungDialog");
@@ -1317,16 +1147,9 @@ private class SucheSchicht extends AsyncTask<Void, Void, String> {
 
     }
 
-private class SaveVerwendung extends AsyncTask<String, Void, String> {
-	
-	protected void onPreExecute() {
+    public void VerwendungAddOnClick() {
 
-        ShowWaitDialog();
-
-    }
-	
-	protected String doInBackground(String... params) {
-
+        showWaitDialog();
 
         //Datum parsen
         String datumStart = "";
@@ -1335,13 +1158,13 @@ private class SaveVerwendung extends AsyncTask<String, Void, String> {
         String[] split = vAdd.datumStart.getText().toString().substring(5).split("\\.");
 
         if (split.length == 3) {
-            datumStart = split[2]+"-"+split[1]+"-"+split[0];
+            datumStart = split[2] + "-" + split[1] + "-" + split[0];
         }
 
         split = vAdd.datumEnde.getText().toString().substring(5).split("\\.");
 
         if (split.length == 3) {
-            datumEnde = split[2]+"-"+split[1]+"-"+split[0];
+            datumEnde = split[2] + "-" + split[1] + "-" + split[0];
         }
 
         // Aufenthalt parsen
@@ -1377,16 +1200,16 @@ private class SaveVerwendung extends AsyncTask<String, Void, String> {
         postdata.put("sid", sid);
         postdata.put("kategorie", getKategorie());
         postdata.put("schicht", vAdd.schicht.getText().toString());
-        postdata.put("fpla",  vAdd.fpla.getText().toString());
+        postdata.put("fpla", vAdd.fpla.getText().toString());
         postdata.put("datumStart", datumStart);
         postdata.put("datumEnde", datumEnde);
         postdata.put("zeitraum", String.valueOf(vAdd.zeitraum.isChecked()));
         postdata.put("est", String.valueOf(((ListClass) vAdd.est.getSelectedItem()).getId()));
         postdata.put("best", String.valueOf(((ListClass) vAdd.best.getSelectedItem()).getId()));
         postdata.put("funktion", String.valueOf(((ListClass) vAdd.funktion.getSelectedItem()).getId()));
-        postdata.put("db",  vAdd.db.getText().toString());
-        postdata.put("de",  vAdd.de.getText().toString());
-        postdata.put("pause",  String.valueOf(((ListClass) vAdd.pause.getSelectedItem()).getId()));
+        postdata.put("db", vAdd.db.getText().toString());
+        postdata.put("de", vAdd.de.getText().toString());
+        postdata.put("pause", String.valueOf(((ListClass) vAdd.pause.getSelectedItem()).getId()));
         postdata.put("pause_ort", vAdd.pausein.getText().toString());
         postdata.put("baureihen", vAdd.baureihen.getText().toString());
 
@@ -1427,107 +1250,332 @@ private class SaveVerwendung extends AsyncTask<String, Void, String> {
         // Sonstiges
         postdata.put("notiz", vAdd.notiz.getText().toString());
 
-        return OSES.getJSON("https://oses.mobi/api.php?request=verwendung&command=addajax", postdata, 30000);
-    
-	}
-	
-	protected void onPostExecute(String response) {
-		
-		String Status = "900";
-		String StatusBody = "Verarbeitung fehlgeschlagen";
-		
-		JSONObject json;
-		
-		try {
-			
-			json=new JSONObject(response);			
-						
-			Status = json.getString("Status");
-			StatusBody = json.getString("StatusBody");
-			
-		} catch (Exception e) {
-	     e.getStackTrace();
-		}
+        OSESRequest request = new OSESRequest(this);
 
-        Bundle extra = new Bundle();
-        extra.putString("status", Status);
-        mFirebaseAnalytics.logEvent("OSES_verwendung_save", extra);
-		
-		if (Status.equals("200")) {
+        request.setUrl("https://oses.mobi/api.php?request=verwendung&command=addajax");
+        request.setTimeout(30000);
+        request.setParams(postdata);
 
-		hideWaitDialog();
+        request.setOnRequestFinishedListener(new OSESRequest.OnRequestFinishedListener() {
+            @Override
+            public void onRequestFinished(String response) {
 
-        setResult(200);
-        if (saveMultiple) {
-            if (increaseDate) {
+                String Status = "900";
+                String StatusBody = "Verarbeitung fehlgeschlagen";
 
-                Integer year;
-                Integer month;
-                Integer day;
+                JSONObject json;
 
-                Calendar c = Calendar.getInstance();
+                try {
 
-                if (vAdd.datumStart.getText().length() > 0) {
-                    String[] split = vAdd.datumStart.getText().toString().substring(5).split("\\.");
-                    day = Integer.parseInt(split[0]);
-                    month = Integer.parseInt(split[1]) - 1;
-                    year = Integer.parseInt(split[2]);
-                } else {
-                    day = c.get(Calendar.DAY_OF_MONTH);
-                    month = c.get(Calendar.MONTH);
-                    year = c.get(Calendar.YEAR);
+                    json = new JSONObject(response);
+
+                    Status = json.getString("Status");
+                    StatusBody = json.getString("StatusBody");
+
+                } catch (Exception e) {
+                    e.getStackTrace();
                 }
 
-                c.set(year, month, day);
-                c.add(Calendar.DATE, 1);
+                Bundle extra = new Bundle();
+                extra.putString("status", Status);
+                mFirebaseAnalytics.logEvent("OSES_verwendung_save", extra);
 
-                day = c.get(Calendar.DAY_OF_MONTH);
-                month = c.get(Calendar.MONTH);
-                year = c.get(Calendar.YEAR);
+                if (Status.equals("200")) {
 
-                SimpleDateFormat dayFormat = new SimpleDateFormat("E", Locale.GERMAN);
+                    hideWaitDialog();
 
-                vAdd.datumStart.setText(dayFormat.format(c.getTime()) + ", " + pad(day) + "." + pad(month + 1) + "." + pad(year));
+                    setResult(200);
+                    if (saveMultiple) {
+                        if (increaseDate) {
 
+                            Integer year;
+                            Integer month;
+                            Integer day;
+
+                            Calendar c = Calendar.getInstance();
+
+                            if (vAdd.datumStart.getText().length() > 0) {
+                                String[] split = vAdd.datumStart.getText().toString().substring(5).split("\\.");
+                                day = Integer.parseInt(split[0]);
+                                month = Integer.parseInt(split[1]) - 1;
+                                year = Integer.parseInt(split[2]);
+                            } else {
+                                day = c.get(Calendar.DAY_OF_MONTH);
+                                month = c.get(Calendar.MONTH);
+                                year = c.get(Calendar.YEAR);
+                            }
+
+                            c.set(year, month, day);
+                            c.add(Calendar.DATE, 1);
+
+                            day = c.get(Calendar.DAY_OF_MONTH);
+                            month = c.get(Calendar.MONTH);
+                            year = c.get(Calendar.YEAR);
+
+                            SimpleDateFormat dayFormat = new SimpleDateFormat("E", Locale.GERMAN);
+
+                            vAdd.datumStart.setText(dayFormat.format(c.getTime()) + ", " + pad(day) + "." + pad(month + 1) + "." + pad(year));
+
+
+                        }
+                    } else
+                        finish();
+                }
+
+                if (Status.equals("201")) {
+                    hideWaitDialog();
+                    setResult(200);
+                    finish();
+                }
+
+
+                Toast.makeText(VerwendungAddActivity.this, Status + ": " + StatusBody, Toast.LENGTH_LONG).show();
+                hideWaitDialog();
 
             }
-        }
-         else
-            finish();
-		}
 
-        if (Status.equals("201")) {
-            hideWaitDialog();
-            setResult(200);
-            finish();
-        }
+            @Override
+            public void onRequestException(Exception e) {
+
+                Toast.makeText(VerwendungAddActivity.this, "Es ist ein interner Programmfehler aufgetreten: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                hideWaitDialog();
+
+            }
+
+            @Override
+            public void onRequestUnknown(int status) {
+
+                Toast.makeText(VerwendungAddActivity.this, "Es ist ein Serverfehler aufgetreten: Der Servermeldet einen unbekannten Antwortcode (" + status + ")", Toast.LENGTH_LONG).show();
+                hideWaitDialog();
+
+            }
+
+            @Override
+            public void onIsNotConnected() {
+
+                Toast.makeText(getApplicationContext(), "Keine Kommunikation mit dem Server möglich. Bitte stelle eine Datenverbindung her!", Toast.LENGTH_LONG).show();
+                hideWaitDialog();
+
+            }
+        });
+
+        request.execute();
+
+    }
 
 
-        Toast.makeText(getApplicationContext(), Status + ": " + StatusBody, Toast.LENGTH_LONG).show();
-        hideWaitDialog();
-		
-	}
-        
- }
-
-
-	public void VerwendungAddOnClick () {
-    	
-		new SaveVerwendung().execute();
-		
-	}	
-	
-	
-	public void SucheOnClick ()  {
+    public void SucheOnClick() {
 
         vAdd.searchprogress.setVisibility(View.VISIBLE);
         vAdd.search.setVisibility(View.GONE);
-		InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(vAdd.search.getWindowToken(), 0);
-		vAdd.search.setEnabled(false);
-		new SucheSchicht().execute();
-	
-	}
+        vAdd.search.setEnabled(false);
+
+        // RESET Abweichung
+        deloaz();
+        delapause();
+        deladb();
+        delade();
+
+        String Tag = "";
+        String Monat = "";
+        String Jahr = "";
+
+        String DatumText = vAdd.datumStart.getText().toString().substring(5);
+
+        String[] split = DatumText.split("\\.");
+
+        if (split.length == 3) {
+            Tag = split[0];
+            Monat = split[1];
+            Jahr = split[2];
+        }
+
+        OSESRequest request = new OSESRequest(this);
+
+        request.setUrl("https://oses.mobi/api.php?request=suche_schicht&session=" + OSES.getSession().getIdentifier() + "&schicht=" + vAdd.schicht.getText().toString().replace(" ", "+") + "&datum=" + Jahr + "-" + Monat + "-" + Tag);
+        request.setTimeout(10000);
+
+        request.setOnRequestFinishedListener(new OSESRequest.OnRequestFinishedListener() {
+            @Override
+            public void onRequestFinished(String response) {
+
+                try {
+                    final JSONArray schichten = new JSONArray(response);
+
+                    if (schichten.length() == 0) {
+                        vAdd.schicht.setError("Leider wurde keine Referenzschicht gefunden, du kannst das Formular jedoch manuell ausfüllen!");
+                        Handler mHandler = new Handler();
+                        mHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                vAdd.schicht.setError(null);
+                            }
+                        }, 5000);
+
+                    }
+
+                    if (schichten.length() == 1) {
+
+                        JSONObject schicht = schichten.getJSONObject(0);
+
+                        vAdd.schicht.setText(schicht.getString("schicht"));
+
+                        if (!schicht.getString("fpla").equals("0"))
+                            vAdd.fpla.setText(schicht.getString("fpla"));
+                        else
+                            vAdd.fpla.setText("");
+
+                        vAdd.db.setText(schicht.getString("db").substring(0, 5));
+                        vAdd.de.setText(schicht.getString("de").substring(0, 5));
+                        vAdd.baureihen.setText(schicht.getString("baureihen"));
+
+//                        if (schicht.getString("ril100").equals("HG")) {
+//							apause.setSelection(1);
+//							apauser.setText("Keine Abnahme Pausenraum durch Betriebsrat");
+//							Toast.makeText(getApplicationContext(), "Achtung: Kein Pausenraum in Göttingen! Abweichung automatisch erstellt!" , Toast.LENGTH_LONG).show();
+//						}
+
+                        ((ListSpinnerAdapter) vAdd.pause.getAdapter()).setSelectionID(schicht.getInt("pause"));
+                        vAdd.pause.setSelection(((ListSpinnerAdapter) vAdd.pause.getAdapter()).getSelection());
+
+                        if (schicht.getInt("pause") > 0)
+                            vAdd.pausein.setText(schicht.getString("ril100"));
+
+                        ((ListSpinnerAdapter) vAdd.est.getAdapter()).setSelectionID(schicht.getInt("est"));
+                        vAdd.est.setSelection(((ListSpinnerAdapter) vAdd.est.getAdapter()).getSelection());
+
+                        ((ListSpinnerAdapter) vAdd.funktion.getAdapter()).setSelectionID(schicht.getInt("funktioni"));
+                        vAdd.funktion.setSelection(((ListSpinnerAdapter) vAdd.funktion.getAdapter()).getSelection());
+
+                        vAdd.aufdb.setText(schicht.optString("aufdb", "3"));
+                        vAdd.aufde.setText(schicht.optString("aufde", "0"));
+
+                    }
+
+                    if (schichten.length() > 1) {
+
+
+                        String[] split = new String[schichten.length()];
+
+                        for (int i = 0; i < schichten.length(); i++) {
+
+                            JSONObject schicht = schichten.getJSONObject(i);
+
+                            String schichtname;
+
+                            if (schicht.getString("fpla").equals("0"))
+                                schichtname = schicht.getString("schicht");
+                            else
+                                schichtname = schicht.getString("schicht") + " Fpl/N/" + schicht.getString("fpla");
+
+                            String kommentar = "";
+
+                            if (!schicht.isNull("kommentar")) {
+                                kommentar = schicht.getString("kommentar") + "\r\n";
+                            }
+
+                            split[i] = "\r\n" + schicht.getString("funktion") + ": " + schichtname + "\r\n" + schicht.getString("ort") + "\r\n" + schicht.getString("db").substring(0, 5) + " - " + schicht.getString("de").substring(0, 5) + "  |  Pause: " + schicht.getString("pause") + " Min" + "\r\n" + kommentar;
+                        }
+
+                        AlertDialog.Builder builder = new AlertDialog.Builder(VerwendungAddActivity.this);
+                        builder.setTitle("Bitte wähle eine Schicht:");
+                        builder.setSingleChoiceItems(split, -1, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int item) {
+                                try {
+
+                                    JSONObject schicht = schichten.getJSONObject(item);
+
+                                    vAdd.schicht.setText(schicht.getString("schicht"));
+
+                                    if (!schicht.getString("fpla").equals("0"))
+                                        vAdd.fpla.setText(schicht.getString("fpla"));
+                                    else
+                                        vAdd.fpla.setText("");
+
+                                    vAdd.db.setText(schicht.getString("db").substring(0, 5));
+                                    vAdd.de.setText(schicht.getString("de").substring(0, 5));
+                                    vAdd.baureihen.setText(schicht.getString("baureihen"));
+
+
+//                        if (schicht.getString("ril100").equals("HG")) {
+//							apause.setSelection(1);
+//							apauser.setText("Keine Abnahme Pausenraum durch Betriebsrat");
+//							Toast.makeText(getApplicationContext(), "Achtung: Kein Pausenraum in Göttingen! Abweichung automatisch erstellt!" , Toast.LENGTH_LONG).show();
+//						}
+
+                                    ((ListSpinnerAdapter) vAdd.pause.getAdapter()).setSelectionID(schicht.getInt("pause"));
+                                    vAdd.pause.setSelection(((ListSpinnerAdapter) vAdd.pause.getAdapter()).getSelection());
+
+                                    if (schicht.getInt("pause") > 0)
+                                        vAdd.pausein.setText(schicht.getString("ril100"));
+
+                                    ((ListSpinnerAdapter) vAdd.est.getAdapter()).setSelectionID(schicht.getInt("est"));
+                                    vAdd.est.setSelection(((ListSpinnerAdapter) vAdd.est.getAdapter()).getSelection());
+
+                                    ((ListSpinnerAdapter) vAdd.funktion.getAdapter()).setSelectionID(schicht.getInt("funktioni"));
+                                    vAdd.funktion.setSelection(((ListSpinnerAdapter) vAdd.funktion.getAdapter()).getSelection());
+
+                                    vAdd.aufdb.setText(schicht.optString("aufdb", "3"));
+                                    vAdd.aufde.setText(schicht.optString("aufde", "0"));
+
+                                } catch (Exception e) {
+                                    dialog.dismiss();
+
+                                }
+
+                                dialog.dismiss();
+                            }
+                        });
+                        AlertDialog alert = builder.create();
+                        alert.getListView().setDivider(new ColorDrawable(Color.parseColor("#cacaca")));
+                        alert.getListView().setDividerHeight(1);
+                        alert.show();
+
+
+                    }
+
+
+                } catch (Exception e) {
+                    Toast.makeText(getApplicationContext(), "Es ist ein Fehler beim Suchen der Schicht aufgetreten: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+
+                vAdd.searchprogress.setVisibility(View.GONE);
+
+                vAdd.search.setVisibility(View.VISIBLE);
+                vAdd.search.setEnabled(true);
+
+            }
+
+            @Override
+            public void onRequestException(Exception e) {
+                Toast.makeText(getApplicationContext(), "Es ist ein Fehler beim Suchen der Schicht aufgetreten: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                vAdd.searchprogress.setVisibility(View.GONE);
+                vAdd.search.setVisibility(View.VISIBLE);
+                vAdd.search.setEnabled(true);
+            }
+
+            @Override
+            public void onRequestUnknown(int status) {
+                Toast.makeText(VerwendungAddActivity.this, "Es ist ein Serverfehler aufgetreten: Der Servermeldet einen unbekannten Antwortcode (" + status + ")", Toast.LENGTH_LONG).show();
+                vAdd.searchprogress.setVisibility(View.GONE);
+                vAdd.search.setVisibility(View.VISIBLE);
+                vAdd.search.setEnabled(true);
+            }
+
+            @Override
+            public void onIsNotConnected() {
+                Toast.makeText(getApplicationContext(), "Keine Kommunikation mit dem Server möglich. Bitte stelle eine Datenverbindung her!", Toast.LENGTH_LONG).show();
+                vAdd.searchprogress.setVisibility(View.GONE);
+                vAdd.search.setVisibility(View.VISIBLE);
+                vAdd.search.setEnabled(true);
+            }
+        });
+
+        request.execute();
+
+    }
 
     public void DatumCheck(TextView setter) {
 
@@ -1557,14 +1605,14 @@ private class SaveVerwendung extends AsyncTask<String, Void, String> {
 
     }
 
-    public void DatumOnClick (final TextView datumSet)  {
+    public void DatumOnClick(final TextView datumSet) {
 
         final Calendar cSet = Calendar.getInstance();
         final SimpleDateFormat dayFormat = new SimpleDateFormat("E, dd.MM.yyyy", Locale.GERMAN);
 
         try {
             cSet.setTime(dayFormat.parse(datumSet.getText().toString()));
-                   } catch (ParseException e) {
+        } catch (ParseException e) {
             e.printStackTrace();
         }
 
@@ -1584,7 +1632,7 @@ private class SaveVerwendung extends AsyncTask<String, Void, String> {
 
     }
 
-    public void ZeitOnClick (final TextView Zeit) {
+    public void ZeitOnClick(final TextView Zeit) {
 
         Integer hour;
         Integer minute;
@@ -1630,7 +1678,6 @@ private class SaveVerwendung extends AsyncTask<String, Void, String> {
         }
     }
 
-	
 
 }
-	
+

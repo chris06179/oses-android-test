@@ -181,6 +181,9 @@ public class OSESRequest extends AsyncTask<String, Integer, Object> {
 
     protected void onPostExecute(Object o) {
 
+        if(isCancelled())
+            return;
+
         if (o instanceof String) { // Erfolg
             if (mListener != null)
                 mListener.onRequestFinished((String) o);
