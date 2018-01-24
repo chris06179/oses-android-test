@@ -2,11 +2,8 @@ package de.stm.oses.fax;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
-import android.os.Vibrator;
 import android.support.v7.util.SortedList;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.util.SortedListAdapterCallback;
 import android.view.LayoutInflater;
@@ -105,9 +102,6 @@ public class FaxAdapter extends RecyclerView.Adapter<FaxAdapter.FaxViewHolder>{
     public void setSelectionId(int id) {
         this.selection = id;
         notifyItemRangeChanged(0, items.size());
-        Vibrator vibrate;
-        vibrate = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-        vibrate.vibrate(15);
     }
 
 

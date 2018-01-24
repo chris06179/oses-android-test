@@ -9,7 +9,7 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 
-import com.google.firebase.crash.FirebaseCrash;
+import com.crashlytics.android.Crashlytics;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,15 +19,9 @@ import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.security.cert.X509Certificate;
 import java.util.Map;
 
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 public class OSESRequest extends AsyncTask<String, Integer, Object> {
     private OnRequestFinishedListener mListener;
@@ -193,16 +187,16 @@ public class OSESRequest extends AsyncTask<String, Integer, Object> {
             if (mListener != null)
                 mListener.onRequestUnknown((int) o);
 
-            FirebaseCrash.log("URL: "+url+ " - Status: "+String.valueOf((int) o));
-            FirebaseCrash.report(new Exception("Unexpected HTTP-Status-Code"));
+            Crashlytics.log("URL: "+url+ " - Status: "+String.valueOf((int) o));
+            Crashlytics.logException(new Exception("Unexpected HTTP-Status-Code"));
         }
 
         if (o instanceof Exception) { // Programmfehler
             if (mListener != null)
                 mListener.onRequestException((Exception) o);
 
-            FirebaseCrash.log("URL: "+url);
-            FirebaseCrash.report((Exception) o);
+            Crashlytics.log("URL: "+url);
+            Crashlytics.logException((Exception) o);
         }
 
         if (o == null) { // Keine Konnektivität

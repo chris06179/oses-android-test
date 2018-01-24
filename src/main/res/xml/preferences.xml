@@ -12,22 +12,23 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="Verwendung">
-        <ListPreference
-            android:key="sumPosition"
-            android:title="Monatszusammenfassung"
-            android:summary="Zeigt eine Zusammenfassung im Bereich Verwendung an"
-            android:dialogTitle="Monatszusammenfassung konfigurieren"
-            android:entries="@array/pref_sum_pos_entries"
-            android:entryValues="@array/pref_sum_pos_values"
-            android:defaultValue="BOTTOM" />
+    android:title="Verwendung">
+    <ListPreference
+        android:key="sumPosition"
+        android:title="Monatszusammenfassung"
+        android:summary="Zeigt eine Zusammenfassung im Bereich Verwendung an"
+        android:dialogTitle="Monatszusammenfassung konfigurieren"
+        android:entries="@array/pref_sum_pos_entries"
+        android:entryValues="@array/pref_sum_pos_values"
+        android:defaultValue="BOTTOM" />
 
-        <CheckBoxPreference
-            android:title="Farbwechsel"
-            android:defaultValue="true"
-            android:summary="Farbe der Aktionsleiste beim Hinzufügen einer Verwendung an die Kategorie anpassen"
-            android:key="changeVerwendungColor" />
-    </PreferenceCategory>
+    <CheckBoxPreference
+        android:title="Farbwechsel"
+        android:defaultValue="true"
+        android:summary="Farbe der Aktionsleiste beim Hinzufügen einer Verwendung an die Kategorie anpassen"
+        android:key="changeVerwendungColor" />
+</PreferenceCategory>
+
                 <PreferenceCategory
                 android:title="Benachrichtigungseinstellungen">
                     <SwitchPreference
@@ -51,58 +52,30 @@
                         android:key="vibrateOnNotification" 
                         android:dependency="allowNotification" />
         </PreferenceCategory>
-        <PreferenceCategory
-                android:title="Benachrichtigungstypen">
-                <CheckBoxPreference
-                        android:title="Sonderleistungszettel"
-                        android:defaultValue="true"
-                        android:summary="Bei Schichtende an Sonderleistungszettel erinnern"
-                        android:key="sdlNotification" 
-                        android:dependency="allowNotification" />
-                <CheckBoxPreference
-                        android:title="Ausbleibzeiten &amp; Fahrauslagen"
-                        android:defaultValue="true"
-                        android:summary="Am Monatsende an Ausbleibezeiten &amp; Fahrauslagen erinnern"
-                        android:key="nebengeldNotification" 
-                        android:dependency="allowNotification" />
-<!--                 <CheckBoxPreference -->
-<!--                         android:enabled="false" -->
-<!--                         android:title="Ereignisse &amp; Störungen" -->
-<!--                         android:defaultValue="true" -->
-<!--                         android:summary="Über neue Ereignisse &amp; Störungen informieren" -->
-<!--                         android:key="eventNotification"  -->
-<!--                         android:dependency="allowNotification" /> -->
-<!--                 <CheckBoxPreference -->
-<!--                     	android:enabled="false" -->
-<!--                         android:title="Allgemeine Informationen" -->
-<!--                         android:defaultValue="true" -->
-<!--                         android:summary="Über allgemeine Informationen (z.B. Neuigkeiten im Betrieb) informieren" -->
-<!--                         android:key="infoNotification"  -->
-<!--                         android:dependency="allowNotification" /> -->
-                 <CheckBoxPreference
-                        android:title="Faxversand"
-                        android:defaultValue="true"
-                        android:summary="Zeige Informationen über den Status des Faxversandes an"
-                        android:key="faxNotification" 
-                        android:dependency="allowNotification" />
-                <CheckBoxPreference
-                        android:title="Nachrichten"
-                        android:defaultValue="true"
-                        android:summary="Über aktuelle Nachrichten in OSES informieren"
-                        android:key="newsNotification" 
-                        android:dependency="allowNotification" />
-                <CheckBoxPreference
-                        android:title="Aktualisierung"
-                        android:defaultValue="true"
-                        android:summary="Über neue Version informieren"
-                        android:key="updateNotification" 
-                        android:dependency="allowNotification" />
-                <CheckBoxPreference
-                        android:title="Sonstiges"
-                        android:defaultValue="true"
-                        android:key="otherNotification" 
-                        android:dependency="allowNotification" />
-        </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Arbeitsaufträge"
+        android:key="aaCategory">
+        <CheckBoxPreference
+            android:key="scanDiloc"
+            android:title="Diloc|Sync-Verzeichnis durchsuchen (DB Regio)"
+            android:summary="Durchsucht das Diloc|Sync-Verzeichnis nach tagesaktuellen Arbeitsauträgen"
+            android:defaultValue="true" />
+
+        <CheckBoxPreference
+            android:key="scanOSES"
+            android:title="OSES-Verzeichnis durchsuchen"
+            android:summary="Durchsucht das OSES-Verzeichnis im internen Speicher (/OSES/Dokumente/Grundschichten/) nach Grundschichten (nur EDITH-Schichten als PDF)"
+            android:defaultValue="false" />
+
+        <CheckBoxPreference
+            android:key="scanAgressive"
+            android:title="Aggressiver Suchalgorithmus"
+            android:summary="Durchsucht das gesamte Endgerät nach Schichten im EDITH-Format. Dies kann unter Umständen erheblich länger dauern und die System- und Akkuleistung beeinträchtigen!"
+            android:defaultValue="false" />
+
+
+    </PreferenceCategory>
 
     <PreferenceCategory
         android:title="Sonstiges">

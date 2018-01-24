@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -61,6 +62,7 @@ public class VerwendungAdapter extends ArrayAdapter<VerwendungClass> {
         TextView notiz;
         TextView info;
         ImageView aa_icon;
+        ProgressBar aa_extracting;
     }
 
     static class SumHolder {
@@ -100,6 +102,10 @@ public class VerwendungAdapter extends ArrayAdapter<VerwendungClass> {
         }
 
         return null;
+    }
+
+    public ArrayList<VerwendungClass> getArrayList() {
+        return VerwendungClassArrayList;
     }
 
     public int getTodayPos() {
@@ -207,6 +213,7 @@ public class VerwendungAdapter extends ArrayAdapter<VerwendungClass> {
                 itemHolder.notiz = (TextView) rowView.findViewById(R.id.verwendung_notiz);
                 itemHolder.info = (TextView) rowView.findViewById(R.id.verwendung_info);
                 itemHolder.aa_icon = (ImageView) rowView.findViewById(R.id.verwendung_aa_icon);
+                itemHolder.aa_extracting = rowView.findViewById(R.id.verwendung_aa_extracting);
                 itemHolder.abweichung_container = (RelativeLayout) rowView.findViewById(R.id.verwendung_abweichung_container);
                 itemHolder.info_container = (RelativeLayout) rowView.findViewById(R.id.verwendung_info_container);
                 itemHolder.notiz_container = (RelativeLayout) rowView.findViewById(R.id.verwendung_notiz_container);
@@ -255,16 +262,22 @@ public class VerwendungAdapter extends ArrayAdapter<VerwendungClass> {
             switch (item.getArbeitsauftragType()) {
                 case ArbeitsauftragBuilder.TYPE_NONE:
                     itemHolder.aa_icon.setVisibility(View.GONE);
+                    itemHolder.aa_extracting.setVisibility(View.GONE);
                     break;
                 case ArbeitsauftragBuilder.TYPE_CACHED:
                     itemHolder.aa_icon.setVisibility(View.VISIBLE);
                     itemHolder.aa_icon.setAlpha(1f);
+                    itemHolder.aa_extracting.setVisibility(View.GONE);
                     break;
                 case ArbeitsauftragBuilder.TYPE_DILOC:
                 case ArbeitsauftragBuilder.TYPE_ONLINE:
                     itemHolder.aa_icon.setVisibility(View.VISIBLE);
                     itemHolder.aa_icon.setAlpha(0.5f);
+                    itemHolder.aa_extracting.setVisibility(View.GONE);
                     break;
+                case ArbeitsauftragBuilder.TYPE_EXTRACTING:
+                    itemHolder.aa_icon.setVisibility(View.GONE);
+                    itemHolder.aa_extracting.setVisibility(View.VISIBLE);
             }
 
             int countab = 0;

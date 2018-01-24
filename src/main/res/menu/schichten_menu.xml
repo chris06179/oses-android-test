@@ -15,5 +15,5 @@
     <item android:id="@+id/action_filter_gb"
           android:icon="@drawable/ic_action_domain"
           android:titleCondensed="G-Bereich"
-          android:title="@string/geschäftsbereich" app:showAsAction="always|withText"/>
+          android:title="@string/gb" app:showAsAction="always|withText"/>
 </menu>

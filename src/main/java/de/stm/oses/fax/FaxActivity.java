@@ -21,6 +21,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
+import android.view.HapticFeedbackConstants;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -262,6 +263,8 @@ public class FaxActivity extends AppCompatActivity implements
                 item.getMarker().showInfoWindow();
                 save.setEnabled(true);
                 getFaxAdapter().setSelectionId(item.getId());
+
+                view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
 
             }
         });

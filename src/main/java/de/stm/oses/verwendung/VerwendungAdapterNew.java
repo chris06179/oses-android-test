@@ -2,8 +2,6 @@ package de.stm.oses.verwendung;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.os.Build;
-import android.os.Vibrator;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.util.SortedList;
 import android.support.v7.widget.RecyclerView;
@@ -15,15 +13,12 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.google.android.gms.maps.model.Marker;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
 import de.stm.oses.R;
-import de.stm.oses.fax.FaxClass;
 
 public class VerwendungAdapterNew extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
@@ -170,9 +165,6 @@ public class VerwendungAdapterNew extends RecyclerView.Adapter<RecyclerView.View
     public void setSelection(int id) {
         this.selection = id;
         notifyItemRangeChanged(0, items.size());
-        Vibrator vibrate;
-        vibrate = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-        vibrate.vibrate(15);
     }
 
     @Override

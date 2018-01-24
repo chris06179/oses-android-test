@@ -80,8 +80,6 @@
             android:id="@+id/verwendungadd_scroll_linear"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
             android:orientation="vertical"
             android:padding="2dp">
 
@@ -446,7 +444,6 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:capitalize="characters"
                                 android:imeOptions="actionSearch"
                                 android:inputType="textNoSuggestions|phone"
                                 android:minWidth="100dp"
@@ -640,6 +637,7 @@
                                 android:layout_weight="1"
                                 android:clickable="false"
                                 android:focusable="false"
+                                android:focusableInTouchMode="false"
                                 android:hint="@string/dd_mm_jjjj"
                                 android:inputType="textNoSuggestions"
                                 android:paddingLeft="8dp"
@@ -691,6 +689,7 @@
                                 android:layout_weight="1"
                                 android:clickable="false"
                                 android:focusable="false"
+                                android:focusableInTouchMode="false"
                                 android:inputType="textNoSuggestions"
                                 android:paddingLeft="8dp"
                                 android:textSize="19sp" />
@@ -792,7 +791,7 @@
                                 android:layout_weight="1"
                                 android:clickable="false"
                                 android:focusable="false"
-                                android:focusableInTouchMode="true"
+                                android:focusableInTouchMode="false"
                                 android:hint="@string/hh_mm"
                                 android:paddingLeft="8dp"
                                 android:textSize="18sp" />
@@ -981,56 +980,6 @@
                     android:paddingRight="8dp"
                     android:paddingTop="4dp">
 
-                    <LinearLayout
-                        android:id="@+id/linearLayout17"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/verwendungadd_auftitle"
-                            style="@style/Theme.OSES.ListSeparator"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:gravity="left|center_horizontal"
-                            android:text="@string/aufenthalt"
-                            android:textAppearance="?android:attr/textAppearanceLarge" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/linearLayout11"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical">
-
-                        <TextView
-                            android:id="@+id/textView18"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="left|center_vertical"
-                            android:minWidth="120dp"
-                            android:text="Berechnung:"
-                            android:textAppearance="?android:attr/textAppearanceMedium" />
-
-                        <Spinner
-                            android:id="@+id/verwendungadd_aufart"
-                            style="@style/Widget.AppCompat.Spinner.Underlined"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:prompt="@string/berech_art"
-                            android:spinnerMode="dialog" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/verwendungadd_auf_inner_box"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="1dp"
-                        android:layout_marginLeft="1dp"
-                        android:layout_marginRight="1dp"
-                        android:orientation="vertical">
 
                         <TextView
                             android:id="@+id/verwendungadd_auf_est"
@@ -1062,18 +1011,24 @@
 
                             <EditText
                                 android:id="@+id/verwendungadd_aufdb"
-                                android:layout_width="40dp"
+                                style="@style/Widget.AppCompat.Spinner.Underlined"
+                                android:layout_width="90dp"
                                 android:layout_height="wrap_content"
-                                android:inputType="number"
+                                android:clickable="false"
+                                android:focusable="false"
+                                android:hint="HH:MM"
+                                android:inputType="textImeMultiLine"
                                 android:paddingLeft="8dp"
-                                android:paddingRight="8dp" />
+                                android:paddingRight="8dp"
+                                android:textSize="18sp"
+                                android:text="00:03" />
 
                             <TextView
                                 android:id="@+id/textView20"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:gravity="left|center_vertical"
-                                android:text="Minuten"
+                                android:text="Std:Min"
                                 android:textAppearance="?android:attr/textAppearanceMedium" />
                         </LinearLayout>
 
@@ -1097,19 +1052,24 @@
 
                             <EditText
                                 android:id="@+id/verwendungadd_aufde"
-                                android:layout_width="40dp"
+                                style="@style/Widget.AppCompat.Spinner.Underlined"
+                                android:layout_width="90dp"
                                 android:layout_height="wrap_content"
-                                android:inputType="number"
+                                android:clickable="false"
+                                android:focusable="false"
+                                android:hint="HH:MM"
+                                android:inputType="textImeMultiLine"
                                 android:paddingLeft="8dp"
                                 android:paddingRight="8dp"
-                                android:singleLine="true" />
+                                android:textSize="18sp"
+                                android:text="00:00" />
 
                             <TextView
                                 android:id="@+id/textView25"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:gravity="left|center_vertical"
-                                android:text="Minuten"
+                                android:text="Std:Min"
                                 android:textAppearance="?android:attr/textAppearanceMedium" />
                         </LinearLayout>
 
@@ -1163,8 +1123,6 @@
                                 android:text="Std:Min"
                                 android:textAppearance="?android:attr/textAppearanceMedium" />
                         </LinearLayout>
-                    </LinearLayout>
-
                 </LinearLayout>
 
             </android.support.v7.widget.CardView>

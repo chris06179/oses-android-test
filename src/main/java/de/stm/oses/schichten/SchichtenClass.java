@@ -25,6 +25,7 @@ public class SchichtenClass implements Serializable {
 
     private int aufdb;
     private int aufde;
+    private int aufdz;
 
     private boolean selected = false;
 
@@ -153,6 +154,10 @@ public class SchichtenClass implements Serializable {
     public void setAufde(int aufde) {
         this.aufde = aufde;
     }
-
-
+    public int getAufdz() {
+        return aufdz;
+    }
+    public void setAufdz(int aufdz) {
+        this.aufdz = aufdz;
+    }
 }

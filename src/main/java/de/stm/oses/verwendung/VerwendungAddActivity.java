@@ -21,8 +21,10 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -111,7 +113,6 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
         CardView az_box;
         CardView oaz_box;
         CardView auf_box;
-        LinearLayout auf_inner_box;
         CardView sonstiges_box;
         CardView abweichungen_box;
         LinearLayout baureihen_box;
@@ -119,7 +120,6 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
         LinearLayout fpla_box;
         LinearLayout ubeschreibung_box;
 
-        TextView auftitle;
         TextView aufest;
         TextView auf_erste_tgk;
 
@@ -148,7 +148,6 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
         EditText bbeschreibung;
 
         Spinner kategorie;
-        Spinner aufart;
         Spinner funktion;
         Spinner pause;
         Spinner apause;
@@ -162,81 +161,78 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
         CheckBox zeitraum;
 
         VerwendungAddHolder(VerwendungAddActivity activity) {
-            toolbar = (Toolbar) activity.findViewById(R.id.verwendungadd_toolbar);
+            toolbar = activity.findViewById(R.id.verwendungadd_toolbar);
 
-            back = (Button) activity.findViewById(R.id.verwendungadd_back);
-            save = (Button) activity.findViewById(R.id.verwendungadd_save);
-            abcbutton = (ToggleButton) activity.findViewById(R.id.verwendungadd_abcbutton);
+            back = activity.findViewById(R.id.verwendungadd_back);
+            save = activity.findViewById(R.id.verwendungadd_save);
+            abcbutton = activity.findViewById(R.id.verwendungadd_abcbutton);
 
-            search = (ImageButton) activity.findViewById(R.id.verwendungadd_search);
-            delade = (ImageButton) activity.findViewById(R.id.verwendungadd_delade);
-            deladb = (ImageButton) activity.findViewById(R.id.verwendungadd_deladb);
-            delapause = (ImageButton) activity.findViewById(R.id.verwendungadd_delapause);
-            deloaz = (ImageButton) activity.findViewById(R.id.verwendungadd_deloaz);
+            search = activity.findViewById(R.id.verwendungadd_search);
+            delade = activity.findViewById(R.id.verwendungadd_delade);
+            deladb = activity.findViewById(R.id.verwendungadd_deladb);
+            delapause = activity.findViewById(R.id.verwendungadd_delapause);
+            deloaz = activity.findViewById(R.id.verwendungadd_deloaz);
 
-            searchprogress = (ProgressBar) activity.findViewById(R.id.verwendungadd_searchprogress);
+            searchprogress = activity.findViewById(R.id.verwendungadd_searchprogress);
 
-            scroll_linear_box = (LinearLayout) activity.findViewById(R.id.verwendungadd_scroll_linear);
-            kategorie_box = (CardView) activity.findViewById(R.id.verwendungadd_kategorie_box);
-            urlaub_box = (CardView) activity.findViewById(R.id.verwendungadd_urlaub_box);
-            buero_box = (CardView) activity.findViewById(R.id.verwendungadd_buero_box);
-            dispo_box = (CardView) activity.findViewById(R.id.verwendungadd_dispo_box);
-            schicht_box = (CardView) activity.findViewById(R.id.verwendungadd_schicht_box);
-            datum_box = (CardView) activity.findViewById(R.id.verwendungadd_datum_box);
-            datumEnde_box = (LinearLayout) activity.findViewById(R.id.verwendungadd_datumEnde_box);
-            zeitraum_box = (LinearLayout) activity.findViewById(R.id.verwendungadd_zeitraum_box);
-            az_box = (CardView) activity.findViewById(R.id.verwendungadd_az_box);
-            oaz_box = (CardView) activity.findViewById(R.id.verwendungadd_oaz_box);
-            auf_box = (CardView) activity.findViewById(R.id.verwendungadd_auf_box);
-            auf_inner_box = (LinearLayout) activity.findViewById(R.id.verwendungadd_auf_inner_box);
-            sonstiges_box = (CardView) activity.findViewById(R.id.verwendungadd_sonstiges_box);
-            abweichungen_box = (CardView) activity.findViewById(R.id.verwendungadd_abweichungen_box);
-            baureihen_box = (LinearLayout) activity.findViewById(R.id.verwendungadd_baureihen_box);
-            pausein_box = (LinearLayout) activity.findViewById(R.id.verwendungadd_pausein_box);
-            fpla_box = (LinearLayout) activity.findViewById(R.id.verwendungadd_fpla_box);
-            ubeschreibung_box = (LinearLayout) activity.findViewById(R.id.verwendungadd_ubeschreibung_box);
+            scroll_linear_box = activity.findViewById(R.id.verwendungadd_scroll_linear);
+            kategorie_box = activity.findViewById(R.id.verwendungadd_kategorie_box);
+            urlaub_box = activity.findViewById(R.id.verwendungadd_urlaub_box);
+            buero_box = activity.findViewById(R.id.verwendungadd_buero_box);
+            dispo_box = activity.findViewById(R.id.verwendungadd_dispo_box);
+            schicht_box = activity.findViewById(R.id.verwendungadd_schicht_box);
+            datum_box = activity.findViewById(R.id.verwendungadd_datum_box);
+            datumEnde_box = activity.findViewById(R.id.verwendungadd_datumEnde_box);
+            zeitraum_box = activity.findViewById(R.id.verwendungadd_zeitraum_box);
+            az_box = activity.findViewById(R.id.verwendungadd_az_box);
+            oaz_box = activity.findViewById(R.id.verwendungadd_oaz_box);
+            auf_box = activity.findViewById(R.id.verwendungadd_auf_box);
+            sonstiges_box = activity.findViewById(R.id.verwendungadd_sonstiges_box);
+            abweichungen_box = activity.findViewById(R.id.verwendungadd_abweichungen_box);
+            baureihen_box = activity.findViewById(R.id.verwendungadd_baureihen_box);
+            pausein_box = activity.findViewById(R.id.verwendungadd_pausein_box);
+            fpla_box = activity.findViewById(R.id.verwendungadd_fpla_box);
+            ubeschreibung_box = activity.findViewById(R.id.verwendungadd_ubeschreibung_box);
 
-            auftitle = (TextView) activity.findViewById(R.id.verwendungadd_auftitle);
-            aufest = (TextView) activity.findViewById(R.id.verwendungadd_auf_est);
-            auf_erste_tgk = (TextView) activity.findViewById(R.id.verwendungadd_auf_erste_tgk);
+            aufest = activity.findViewById(R.id.verwendungadd_auf_est);
+            auf_erste_tgk = activity.findViewById(R.id.verwendungadd_auf_erste_tgk);
 
-            rilstatus = (ImageView) activity.findViewById(R.id.verwendungadd_rilstatus);
-            rilprogress = (ProgressBar) activity.findViewById(R.id.verwendungadd_rilprogress);
+            rilstatus = activity.findViewById(R.id.verwendungadd_rilstatus);
+            rilprogress = activity.findViewById(R.id.verwendungadd_rilprogress);
 
-            db = (EditText) activity.findViewById(R.id.verwendungadd_db);
-            de = (EditText) activity.findViewById(R.id.verwendungadd_de);
-            adb = (EditText) activity.findViewById(R.id.verwendungadd_adb);
-            ade = (EditText) activity.findViewById(R.id.verwendungadd_ade);
-            dbr = (EditText) activity.findViewById(R.id.verwendungadd_dbr);
-            der = (EditText) activity.findViewById(R.id.verwendungadd_der);
-            apauser = (EditText) activity.findViewById(R.id.verwendungadd_apauser);
-            schicht = (EditText) activity.findViewById(R.id.verwendungadd_bezeichner);
-            fpla = (EditText) activity.findViewById(R.id.verwendungadd_fpla);
-            datumStart = (EditText) activity.findViewById(R.id.verwendungadd_datumStart);
-            datumEnde = (EditText) activity.findViewById(R.id.verwendungadd_datumEnde);
-            pausein = (EditText) activity.findViewById(R.id.verwendungadd_pausein);
-            baureihen = (EditText) activity.findViewById(R.id.verwendungadd_baureihen);
-            notiz = (EditText) activity.findViewById(R.id.verwendungadd_notiz);
-            aufdb = (EditText) activity.findViewById(R.id.verwendungadd_aufdb);
-            aufde = (EditText) activity.findViewById(R.id.verwendungadd_aufde);
-            aufdz = (EditText) activity.findViewById(R.id.verwendungadd_aufdz);
-            oaz = (EditText) activity.findViewById(R.id.verwendungadd_oaz);
-            ubeschreibung = (EditText) activity.findViewById(R.id.verwendungadd_ubeschreibung);
-            bbeschreibung = (EditText) activity.findViewById(R.id.verwendungadd_bbeschreibung);
+            db = activity.findViewById(R.id.verwendungadd_db);
+            de = activity.findViewById(R.id.verwendungadd_de);
+            adb = activity.findViewById(R.id.verwendungadd_adb);
+            ade = activity.findViewById(R.id.verwendungadd_ade);
+            dbr = activity.findViewById(R.id.verwendungadd_dbr);
+            der = activity.findViewById(R.id.verwendungadd_der);
+            apauser = activity.findViewById(R.id.verwendungadd_apauser);
+            schicht = activity.findViewById(R.id.verwendungadd_bezeichner);
+            fpla = activity.findViewById(R.id.verwendungadd_fpla);
+            datumStart = activity.findViewById(R.id.verwendungadd_datumStart);
+            datumEnde = activity.findViewById(R.id.verwendungadd_datumEnde);
+            pausein = activity.findViewById(R.id.verwendungadd_pausein);
+            baureihen = activity.findViewById(R.id.verwendungadd_baureihen);
+            notiz = activity.findViewById(R.id.verwendungadd_notiz);
+            aufdb = activity.findViewById(R.id.verwendungadd_aufdb);
+            aufde = activity.findViewById(R.id.verwendungadd_aufde);
+            aufdz = activity.findViewById(R.id.verwendungadd_aufdz);
+            oaz = activity.findViewById(R.id.verwendungadd_oaz);
+            ubeschreibung = activity.findViewById(R.id.verwendungadd_ubeschreibung);
+            bbeschreibung = activity.findViewById(R.id.verwendungadd_bbeschreibung);
 
-            kategorie = (Spinner) activity.findViewById(R.id.verwendungadd_kategorie);
-            aufart = (Spinner) activity.findViewById(R.id.verwendungadd_aufart);
-            funktion = (Spinner) activity.findViewById(R.id.verwendungadd_funktion);
-            pause = (Spinner) activity.findViewById(R.id.verwendungadd_pause);
-            apause = (Spinner) activity.findViewById(R.id.verwendungadd_apause);
-            est = (Spinner) activity.findViewById(R.id.verwendungadd_est);
-            best = (Spinner) activity.findViewById(R.id.verwendungadd_best);
-            adban = (Spinner) activity.findViewById(R.id.verwendungadd_adban);
-            adean = (Spinner) activity.findViewById(R.id.verwendungadd_adean);
-            dispotyp = (Spinner) activity.findViewById(R.id.verwendungadd_dispotyp);
-            urlaubtyp = (Spinner) activity.findViewById(R.id.verwendungadd_urlaubtyp);
+            kategorie = activity.findViewById(R.id.verwendungadd_kategorie);
+            funktion = activity.findViewById(R.id.verwendungadd_funktion);
+            pause = activity.findViewById(R.id.verwendungadd_pause);
+            apause = activity.findViewById(R.id.verwendungadd_apause);
+            est = activity.findViewById(R.id.verwendungadd_est);
+            best = activity.findViewById(R.id.verwendungadd_best);
+            adban = activity.findViewById(R.id.verwendungadd_adban);
+            adean = activity.findViewById(R.id.verwendungadd_adean);
+            dispotyp = activity.findViewById(R.id.verwendungadd_dispotyp);
+            urlaubtyp = activity.findViewById(R.id.verwendungadd_urlaubtyp);
 
-            zeitraum = (CheckBox) activity.findViewById(R.id.verwendungadd_zeitraum);
+            zeitraum = activity.findViewById(R.id.verwendungadd_zeitraum);
 
             back.setOnClickListener(activity);
             save.setOnClickListener(activity);
@@ -253,6 +249,8 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
             datumStart.setOnClickListener(activity);
             datumEnde.setOnClickListener(activity);
             aufdz.setOnClickListener(activity);
+            aufdb.setOnClickListener(activity);
+            aufde.setOnClickListener(activity);
             oaz.setOnClickListener(activity);
 
         }
@@ -352,6 +350,23 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
         vAdd.kategorie.setAdapter(kategorien);
         vAdd.kategorie.setSelection(kategorien.getSelection());
 
+        vAdd.kategorie.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                InputMethodManager inputManager =
+                        (InputMethodManager) getApplicationContext().
+                                getSystemService(Context.INPUT_METHOD_SERVICE);
+
+                if (inputManager != null) {
+                    inputManager.hideSoftInputFromWindow(vAdd.schicht.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                }
+
+                view.performClick();
+
+                return true;
+            }
+        });
+
         vAdd.kategorie.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -364,12 +379,6 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
 
                 BuildForm(item.getIdent());
 
-                InputMethodManager inputManager =
-                        (InputMethodManager) getApplicationContext().
-                                getSystemService(Context.INPUT_METHOD_SERVICE);
-                inputManager.hideSoftInputFromWindow(
-                        vAdd.schicht.getWindowToken(),
-                        InputMethodManager.HIDE_NOT_ALWAYS);
 
                 boolean bChangeColor = OSES.getSession().getPreferences().getBoolean("changeVerwendungColor", true);
 
@@ -425,7 +434,12 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 ests.setSelection((int) l);
 
-                vAdd.aufest.setText("Aufenthalt in " + ests.getItem((int) l).getTitle());
+                ListClass item = ests.getItem(i);
+
+                if (item == null)
+                    return;
+
+                vAdd.aufest.setText("Aufenthalt in " + item.getTitle());
             }
 
             @Override
@@ -741,30 +755,6 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
             }
         });
 
-        vAdd.aufart.setAdapter(OSES.getAufenthaltAdapter(OSES.getSession().getSessionAufArt()));
-        vAdd.aufart.setSelection(((ListSpinnerAdapter) vAdd.aufart.getAdapter()).getSelection());
-
-        vAdd.aufart.setOnItemSelectedListener(new OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                ((ListSpinnerAdapter) vAdd.aufart.getAdapter()).setSelection((int) id);
-
-                if (position > 0) {
-                    vAdd.auf_inner_box.setVisibility(View.VISIBLE);
-                } else {
-                    vAdd.auf_inner_box.setVisibility(View.GONE);
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-        vAdd.aufdb.setText(String.valueOf(OSES.getSession().getSessionAufDb()));
-        vAdd.aufde.setText(String.valueOf(OSES.getSession().getSessionAufDe()));
-
         if (getIntent().hasExtra("item")) {
 
             vAdd.zeitraum_box.setVisibility(View.GONE);
@@ -801,10 +791,9 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
                     setSelectedId(vAdd.pause, edit.getPauseInt());
                     if (edit.getPauseInt() > 0)
                         vAdd.pausein.setText(edit.getPauseRil());
-                    setSelectedIdent(vAdd.aufart, edit.getAufart());
-                    vAdd.aufdb.setText(edit.getAufdb());
-                    vAdd.aufde.setText(edit.getAufde());
-                    vAdd.aufdz.setText(String.format("%02d:%02d", TimeUnit.SECONDS.toHours(edit.getAufdz()), TimeUnit.SECONDS.toMinutes(edit.getAufdz()) - TimeUnit.HOURS.toMinutes(TimeUnit.SECONDS.toHours(edit.getAufdz()))));
+                    vAdd.aufdb.setText(String.format(Locale.GERMAN, "%02d:%02d", TimeUnit.MINUTES.toHours(edit.getAufdb()), edit.getAufdb() - TimeUnit.HOURS.toMinutes(TimeUnit.MINUTES.toHours(edit.getAufdb()))));
+                    vAdd.aufde.setText(String.format(Locale.GERMAN, "%02d:%02d", TimeUnit.MINUTES.toHours(edit.getAufde()), edit.getAufde() - TimeUnit.HOURS.toMinutes(TimeUnit.MINUTES.toHours(edit.getAufde()))));
+                    vAdd.aufdz.setText(String.format(Locale.GERMAN, "%02d:%02d", TimeUnit.SECONDS.toHours(edit.getAufdz()), TimeUnit.SECONDS.toMinutes(edit.getAufdz()) - TimeUnit.HOURS.toMinutes(TimeUnit.SECONDS.toHours(edit.getAufdz()))));
                     vAdd.baureihen.setText(edit.getBaureihen());
                     if (!edit.getAdb().equals("null")) {
                         vAdd.adb.setText(edit.getAdb());
@@ -860,8 +849,9 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
                     }
                     break;
             }
+        } else {
+            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         }
-
     }
 
     public String getKategorie() {
@@ -913,8 +903,12 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
         // Hide all
         for (int i = 0; i < vAdd.scroll_linear_box.getChildCount(); i++) {
             View v = vAdd.scroll_linear_box.getChildAt(i);
-            if (v.getId() != R.id.verwendungadd_datum_box && v.getId() != R.id.verwendungadd_kategorie_box && v.getId() != R.id.verwendungadd_sonstiges_box)
+            if (v.getId() != R.id.verwendungadd_datum_box &&
+                    v.getId() != R.id.verwendungadd_kategorie_box &&
+                    v.getId() != R.id.verwendungadd_sonstiges_box && (v.getId() != R.id.verwendungadd_schicht_box || !kategorie.equals("S"))
+                    ) {
                 v.setVisibility(View.GONE);
+            }
         }
 
         vAdd.baureihen_box.setVisibility(View.GONE);
@@ -1076,6 +1070,12 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
             case R.id.verwendungadd_aufdz:
                 ZeitOnClick(vAdd.aufdz);
                 break;
+            case R.id.verwendungadd_aufdb:
+                ZeitOnClick(vAdd.aufdb);
+                break;
+            case R.id.verwendungadd_aufde:
+                ZeitOnClick(vAdd.aufde);
+                break;
             case R.id.verwendungadd_oaz:
                 ZeitOnClick(vAdd.oaz);
                 break;
@@ -1168,10 +1168,22 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
         }
 
         // Aufenthalt parsen
-        String aufdzh = "";
-        String aufdzm = "";
+        String aufdbh = "0";
+        String aufdbm = "0";
+        String aufdeh = "0";
+        String aufdem = "0";
+        String aufdzh = "0";
+        String aufdzm = "0";
 
         try {
+            if (vAdd.aufdb.getText().length() > 0) {
+                aufdbh = vAdd.aufdb.getText().toString().split(":")[0];
+                aufdbm = vAdd.aufdb.getText().toString().split(":")[1];
+            }
+            if (vAdd.aufde.getText().length() > 0) {
+                aufdeh = vAdd.aufde.getText().toString().split(":")[0];
+                aufdem = vAdd.aufde.getText().toString().split(":")[1];
+            }
             if (vAdd.aufdz.getText().length() > 0) {
                 aufdzh = vAdd.aufdz.getText().toString().split(":")[0];
                 aufdzm = vAdd.aufdz.getText().toString().split(":")[1];
@@ -1224,10 +1236,10 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
         postdata.put("apauser", vAdd.apauser.getText().toString());
 
         //Aufenthalt
-        postdata.put("aufart", getSelectedIdent(vAdd.aufart));
-        postdata.put("aufdb", vAdd.aufdb.getText().toString());
-        postdata.put("aufde", vAdd.aufde.getText().toString());
-        postdata.put("aufdb", vAdd.aufdb.getText().toString());
+        postdata.put("aufdbh", aufdbh);
+        postdata.put("aufdbm", aufdbm);
+        postdata.put("aufdeh", aufdeh);
+        postdata.put("aufdem", aufdem);
         postdata.put("aufdzh", aufdzh);
         postdata.put("aufdzm", aufdzm);
 
@@ -1449,8 +1461,14 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
                         ((ListSpinnerAdapter) vAdd.funktion.getAdapter()).setSelectionID(schicht.getInt("funktioni"));
                         vAdd.funktion.setSelection(((ListSpinnerAdapter) vAdd.funktion.getAdapter()).getSelection());
 
-                        vAdd.aufdb.setText(schicht.optString("aufdb", "3"));
-                        vAdd.aufde.setText(schicht.optString("aufde", "0"));
+                        vAdd.aufdb.setText(schicht.getString("aufdb"));
+                        vAdd.aufde.setText(schicht.getString("aufde"));
+
+                        if (schicht.getInt("est") == OSES.getSession().getEst()) {
+                            vAdd.aufdz.setText(String.format(Locale.GERMAN, "%02d:%02d", TimeUnit.MINUTES.toHours(schicht.getInt("aufdz")), schicht.getInt("aufdz") - TimeUnit.HOURS.toMinutes(TimeUnit.MINUTES.toHours(schicht.getInt("aufdz")))));
+                        } else {
+                            vAdd.aufdz.setText("00:00");
+                        }
 
                     }
 
@@ -1517,8 +1535,14 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
                                     ((ListSpinnerAdapter) vAdd.funktion.getAdapter()).setSelectionID(schicht.getInt("funktioni"));
                                     vAdd.funktion.setSelection(((ListSpinnerAdapter) vAdd.funktion.getAdapter()).getSelection());
 
-                                    vAdd.aufdb.setText(schicht.optString("aufdb", "3"));
-                                    vAdd.aufde.setText(schicht.optString("aufde", "0"));
+                                    vAdd.aufdb.setText(schicht.getString("aufdb"));
+                                    vAdd.aufde.setText(schicht.getString("aufde"));
+
+                                    if (schicht.getInt("est") == OSES.getSession().getEst()) {
+                                        vAdd.aufdz.setText(String.format(Locale.GERMAN, "%02d:%02d", TimeUnit.MINUTES.toHours(schicht.getInt("aufdz")), schicht.getInt("aufdz") - TimeUnit.HOURS.toMinutes(TimeUnit.MINUTES.toHours(schicht.getInt("aufdz")))));
+                                    } else {
+                                        vAdd.aufdz.setText("00:00");
+                                    }
 
                                 } catch (Exception e) {
                                     dialog.dismiss();

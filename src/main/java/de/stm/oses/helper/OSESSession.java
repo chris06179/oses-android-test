@@ -3,31 +3,25 @@ package de.stm.oses.helper;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.firebase.iid.FirebaseInstanceId;
 
-import java.util.ArrayList;
-
 import de.stm.oses.R;
-import de.stm.oses.verwendung.VerwendungClass;
 
 public class OSESSession {
 
     private final Context context;
     private String SessionUsername = "";
-    private int SessionGroup = 0;
+    private int SessionGroup = 90;
     private int SessionEst = 0;
     private String SessionEstText;
     private String SessionVorname = "";
     private String SessionNachname = "";
     private int SessionGB = 0;
     private String SessionGBText;
-    private int SessionFunktion = 99;
+    private int SessionFunktion = 0;
     private String SessionIdentifier;
-    private String SessionAufArt = "auto";
-    private int SessionAufDb = 3;
-    private int SessionAufDe = 0;
     private String SessionFcmInstanceId = "";
     private String SessionLastVerwendung;
     private boolean SessionDilocReminder;
@@ -37,23 +31,26 @@ public class OSESSession {
     OSESSession(Context context) {
         this.context = context;
 
-        PreferenceManager.setDefaultValues(context, R.xml.preferences, true);
+        // Fix für API < 20
+        try {
+            PreferenceManager.setDefaultValues(context, R.xml.preferences, true);
+        } catch (Exception e) {
+            Crashlytics.logException(e);
+        }
+
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         SharedPreferences settings = context.getSharedPreferences("OSESPrefs", Context.MODE_PRIVATE);
         SessionUsername = settings.getString("SessionUsername", "");
-        SessionGroup = settings.getInt("SessionGruppe", 0);
+        SessionGroup = settings.getInt("SessionGruppe", 90);
         SessionEst = settings.getInt("SessionEst", 0);
         SessionEstText = settings.getString("SessionEstText", "");
         SessionVorname = settings.getString("SessionVorname", "");
         SessionNachname = settings.getString("SessionNachname", "");
         SessionGB = settings.getInt("SessionGB", 0);
         SessionGBText = settings.getString("SessionGBText", "");
-        SessionFunktion = settings.getInt("SessionFunktion", 99);
+        SessionFunktion = settings.getInt("SessionFunktion", 0);
         SessionIdentifier = settings.getString("SessionIdentifier", "");
-        SessionAufArt = settings.getString("SessionAufArt", "auto");
-        SessionAufDb = settings.getInt("SessionAufDb", 3);
-        SessionAufDe = settings.getInt("SessionAufDe", 0);
         SessionFcmInstanceId = settings.getString("SessionFcmInstanceId", "");
         SessionLastVerwendung = settings.getString("SessionLastVerwendung", null);
         SessionDilocReminder = settings.getBoolean("SessionDilocReminder", false);
@@ -107,15 +104,6 @@ public class OSESSession {
     }
     public Context getContext() {
         return context;
-    }
-    public String getSessionAufArt() {
-        return SessionAufArt;
-    }
-    public int getSessionAufDb() {
-        return SessionAufDb;
-    }
-    public int getSessionAufDe() {
-        return SessionAufDe;
     }
     public String getSessionFcmInstanceId() {
             return SessionFcmInstanceId;

@@ -21,8 +21,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.google.firebase.crash.FirebaseCrash;
 
 import org.json.JSONObject;
 
@@ -30,9 +30,10 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.stm.oses.dialogs.ProgressDialogFragment;
 import de.stm.oses.helper.OSESBase;
 import de.stm.oses.helper.OSESRequest;
-import de.stm.oses.dialogs.ProgressDialogFragment;
+import de.stm.oses.notification.NotificationHelper;
 
 public class OSESActivity extends AppCompatActivity implements View.OnClickListener {
 	
@@ -46,13 +47,13 @@ public class OSESActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.main);
 
         OSES = new OSESBase(OSESActivity.this);
+        new NotificationHelper(this);
 
         // Obtain the FirebaseAnalytics instance.
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         // Arbeitsverzeichnis aufräumen und anpassen -> ab v345
         OSES.rebuildWorkingDirectory();
-
 
         if (!OSES.getSession().getIdentifier().equals("")) {
             Intent intent = new Intent(OSESActivity.this,StartActivity.class);
@@ -198,7 +199,7 @@ public class OSESActivity extends AppCompatActivity implements View.OnClickListe
                         }
 
                     } catch (Exception e) {
-                        FirebaseCrash.report(e);
+                        Crashlytics.logException(e);
                     }
 
                     if (!StatusCode.equals("200")) {

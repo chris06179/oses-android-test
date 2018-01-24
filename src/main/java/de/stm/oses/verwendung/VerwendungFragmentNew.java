@@ -10,7 +10,6 @@ import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Message;
-import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.v4.content.FileProvider;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -32,12 +31,12 @@ import java.io.File;
 import java.util.Calendar;
 
 import de.stm.oses.R;
+import de.stm.oses.dialogs.ZeitraumDialogFragment;
 import de.stm.oses.fax.FaxActivity;
 import de.stm.oses.helper.FileDownload;
 import de.stm.oses.helper.OSESBase;
 import de.stm.oses.helper.OSESRequest;
 import de.stm.oses.helper.RecyclerFragment;
-import de.stm.oses.dialogs.ZeitraumDialogFragment;
 
 public class VerwendungFragmentNew extends RecyclerFragment implements ActionMode.Callback {
 
@@ -273,10 +272,6 @@ public class VerwendungFragmentNew extends RecyclerFragment implements ActionMod
             menu.findItem(R.id.action_fax_sdl).setVisible(false);
         }
 
-        Vibrator vibrate;
-        vibrate = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
-        vibrate.vibrate(15);
-
     }
 
     @Override
@@ -425,9 +420,9 @@ public class VerwendungFragmentNew extends RecyclerFragment implements ActionMod
                 item.setAz(schicht.getString("az"));
                 item.setOaz(schicht.optInt("o_az", 0));
 
-                item.setAufart(schicht.getString("auf_art"));
-                item.setAufdb(schicht.getString("aufdb"));
-                item.setAufde(schicht.getString("aufde"));
+                //item.setAufart(schicht.getString("auf_art"));
+                //item.setAufdb(schicht.getString("aufdb"));
+                //item.setAufde(schicht.getString("aufde"));
                 item.setAufdz(schicht.optInt("aufdz", 0));
 
                 item.setMdifferenz(schicht.getString("mdifferenz"));

@@ -101,7 +101,9 @@
                 android:id="@+id/LinearLayout10"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:focusable="true"
+                android:focusableInTouchMode="true">
 
                 <TextView
                     android:id="@+id/TextView02"
@@ -332,6 +334,8 @@ on
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:clickable="false"
                     android:hint="@string/dd_mm_jjjj"
                     android:inputType="textNoSuggestions"
                     style="@style/Base.Widget.AppCompat.Spinner.Underlined"
@@ -364,6 +368,8 @@ on
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:clickable="false"
                     android:hint="@string/dd_mm_jjjj"
                     android:inputType="textNoSuggestions"
                     style="@style/Base.Widget.AppCompat.Spinner.Underlined"
@@ -593,8 +599,8 @@ on
                     android:id="@+id/linearLayout5"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="visible"
-                    android:gravity="center_vertical" >
+                    android:gravity="center_vertical"
+                    android:visibility="visible">
 
                     <TextView
                         android:id="@+id/textView8"
@@ -607,19 +613,23 @@ on
 
                     <EditText
                         android:id="@+id/schichtadd_aufdb"
-                        android:layout_width="40dp"
+                        style="@style/Widget.AppCompat.Spinner.Underlined"
+                        android:layout_width="90dp"
                         android:layout_height="wrap_content"
-                        android:hint="3"
-                        android:inputType="number"
+                        android:clickable="false"
+                        android:focusable="false"
+                        android:hint="HH:MM"
+                        android:inputType="textImeMultiLine"
                         android:paddingLeft="8dp"
-                        android:paddingRight="8dp" />
+                        android:paddingRight="8dp"
+                        android:text="00:03"
+                        android:textSize="18sp" />
 
                     <TextView
-                        android:id="@+id/textView10"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="left|center_vertical"
-                        android:text="Minuten"
+                        android:text="Std:Min"
                         android:textAppearance="?android:attr/textAppearanceMedium" />
                 </LinearLayout>
 
@@ -627,35 +637,83 @@ on
                     android:id="@+id/linearLayout6"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical" >
+                    android:gravity="center_vertical">
 
                     <TextView
                         android:id="@+id/textView9"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="left|center_vertical"
+                        android:minWidth="120dp"
                         android:text="@string/vor_de"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:minWidth="120dp" />
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
 
                     <EditText
                         android:id="@+id/schichtadd_aufde"
-                        android:layout_width="40dp"
+                        style="@style/Widget.AppCompat.Spinner.Underlined"
+                        android:layout_width="90dp"
                         android:layout_height="wrap_content"
-                        android:singleLine="true"
-                        android:hint="0"
+                        android:clickable="false"
+                        android:focusable="false"
+                        android:hint="HH:MM"
+                        android:inputType="textImeMultiLine"
                         android:paddingLeft="8dp"
                         android:paddingRight="8dp"
-                        android:inputType="number" />
+                        android:text="00:00"
+                        android:textSize="18sp" />
 
                     <TextView
-                        android:id="@+id/textView11"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="left|center_vertical"
-                        android:text="Minuten"
+                        android:text="Std:Min"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/linearLayout19"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:visibility="visible">
+
+                    <TextView
+                        android:id="@+id/textView21"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="none"
+                        android:gravity="left|center_vertical"
+                        android:maxWidth="120dp"
+                        android:minWidth="120dp"
+                        android:singleLine="true"
+                        android:text="@string/auf_dz"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <EditText
+                        android:id="@+id/schichtadd_aufdz"
+                        style="@style/Widget.AppCompat.Spinner.Underlined"
+                        android:layout_width="90dp"
+                        android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:focusable="false"
+                        android:hint="HH:MM"
+                        android:inputType="textImeMultiLine"
+                        android:paddingLeft="8dp"
+                        android:paddingRight="8dp"
+                        android:text="00:00"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:id="@+id/textView23"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left|center_vertical"
+                        android:text="Std:Min"
                         android:textAppearance="?android:attr/textAppearanceMedium" />
                 </LinearLayout>
+
             </LinearLayout>
         </LinearLayout>
 

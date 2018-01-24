@@ -1,161 +1,161 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/schicht_container"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:id="@+id/schicht_container"
     android:background="#BBBBBB">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_margin="1dp">
+        android:layout_margin="1dp"
+        android:orientation="vertical">
 
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/schicht_schicht"
                 android:layout_width="120dp"
                 android:layout_height="fill_parent"
-                android:gravity="center"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:layout_alignWithParentIfMissing="false"
+                android:layout_alignParentBottom="false"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:layout_alignParentBottom="false"
                 android:layout_alignParentTop="true"
-                android:background="@drawable/verwendung_head_light"
+                android:layout_alignWithParentIfMissing="false"
                 android:layout_marginRight="1dp"
-                android:textColor="#ff373737" />
+                android:background="@drawable/verwendung_head_light"
+                android:gravity="center"
+                android:textColor="#ff373737"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
             <RelativeLayout
+                android:id="@+id/relativeLayout"
                 android:layout_width="fill_parent"
                 android:layout_height="match_parent"
                 android:layout_toRightOf="@+id/schicht_schicht"
                 android:background="@drawable/verwendung_item_light"
-                android:id="@+id/relativeLayout"
                 android:padding="5dp">
 
                 <TextView
                     android:id="@+id/schicht_von"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="00:00"
-                    android:textAppearance="@android:style/TextAppearance.Medium"
-                    android:layout_alignParentTop="true"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
                     android:layout_marginRight="5dp"
+                    android:text="00:00"
+                    android:textAppearance="@android:style/TextAppearance.Medium"
                     android:textSize="14sp" />
 
                 <TextView
                     android:id="@+id/textView1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="-"
-                    android:textAppearance="@android:style/TextAppearance.Medium"
                     android:layout_alignParentTop="true"
                     android:layout_toRightOf="@+id/schicht_von"
+                    android:text="-"
+                    android:textAppearance="@android:style/TextAppearance.Medium"
                     android:textSize="14sp" />
 
                 <TextView
                     android:id="@+id/schicht_bis"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginLeft="5dp"
+                    android:layout_toRightOf="@+id/textView1"
                     android:text="00:00"
                     android:textAppearance="@android:style/TextAppearance.Medium"
-                    android:layout_alignParentTop="true"
-                    android:layout_toRightOf="@+id/textView1"
-                    android:layout_marginLeft="5dp"
                     android:textSize="14sp" />
 
                 <TextView
                     android:id="@+id/schicht_pause"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_below="@+id/schicht_bis"
                     android:text="Medium Text"
                     android:textAppearance="@android:style/TextAppearance.Medium"
-                    android:layout_below="@+id/schicht_bis"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentEnd="true"
                     android:textSize="14sp" />
 
                 <TextView
+                    android:id="@+id/schicht_az"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="New Text"
-                    android:layout_alignTop="@+id/schicht_bis"
-                    android:layout_alignParentRight="true"
                     android:layout_alignParentEnd="true"
-                    android:textSize="14sp"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignTop="@+id/schicht_bis"
+                    android:text="New Text"
                     android:textAppearance="@android:style/TextAppearance.Medium"
-                    android:id="@+id/schicht_az" />
+                    android:textSize="14sp" />
 
                 <TextView
+                    android:id="@+id/schicht_est"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="New Text"
-                    android:id="@+id/schicht_est"
                     android:layout_alignBottom="@+id/schicht_pause"
                     android:layout_alignLeft="@+id/schicht_von"
                     android:layout_alignStart="@+id/schicht_von"
-                    android:textSize="14sp"
-                    android:textAppearance="@android:style/TextAppearance.Medium" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:text="New Text"
-                    android:id="@+id/schicht_funktion"
-                    android:textSize="14sp"
                     android:textAppearance="@android:style/TextAppearance.Medium"
-                    android:layout_below="@+id/schicht_est"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true" />
+                    android:textSize="14sp" />
 
                 <TextView
+                    android:id="@+id/schicht_funktion"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/schicht_est"
                     android:text="New Text"
+                    android:textAppearance="@android:style/TextAppearance.Medium"
+                    android:textSize="14sp" />
+
+                <TextView
                     android:id="@+id/schicht_gvgb"
-                    android:textSize="14sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_below="@+id/schicht_pause"
+                    android:layout_gravity="right|top"
                     android:ellipsize="start"
                     android:singleLine="true"
-                    android:layout_gravity="right|top"
-                    android:layout_below="@+id/schicht_pause"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentEnd="true"
-                    android:textAppearance="@android:style/TextAppearance.Medium" />
+                    android:text="New Text"
+                    android:textAppearance="@android:style/TextAppearance.Medium"
+                    android:textSize="14sp" />
 
             </RelativeLayout>
 
         </LinearLayout>
 
         <RelativeLayout
+            android:id="@+id/schicht_kommentar_container"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:visibility="visible"
-            android:id="@+id/schicht_kommentar_container"
-            android:padding="5dp"
-            android:layout_below="@+id/verwendung_info_container"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
+            android:layout_below="@+id/verwendung_info_container"
+            android:layout_marginTop="1dp"
             android:background="@drawable/verwendung_item_light"
             android:focusableInTouchMode="false"
-            android:layout_marginTop="1dp">
+            android:padding="5dp"
+            android:visibility="visible">
 
             <TextView
+                android:id="@+id/schicht_kommentar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Medium Text"
-                android:id="@+id/schicht_kommentar"
-                android:visibility="visible"
                 android:layout_alignParentStart="true"
-                android:textSize="12sp" />
+                android:text="Medium Text"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="12sp"
+                android:visibility="visible" />
         </RelativeLayout>
     </LinearLayout>
 

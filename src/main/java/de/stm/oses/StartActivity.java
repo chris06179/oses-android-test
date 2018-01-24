@@ -1,37 +1,34 @@
 package de.stm.oses;
 
-import android.content.ComponentName;
-import android.content.pm.PackageManager;
-import android.os.Build;
-import android.preference.PreferenceManager;
-import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.v4.content.FileProvider;
-import android.support.v7.app.AlertDialog;
 import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.ActivityNotFoundException;
+import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
+import android.support.v4.content.FileProvider;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.AdapterView;
@@ -40,14 +37,19 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
 import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.stm.oses.dokumente.DokumenteFragment;
 import de.stm.oses.helper.FileDownload;
@@ -110,6 +112,7 @@ public class StartActivity extends AppCompatActivity {
         // Obtain the FirebaseAnalytics instance.
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
+
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(StartActivity.this);
         boolean useDev = settings.getBoolean("debugUseDevServer", false);
 
@@ -120,6 +123,10 @@ public class StartActivity extends AppCompatActivity {
         }
 
         OSES = new OSESBase(this);
+
+        mFirebaseAnalytics.setUserProperty("est", OSES.getSession().getEstText());
+        mFirebaseAnalytics.setUserProperty("funktion", String.valueOf(OSES.getSession().getFunktion()));
+        mFirebaseAnalytics.setUserProperty("gb", OSES.getSession().getGBText());
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
@@ -234,9 +241,15 @@ public class StartActivity extends AppCompatActivity {
                             ChangeFragment(new BrowserFragment(), "impressum");
                             setDrawer(false);
                             return;
+                        case 95:
+                            setMenuSelection(id);
+                            ChangeFragment(new BrowserFragment(), "spenden");
+                            setDrawer(false);
+                            return;
                         case 99:
                             OpenOSES();
                             setDrawer(false);
+                            return;
                     }
                 }
             }
@@ -265,6 +278,18 @@ public class StartActivity extends AppCompatActivity {
 
 
         new CheckSession().execute();
+
+        // Settings holen, blockiere Upload zum Server
+        final FirebaseRemoteConfig mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+        Map<String, Object> firebaseRemoteConfigDefaults = new HashMap<>();
+        firebaseRemoteConfigDefaults.put("allow_arbeitsauftrag_upload", true);
+        mFirebaseRemoteConfig.setDefaults(firebaseRemoteConfigDefaults);
+        mFirebaseRemoteConfig.fetch().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                mFirebaseRemoteConfig.activateFetched();
+            }
+        });
 
         FragmentManager fragmentManager = getFragmentManager();
         Fragment running = fragmentManager.findFragmentById(R.id.content_frame);
@@ -546,6 +571,7 @@ public class StartActivity extends AppCompatActivity {
         items.add(new MenuClass(R.drawable.ic_action_cancel, "Abmelden", 83, ""));
         items.add(new MenuClass("Sonstiges"));
         items.add(new MenuClass(R.drawable.ic_action_help, "Dokumentation", 92, ""));
+        items.add(new MenuClass(R.drawable.ic_action_donate, "Spenden", 95, ""));
         items.add(new MenuClass(R.drawable.ic_action_about, "Nutzungsbedingungen", 93, ""));
         items.add(new MenuClass(R.drawable.ic_action_para, "Impressum", 94, ""));
         items.add(new MenuClass(R.drawable.ic_action_web_site, "Webversion", 99, ""));
@@ -723,39 +749,14 @@ public class StartActivity extends AppCompatActivity {
 
     }
 
-    private boolean isNonPlayInstallAllowed() {
+    private boolean isInstalledViaPlayStore() {
 
-        boolean isNonPlayAppAllowed = false;
-        try {
-            isNonPlayAppAllowed = Settings.Secure.getInt(getContentResolver(), Settings.Secure.INSTALL_NON_MARKET_APPS) == 1;
-        } catch (Settings.SettingNotFoundException e)
-        {
-            e.printStackTrace();
-        }
+        return true;
 
-        if (!isNonPlayAppAllowed) {
+       // String installer = getPackageManager().getInstallerPackageName(getPackageName());
 
-            final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
-            try {
-                Toast.makeText(this, "Automatisches Update nicht möglich! Weiterleitung zum Google Play Store...", Toast.LENGTH_SHORT).show();
-                Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.android.vending");
-                ComponentName comp = new ComponentName("com.android.vending", "com.google.android.finsky.activities.LaunchUrlHandlerActivity"); // package name and activity
-                launchIntent.setComponent(comp);
-                launchIntent.setData(Uri.parse("market://details?id="+appPackageName));
-                startActivity(launchIntent);
-            } catch (android.content.ActivityNotFoundException anfe) {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
-            }
+        //return installer != null && installer.equals("com.android.vending");
 
-            Bundle extra = new Bundle();
-            extra.putString("reason", "NON_PLAY_INSTALL_REFUSED");
-            mFirebaseAnalytics.logEvent("OSES_force_update_gplay", extra);
-
-            finish();
-            return false;
-
-        } else
-            return true;
     }
 
 
@@ -776,14 +777,13 @@ public class StartActivity extends AppCompatActivity {
 
         }
 
-        @SuppressWarnings("deprecation")
         protected void onPostExecute(String response) {
 
             String StatusCode = "";
             String StatusMessage = "";
 
             String SessionUsername = "";
-            int SessionGroup = 0;
+            int SessionGroup = 90;
             int SessionEst = 0;
             String SessionEstText = "";
             String SessionVorname = "";
@@ -791,9 +791,6 @@ public class StartActivity extends AppCompatActivity {
             int SessionGB = 0;
             String SessionGBText = "";
             int SessionFunktion = 0;
-            String SessionAufArt = "auto";
-            int SessionAufDb = 3;
-            int SessionAufDe = 0;
 
             String DataEstOwn = "";
             String DataEstAll = "";
@@ -834,9 +831,7 @@ public class StartActivity extends AppCompatActivity {
                 SessionGB = json.getInt("SessionGB");
                 SessionGBText = json.getString("SessionGBText");
                 SessionFunktion = json.getInt("SessionFunktion");
-                SessionAufArt = json.getString("SessionAufArt");
-                SessionAufDb = json.getInt("SessionAufDb");
-                SessionAufDe = json.getInt("SessionAufDe");
+
 
 
                 if (json.has("WebpageURL") && json.has("WebpageIdent") && json.has("WebpageTitle") && json.has("WebpageMessage")) {
@@ -871,9 +866,6 @@ public class StartActivity extends AppCompatActivity {
                 editor.putInt("SessionGB", SessionGB);
                 editor.putString("SessionGBText", SessionGBText);
                 editor.putInt("SessionFunktion", SessionFunktion);
-                editor.putString("SessionAufArt", SessionAufArt);
-                editor.putInt("SessionAufDb", SessionAufDb);
-                editor.putInt("SessionAufDe", SessionAufDe);
 
                 editor.putString("DataEstOwn", DataEstOwn);
                 editor.putString("DataEstAll", DataEstAll);
@@ -944,8 +936,31 @@ public class StartActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
 
-                        if (isNonPlayInstallAllowed()) {
+                        if (isInstalledViaPlayStore()) {
 
+                            final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
+                            try {
+                                Toast.makeText(StartActivity.this, "Weiterleitung zum Google Play Store...", Toast.LENGTH_SHORT).show();
+                                Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.android.vending");
+                                ComponentName comp = new ComponentName("com.android.vending", "com.google.android.finsky.activities.LaunchUrlHandlerActivity"); // package name and activity
+                                launchIntent.setComponent(comp);
+                                launchIntent.setData(Uri.parse("market://details?id="+appPackageName));
+                                startActivity(launchIntent);
+                            } catch (ActivityNotFoundException | NullPointerException e) {
+                                Crashlytics.log("opening GPLAY failed");
+                                Crashlytics.logException(e);
+                            } finally {
+                                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+                            }
+
+                            mFirebaseAnalytics.logEvent("OSES_update_gplay", null);
+
+                            finish();
+                        }
+
+                        else {
+
+                            mFirebaseAnalytics.logEvent("OSES_update_self", null);
                             FileDownload download = new FileDownload(StartActivity.this);
                             download.setTitle("Aktualisierung");
                             download.setMessage("Installationsdatei wird heruntergeladen, dieser Vorgang kann einige Minuten dauern...");
@@ -954,6 +969,7 @@ public class StartActivity extends AppCompatActivity {
                             download.setLocalFilename("OSES.apk");
                             download.setOnDownloadFinishedListener(onUpdateResponse);
                             download.execute();
+
                         }
                     }
                 });

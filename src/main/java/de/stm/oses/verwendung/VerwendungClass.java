@@ -8,7 +8,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,7 +24,6 @@ import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -58,9 +56,9 @@ public class VerwendungClass implements Parcelable {
     private String apauser;
     private String az;
     private int oaz;
-    private String aufart;
-    private String aufdb;
-    private String aufde;
+
+    private int aufdb;
+    private int aufde;
     private int aufdz;
     private String info;
     private String notiz;
@@ -79,9 +77,7 @@ public class VerwendungClass implements Parcelable {
     private String jahr;
 
     private int arbeitsauftrag = ArbeitsauftragBuilder.TYPE_NONE;
-    private File arbeitsauftragDilocFile;
     private File arbeitsauftragCacheFile;
-    private List<String> dilocSearchPath = new ArrayList<>();
 
     public VerwendungClass(boolean isVerwendungSummary) {
         this.isVerwendungSummary = isVerwendungSummary;
@@ -119,9 +115,8 @@ public class VerwendungClass implements Parcelable {
         apauser = in.readString();
         az = in.readString();
         oaz = in.readInt();
-        aufart = in.readString();
-        aufdb = in.readString();
-        aufde = in.readString();
+        aufdb = in.readInt();
+        aufde = in.readInt();
         aufdz = in.readInt();
         info = in.readString();
         notiz = in.readString();
@@ -141,17 +136,10 @@ public class VerwendungClass implements Parcelable {
 
         String path = in.readString();
         if (path.equals(""))
-            arbeitsauftragDilocFile = null;
-        else
-            arbeitsauftragDilocFile = new File(path);
-
-        path = in.readString();
-        if (path.equals(""))
             arbeitsauftragCacheFile = null;
         else
             arbeitsauftragCacheFile = new File(path);
 
-        in.readStringList(dilocSearchPath);
     }
 
     @Override
@@ -186,9 +174,8 @@ public class VerwendungClass implements Parcelable {
         dest.writeString(apauser);
         dest.writeString(az);
         dest.writeInt(oaz);
-        dest.writeString(aufart);
-        dest.writeString(aufdb);
-        dest.writeString(aufde);
+        dest.writeInt(aufdb);
+        dest.writeInt(aufde);
         dest.writeInt(aufdz);
         dest.writeString(info);
         dest.writeString(notiz);
@@ -206,16 +193,10 @@ public class VerwendungClass implements Parcelable {
         dest.writeString(jahr);
         dest.writeInt(arbeitsauftrag);
 
-        if (arbeitsauftragDilocFile != null)
-            dest.writeString(arbeitsauftragDilocFile.getAbsolutePath());
-        else
-            dest.writeString("");
         if (arbeitsauftragCacheFile != null)
             dest.writeString(arbeitsauftragCacheFile.getAbsolutePath());
         else
             dest.writeString("");
-
-        dest.writeStringList(dilocSearchPath);
     }
 
     @SuppressWarnings("unused")
@@ -297,9 +278,8 @@ public class VerwendungClass implements Parcelable {
         this.setAz(schicht.getString("az"));
         this.setOaz(schicht.optInt("o_az", 0));
 
-        this.setAufart(schicht.getString("auf_art"));
-        this.setAufdb(schicht.getString("aufdb"));
-        this.setAufde(schicht.getString("aufde"));
+        this.setAufdb(schicht.optInt("aufdb", 0));
+        this.setAufde(schicht.optInt("aufde", 0));
         this.setAufdz(schicht.optInt("aufdz", 0));
 
         this.setMdifferenz(schicht.getString("mdifferenz"));
@@ -335,61 +315,36 @@ public class VerwendungClass implements Parcelable {
 
         // Arbeitsauftrag
 
-        if (!getKat().equals("S") || ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+        if (getKat().equals("S") && ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
 
-            if (schicht.optBoolean("hasSharedArbeitsauftrag", false)) {
-                this.arbeitsauftrag = ArbeitsauftragBuilder.TYPE_ONLINE;
-            } else {
-                this.arbeitsauftrag = ArbeitsauftragBuilder.TYPE_NONE;
-            }
-        } else {
+            ArbeitsauftragBuilder auftrag = new ArbeitsauftragBuilder(this);
 
-            ArbeitsauftragBuilder auftrag = new ArbeitsauftragBuilder(this, context);
+            arbeitsauftragCacheFile = auftrag.getExtractedCacheFile();
 
-            if (schicht.has("dilocSearchPath")) {
-
-                JSONArray dilocFilePath = schicht.optJSONArray("dilocSearchPath");
-
-                if (dilocFilePath != null) {
-
-                    List<String> dilocPathList = new ArrayList<>();
-                    for (int i = 0; i < dilocFilePath.length(); i++) {
-                        dilocPathList.add(dilocFilePath.getString(i));
-                    }
-
-                    dilocSearchPath = dilocPathList;
-
-                }
-
+            if (arbeitsauftragCacheFile != null) {
+                arbeitsauftrag = ArbeitsauftragBuilder.TYPE_CACHED;
             }
 
-            this.arbeitsauftragDilocFile = auftrag.getDilocSourceFile();
-            this.arbeitsauftragCacheFile = auftrag.getExtractedCacheFile();
+            if (arbeitsauftragCacheFile != null && schicht.optBoolean("hasSharedArbeitsauftrag", false)) {
 
-            if (this.arbeitsauftragCacheFile != null) {
-                this.arbeitsauftrag = ArbeitsauftragBuilder.TYPE_CACHED;
-
-            } else {
-                if (this.arbeitsauftragDilocFile != null) {
-                    this.arbeitsauftrag = ArbeitsauftragBuilder.TYPE_DILOC;
-                }
-            }
-
-            if (this.arbeitsauftragCacheFile != null && this.arbeitsauftragDilocFile == null && schicht.optBoolean("hasSharedArbeitsauftrag", false)) {
-
-                String hash = calculateMD5(this.arbeitsauftragCacheFile);
+                String hash = calculateMD5(arbeitsauftragCacheFile);
 
                 if (hash != null && !hash.equals(schicht.getString("SharedArbeitsauftragHash"))) {
-                    this.arbeitsauftrag = ArbeitsauftragBuilder.TYPE_ONLINE;
+                    arbeitsauftrag = ArbeitsauftragBuilder.TYPE_ONLINE;
                     return;
                 }
-
             }
 
-            if (this.arbeitsauftragCacheFile == null && this.arbeitsauftragDilocFile == null && schicht.optBoolean("hasSharedArbeitsauftrag", false)) {
-               this.arbeitsauftrag = ArbeitsauftragBuilder.TYPE_ONLINE;
+            if (arbeitsauftragCacheFile == null && schicht.optBoolean("hasSharedArbeitsauftrag", false)) {
+                this.arbeitsauftrag = ArbeitsauftragBuilder.TYPE_ONLINE;
             }
 
+        } else {
+            if (schicht.optBoolean("hasSharedArbeitsauftrag", false)) {
+                arbeitsauftrag = ArbeitsauftragBuilder.TYPE_ONLINE;
+            } else {
+                arbeitsauftrag = ArbeitsauftragBuilder.TYPE_NONE;
+            }
         }
 
     }
@@ -746,27 +701,19 @@ public class VerwendungClass implements Parcelable {
         this.pauseRil = pauseRil;
     }
 
-    public String getAufart() {
-        return aufart;
-    }
-
-    public void setAufart(String aufart) {
-        this.aufart = aufart;
-    }
-
-    public String getAufdb() {
+    public int getAufdb() {
         return aufdb;
     }
 
-    public void setAufdb(String aufdb) {
+    public void setAufdb(int aufdb) {
         this.aufdb = aufdb;
     }
 
-    public String getAufde() {
+    public int getAufde() {
         return aufde;
     }
 
-    public void setAufde(String aufde) {
+    public void setAufde(int aufde) {
         this.aufde = aufde;
     }
 
@@ -806,21 +753,20 @@ public class VerwendungClass implements Parcelable {
         return arbeitsauftrag;
     }
 
-    public File getArbeitsauftragDilocFile() {
-        return arbeitsauftragDilocFile;
-    }
-
     public File getArbeitsauftragCacheFile() {
         return arbeitsauftragCacheFile;
     }
 
     public void setArbeitsauftragCacheFile(File file) {
-        this.arbeitsauftragCacheFile = file;
-        this.arbeitsauftrag = ArbeitsauftragBuilder.TYPE_CACHED;
+        arbeitsauftragCacheFile = file;
+        arbeitsauftrag = ArbeitsauftragBuilder.TYPE_CACHED;
     }
 
-    public List<String> getDilocSearchPath() {
-        return dilocSearchPath;
+    public void setArbeitsauftragExtracting() {
+        this.arbeitsauftrag = ArbeitsauftragBuilder.TYPE_EXTRACTING;
     }
 
+    public void setArbeitsauftragType(int type) {
+        arbeitsauftrag = type;
+    }
 }

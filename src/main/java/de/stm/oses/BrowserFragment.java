@@ -2,7 +2,9 @@ package de.stm.oses;
 
 import android.annotation.TargetApi;
 import android.app.Fragment;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -123,6 +125,9 @@ public class BrowserFragment extends Fragment {
         if (request.equals("anb"))
             ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Nutzungsbedingungen");
 
+        if (request.equals("spenden"))
+            ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Spenden");
+
         Bundle extra = new Bundle();
         extra.putString("request", request);
         mFirebaseAnalytics.logEvent("OSES_view_webpage", extra);
@@ -151,7 +156,7 @@ public class BrowserFragment extends Fragment {
 			@Override  
 		    public void onPageFinished(WebView view, String url) {
 
-                super.onPageFinished(engine, url);
+                super.onPageFinished(view, url);
 
                 if (getActivity() == null || mRefreshLayout == null)
                     return;
@@ -180,11 +185,36 @@ public class BrowserFragment extends Fragment {
             @TargetApi(android.os.Build.VERSION_CODES.M)
             @Override
             public void onReceivedError(WebView view, WebResourceRequest req, WebResourceError rerr) {
-                // Redirect to deprecated method, so you can use it in all SDK versions
                 errorCode = rerr.getErrorCode();
+                super.onReceivedError(view, req, rerr);
             }
-	
-		});
+
+            @TargetApi(android.os.Build.VERSION_CODES.M)
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                String host;
+                host = request.getUrl().getHost();
+                if (host != null && host.contains("paypal.com")) {
+                    view.getContext().startActivity(
+                            new Intent(Intent.ACTION_VIEW, request.getUrl()));
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+            @SuppressWarnings("deprecation")
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                if (url != null && url.startsWith("https://www.paypal.com")) {
+                    view.getContext().startActivity(
+                            new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        });
 		
 		engine.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
         engine.loadUrl("https://oses.mobi/api.php?request="+request+"&session="+OSES.getSession().getIdentifier());

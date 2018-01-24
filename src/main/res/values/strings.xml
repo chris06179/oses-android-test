@@ -121,11 +121,10 @@
     <string name="faxnummer">Faxnummer</string>
     <string name="_fpl_n_">[Fpl/N/</string>
     <string name="close_bracket">]</string>
-    <string name="geschäftsbereich">Geschäftsbereich</string>
+    <string name="gb">Geschäftsbereich</string>
     <string name="no_verwendung">Es wurde keine Verwendung im angegebenen Monat gefunden!</string>
     <string name="wiederholen">Wiederholen</string>
     <string name="aktualisieren">Aktualisieren</string>
-    <string name="Löschen">Löschen</string>
     <string name="speichern">Speichern</string>
     <string name="abbrechen">Verwerfen</string>
     <string name="title_activity_verwendung_add_all">VerwendungAddAll</string>

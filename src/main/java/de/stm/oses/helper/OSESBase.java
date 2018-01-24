@@ -1,70 +1,44 @@
 package de.stm.oses.helper;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.content.res.AssetManager;
-import android.net.Uri;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.ContextThemeWrapper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Authenticator;
-import java.net.InetAddress;
-import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
-import java.net.Socket;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.net.UnknownHostException;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 import de.stm.oses.R;
 
-@SuppressLint("PrivateResource")
 public class OSESBase {
 
-    private static final int PERMISSION_REQUEST_STORAGE_DILOC = 5600;
+    public static final int DILOC_STATUS_UNKNOWN = -1;
+    public static final int DILOC_STATUS_NOT_INSTALLED = 0;
+    public static final int DILOC_STATUS_INSTALLED = 1;
+
 
     private Context context;
     private OSESSession session;
@@ -72,6 +46,7 @@ public class OSESBase {
     private Integer iVersionCode;
     private Integer iSDKLevel;
     private String sSDKString;
+    private int iDilocStatus;
 
 
     public OSESBase(Context context) {
@@ -91,6 +66,8 @@ public class OSESBase {
 
         this.iSDKLevel = android.os.Build.VERSION.SDK_INT;
         this.sSDKString = android.os.Build.VERSION.RELEASE;
+
+        this.iDilocStatus = DILOC_STATUS_UNKNOWN;
 
     }
 
@@ -475,7 +452,7 @@ public class OSESBase {
 
     }
 
-    public boolean isPackageInstalled(String packagename, PackageManager packageManager) {
+    boolean isPackageInstalled(String packagename, PackageManager packageManager) {
         try {
             packageManager.getPackageInfo(packagename, 0);
             return true;
@@ -484,9 +461,25 @@ public class OSESBase {
         }
     }
 
+    public int getDilocStatus() {
+        if (iDilocStatus == DILOC_STATUS_UNKNOWN) {
+            if (isPackageInstalled("de.diloc.DiLocSyncMobile", context.getPackageManager())) {
+                iDilocStatus = DILOC_STATUS_INSTALLED;
+            } else {
+                iDilocStatus = DILOC_STATUS_NOT_INSTALLED;
+            }
+        }
+
+        return iDilocStatus;
+    }
+
+    public boolean hasStoragePermission() {
+       return ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+    }
+
     public void rebuildWorkingDirectory() {
 
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+        if (hasStoragePermission()) {
 
             File oldpath = new File(Environment.getExternalStorageDirectory().getPath() + "/OSES/docs/");
 

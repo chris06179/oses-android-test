@@ -1,6 +1,5 @@
 package de.stm.oses.schichten;
 
-import android.support.v7.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -10,10 +9,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.Vibrator;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
+import android.view.HapticFeedbackConstants;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -394,14 +394,10 @@ public class SchichtenFragment extends SwipeRefreshListFragment implements Actio
         mActionMode.setTitle(item.getSchicht() + fpla);
         mActionMode.setSubtitle(item.getGv() + " - " + item.getGb());
 
-        Menu menu = mActionMode.getMenu();
-
         RemoveListSelection(false);
         setListSelection(id);
 
-        Vibrator vibrate = (Vibrator) getActivity().getSystemService(getActivity().getApplicationContext().VIBRATOR_SERVICE);
-        // Vibrate for 500 milliseconds
-        vibrate.vibrate(25);
+        v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
 
     }
 
@@ -510,6 +506,7 @@ public class SchichtenFragment extends SwipeRefreshListFragment implements Actio
 
                 item.setAufdb(schicht.getInt("aufdb"));
                 item.setAufde(schicht.getInt("aufde"));
+                item.setAufdz(schicht.getInt("aufdz"));
 
                 item.setBaureihen(schicht.getString("baureihen"));
 

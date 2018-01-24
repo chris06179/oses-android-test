@@ -16,5 +16,5 @@
         android:title="Bearbeiten" app:showAsAction="always|withText"/>
     <item android:id="@+id/action_delete_schicht"
         android:icon="@drawable/ic_action_discard"
-        android:title="@string/Löschen" app:showAsAction="always|withText"/>
+        android:title="@string/l_schen" app:showAsAction="always|withText"/>
 </menu>

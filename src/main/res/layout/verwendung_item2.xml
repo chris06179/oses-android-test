@@ -83,6 +83,13 @@
                         android:layout_marginLeft="4dp"
                         android:layout_width="18dp"
                         android:layout_weight="1" />
+
+                    <ProgressBar
+                        android:id="@+id/verwendung_aa_extracting"
+                        style="?android:attr/progressBarStyle"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_weight="1" />
                 </LinearLayout>
 
             </RelativeLayout>

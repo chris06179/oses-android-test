@@ -1,8 +1,6 @@
 package de.stm.oses.schichten;
 
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -11,12 +9,11 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
@@ -34,7 +31,6 @@ import com.codetroopers.betterpickers.timepicker.TimePickerBuilder;
 import com.codetroopers.betterpickers.timepicker.TimePickerDialogFragment;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
-import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import org.json.JSONException;
@@ -45,9 +41,9 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import de.stm.oses.R;
 import de.stm.oses.helper.ListAdapter;
@@ -101,6 +97,7 @@ public class SchichtenAddActivity extends AppCompatActivity implements View.OnCl
         EditText notiz;
         EditText aufdb;
         EditText aufde;
+        EditText aufdz;
 
         Spinner gbereich;
         Spinner funktion;
@@ -133,8 +130,9 @@ public class SchichtenAddActivity extends AppCompatActivity implements View.OnCl
             pausein = (EditText) activity.findViewById(R.id.schichtadd_pausein);
             baureihen = (EditText) activity.findViewById(R.id.schichtadd_baureihen);
             notiz = (EditText) activity.findViewById(R.id.schichtadd_notiz);
-            aufdb = (EditText) activity.findViewById(R.id.schichtadd_aufdb);
-            aufde = (EditText) activity.findViewById(R.id.schichtadd_aufde);
+            aufdb = activity.findViewById(R.id.schichtadd_aufdb);
+            aufde = activity.findViewById(R.id.schichtadd_aufde);
+            aufdz = activity.findViewById(R.id.schichtadd_aufdz);
 
             gbereich = (Spinner) activity.findViewById(R.id.schichtadd_gbereich);
             funktion = (Spinner) activity.findViewById(R.id.schichtadd_funktion);
@@ -148,6 +146,9 @@ public class SchichtenAddActivity extends AppCompatActivity implements View.OnCl
             von.setOnClickListener(activity);
             bis.setOnClickListener(activity);
             abcbutton.setOnClickListener(activity);
+            aufdz.setOnClickListener(activity);
+            aufdb.setOnClickListener(activity);
+            aufde.setOnClickListener(activity);
         }
     }
 
@@ -173,14 +174,6 @@ public class SchichtenAddActivity extends AppCompatActivity implements View.OnCl
 
         if (savedInstanceState != null) {
             saveMultiple = savedInstanceState.getBoolean("saveMultiple");
-        } else {
-            sAdd.schicht.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    InputMethodManager keyboard = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    keyboard.showSoftInput(sAdd.schicht, 0);
-                }
-            }, 250);
         }
 
         setResult(400);
@@ -349,9 +342,6 @@ public class SchichtenAddActivity extends AppCompatActivity implements View.OnCl
             }
         });
 
-        sAdd.aufdb.setText(String.valueOf(OSES.getSession().getSessionAufDb()));
-        sAdd.aufde.setText(String.valueOf(OSES.getSession().getSessionAufDe()));
-
         if (getIntent().hasExtra("item")) {
 
         SchichtenClass edit = ((SchichtenClass) getIntent().getExtras().getSerializable("item"));
@@ -385,8 +375,10 @@ public class SchichtenAddActivity extends AppCompatActivity implements View.OnCl
 
             sAdd.db.setText(edit.getDb());
             sAdd.de.setText(edit.getDe());
-            sAdd.aufdb.setText(String.valueOf(edit.getAufdb()));
-            sAdd.aufde.setText(String.valueOf(edit.getAufde()));
+
+            sAdd.aufdb.setText(String.format(Locale.GERMAN,"%02d:%02d", TimeUnit.MINUTES.toHours(edit.getAufdb()), edit.getAufdb() - TimeUnit.HOURS.toMinutes(TimeUnit.MINUTES.toHours(edit.getAufdb()))));
+            sAdd.aufde.setText(String.format(Locale.GERMAN,"%02d:%02d", TimeUnit.MINUTES.toHours(edit.getAufde()), edit.getAufde() - TimeUnit.HOURS.toMinutes(TimeUnit.MINUTES.toHours(edit.getAufde()))));
+            sAdd.aufdz.setText(String.format(Locale.GERMAN,"%02d:%02d", TimeUnit.MINUTES.toHours(edit.getAufdz()), edit.getAufdz() - TimeUnit.HOURS.toMinutes(TimeUnit.MINUTES.toHours(edit.getAufdz()))));
 
 
             sAdd.baureihen.setText(edit.getBaureihen());
@@ -410,9 +402,9 @@ public class SchichtenAddActivity extends AppCompatActivity implements View.OnCl
             c.setTime(bisdate);
             sAdd.bis.setText(dayFormat.format(c.getTime())+", "+pad(c.get(Calendar.DAY_OF_MONTH))+"."+pad(c.get(Calendar.MONTH)+1)+"."+pad(c.get(Calendar.YEAR)));
 
-
+        } else {
+            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         }
-        
 
 	}
 
@@ -486,6 +478,15 @@ public class SchichtenAddActivity extends AppCompatActivity implements View.OnCl
             case R.id.schichtadd_bis:
                 DatumOnClick(sAdd.bis);
                 break;
+            case R.id.schichtadd_aufdz:
+                ZeitOnClick(sAdd.aufdz);
+                break;
+            case R.id.schichtadd_aufdb:
+                ZeitOnClick(sAdd.aufdb);
+                break;
+            case R.id.schichtadd_aufde:
+                ZeitOnClick(sAdd.aufde);
+                break;
         }
 
 
@@ -539,6 +540,31 @@ private class SaveSchicht extends AsyncTask<Void, Void, String> {
 
     protected String doInBackground(Void... params) {
 
+        // Aufenthalt parsen
+        String aufdbh = "0";
+        String aufdbm = "0";
+        String aufdeh = "0";
+        String aufdem = "0";
+        String aufdzh = "0";
+        String aufdzm = "0";
+
+        try {
+            if (sAdd.aufdb.getText().length() > 0) {
+                aufdbh = sAdd.aufdb.getText().toString().split(":")[0];
+                aufdbm = sAdd.aufdb.getText().toString().split(":")[1];
+            }
+            if (sAdd.aufde.getText().length() > 0) {
+                aufdeh = sAdd.aufde.getText().toString().split(":")[0];
+                aufdem = sAdd.aufde.getText().toString().split(":")[1];
+            }
+            if (sAdd.aufdz.getText().length() > 0) {
+                aufdzh = sAdd.aufdz.getText().toString().split(":")[0];
+                aufdzm = sAdd.aufdz.getText().toString().split(":")[1];
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         String[] splitVon = sAdd.von.getText().toString().substring(5).split("\\.");
         String gv = splitVon[2] + '-' + splitVon[1] + '-' + splitVon[0];
 
@@ -566,6 +592,12 @@ private class SaveSchicht extends AsyncTask<Void, Void, String> {
         postdata.put("kommentar", sAdd.notiz.getText().toString());
         postdata.put("aufdb", sAdd.aufdb.getText().toString());
         postdata.put("aufde", sAdd.aufde.getText().toString());
+        postdata.put("aufdbh", aufdbh);
+        postdata.put("aufdbm", aufdbm);
+        postdata.put("aufdeh", aufdeh);
+        postdata.put("aufdem", aufdem);
+        postdata.put("aufdzh", aufdzh);
+        postdata.put("aufdzm", aufdzm);
 
         return OSES.getJSON("https://oses.mobi/api.php?request=schichten&command=addajax", postdata, 60000);
 

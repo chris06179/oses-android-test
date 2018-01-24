@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:title="Eingabe">
+        <CheckBoxPreference
+            android:title="Alternative Zeiteingabe"
+            android:defaultValue="false"
+            android:summaryOff="Es wird die Standard Android Zeiteingabe verwendet"
+            android:summaryOn="Es wird die alternative Zeiteingabe mit Nummernblock verwendet"
+            android:key="useAlternateTimePicker" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Verwendung">
+        <ListPreference
+            android:key="sumPosition"
+            android:title="Monatszusammenfassung"
+            android:summary="Zeigt eine Zusammenfassung im Bereich Verwendung an"
+            android:dialogTitle="Monatszusammenfassung konfigurieren"
+            android:entries="@array/pref_sum_pos_entries"
+            android:entryValues="@array/pref_sum_pos_values"
+            android:defaultValue="BOTTOM" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="changeVerwendungColor"
+            android:summary="Farbe der Aktionsleiste beim Hinzufügen einer Verwendung an die Kategorie anpassen"
+            android:title="Farbwechsel" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="Benachrichtigungen">
+        <Preference android:title="Benachrichtigungseinstellungen anzeigen"
+            android:key="notificationsv26"
+            android:summary="Weiterleitung zu den Betriebssystemeinstellungen"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Arbeitsaufträge (nur EDITH-PDF)"
+        android:key="aaCategory">
+        <CheckBoxPreference
+            android:key="scanDiloc"
+            android:title="Diloc|Sync-Verzeichnis durchsuchen (DB Regio)"
+            android:summary="Durchsucht das Diloc|Sync-Verzeichnis nach tagesaktuellen Arbeitsauträgen"
+            android:defaultValue="true" />
+
+        <CheckBoxPreference
+            android:key="scanOSES"
+            android:title="OSES-Verzeichnis durchsuchen"
+            android:summary="Durchsucht das OSES-Verzeichnis im internen Speicher (/OSES/Dokumente/Grundschichten/) nach Grundschichten"
+            android:defaultValue="false" />
+
+        <CheckBoxPreference
+            android:key="scanAgressive"
+            android:title="Aggressiver Suchalgorithmus"
+            android:summary="Durchsucht das gesamte Endgerät nach Grundschichten. Dies kann unter Umständen erheblich länger dauern und die System- und Akkuleistung beeinträchtigen!"
+            android:defaultValue="false" />
+
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Sonstiges">
+        <PreferenceScreen
+            android:key="about"
+            android:title="Anwendungsinformationen"
+            android:persistent="false">
+            <PreferenceCategory
+                android:title="Anwendungsinformationen">
+                <Preference
+                    android:key="version"
+                    android:title="Version">
+                </Preference>
+                <Preference
+                    android:key="versioncode"
+                    android:title="Versionscode">
+                </Preference>
+                <Preference
+                    android:key="copyright"
+                    android:title="Urheberrecht">
+                </Preference>
+                <Preference
+                    android:key="contact"
+                    android:title="Kontakt"
+                    android:summary="E-Mail an info@oses.mobi">
+                    <intent
+                        android:action="android.intent.action.VIEW"
+                        android:data="mailto:info@oses.mobi?subject=OSES Benutzeranfrage">
+                    </intent>
+                </Preference>
+            </PreferenceCategory>
+        </PreferenceScreen>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Debug"
+        android:key="debugCategory">
+        <SwitchPreference
+            android:title="Entwicklungsserver verwenden"
+            android:summary="Benutername und Passwort ergänzen, nur für berechtigte Personen!"
+            android:defaultValue="false"
+            android:key="debugUseDevServer" />
+        <EditTextPreference
+            android:title="Benutzername"
+            android:key="debugDevServerUser"
+            android:defaultValue=""
+            android:dependency="debugUseDevServer" />
+        <EditTextPreference
+            android:title="Passwort"
+            android:key="debugDevServerPass"
+            android:defaultValue=""
+            android:dependency="debugUseDevServer"
+            android:inputType="textPassword" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

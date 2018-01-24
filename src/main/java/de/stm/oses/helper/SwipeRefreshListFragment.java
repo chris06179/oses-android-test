@@ -136,11 +136,7 @@ public class SwipeRefreshListFragment extends ListFragment {
         @Override
         public boolean canChildScrollUp() {
             final ListView listView = getListView();
-            if (listView.getVisibility() == View.VISIBLE) {
-                return canListViewScrollUp(listView);
-            } else {
-                return false;
-            }
+            return listView.getVisibility() == View.VISIBLE && canListViewScrollUp(listView);
         }
 
     }
@@ -152,16 +148,7 @@ public class SwipeRefreshListFragment extends ListFragment {
      * needed.
      */
     private static boolean canListViewScrollUp(ListView listView) {
-        if (android.os.Build.VERSION.SDK_INT >= 14) {
-            // For ICS and above we can call canScrollVertically() to determine this
-            return ViewCompat.canScrollVertically(listView, -1);
-        } else {
-            // Pre-ICS we need to manually check the first visible item and the child view's top
-            // value
-            return listView.getChildCount() > 0 &&
-                    (listView.getFirstVisiblePosition() > 0
-                            || listView.getChildAt(0).getTop() < listView.getPaddingTop());
-        }
+           return  listView.canScrollVertically(-1);
     }
     // END_INCLUDE (check_list_can_scroll)
 
