@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.util.Base64;
 import android.util.Base64OutputStream;
+import android.util.Log;
 
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
@@ -28,6 +29,8 @@ import de.stm.oses.verwendung.VerwendungClass;
 
 public class ArbeitsauftragIntentService extends IntentService {
 
+    private boolean alreadyStarted = false;
+
     public static class ArbeitsauftragProgressEvent {
         public int id;
 
@@ -46,21 +49,7 @@ public class ArbeitsauftragIntentService extends IntentService {
         }
     }
 
-    public static boolean isAlreadyRunning(Context context) {
-        ActivityManager manager = (ActivityManager) context.getSystemService(ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if ("de.stm.oses.arbeitsauftrag.ArbeitsauftragIntentService".equals(service.service.getClassName())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public static void tryStartService(Context context, OSESBase OSES, ArrayList<VerwendungClass> list) {
-
-        if (isAlreadyRunning(context)) {
-            return;
-        }
 
         if (!OSES.hasStoragePermission()) {
             return;
@@ -111,8 +100,16 @@ public class ArbeitsauftragIntentService extends IntentService {
         return lastVal;
     }
 
+
+
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
+
+        // weitere Requests in der selben Instanz verhindern
+        if (alreadyStarted)
+            return;
+
+        alreadyStarted = true;
 
         // Remote Config
         final FirebaseRemoteConfig mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();

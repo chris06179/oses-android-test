@@ -109,12 +109,10 @@ public class BrowserFragment extends Fragment {
 		return inflater.inflate(R.layout.browser, container, false);
 		
 	}
-	
-	@Override
-	public void onActivityCreated (Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
 
-        request = getTag();
+	public void setRequest(String newRequest) {
+
+        request = newRequest;
 
         if (request.equals("aktuell"))
             ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Aktuelles");
@@ -128,9 +126,21 @@ public class BrowserFragment extends Fragment {
         if (request.equals("spenden"))
             ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Spenden");
 
+        if (request.equals("hilfe"))
+            ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Hilfe");
+
+
         Bundle extra = new Bundle();
         extra.putString("request", request);
         mFirebaseAnalytics.logEvent("OSES_view_webpage", extra);
+
+        engine.loadUrl("https://oses.mobi/api.php?request="+request+"&session="+OSES.getSession().getIdentifier());
+
+    }
+
+	@Override
+	public void onActivityCreated (Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
         
      // WebView definieren
         engine = (WebView) getActivity().findViewById(R.id.browser_view);
@@ -194,7 +204,7 @@ public class BrowserFragment extends Fragment {
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 String host;
                 host = request.getUrl().getHost();
-                if (host != null && host.contains("paypal.com")) {
+                if (host != null && (host.contains("paypal.com") || host.contains("wa.me") || host.contains("youtube.com"))) {
                     view.getContext().startActivity(
                             new Intent(Intent.ACTION_VIEW, request.getUrl()));
                     return true;
@@ -206,7 +216,7 @@ public class BrowserFragment extends Fragment {
             @SuppressWarnings("deprecation")
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                if (url != null && url.startsWith("https://www.paypal.com")) {
+                if (url != null && (url.startsWith("https://www.paypal.com") || url.startsWith("https://wa.me") || url.startsWith("https://www.youtube.com"))) {
                     view.getContext().startActivity(
                             new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
                     return true;
@@ -217,7 +227,7 @@ public class BrowserFragment extends Fragment {
         });
 		
 		engine.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
-        engine.loadUrl("https://oses.mobi/api.php?request="+request+"&session="+OSES.getSession().getIdentifier());
+		setRequest(getTag());
 
 	}
 

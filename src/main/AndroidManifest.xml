@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="de.stm.oses"
-    android:versionCode="374"
-    android:versionName="3.7.2"
+    android:versionCode="376"
+    android:versionName="3.7.4"
     android:installLocation="auto">
 
     <uses-permission android:name="android.permission.INTERNET" />

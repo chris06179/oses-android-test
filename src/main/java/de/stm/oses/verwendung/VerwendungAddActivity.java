@@ -1461,8 +1461,8 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
                         ((ListSpinnerAdapter) vAdd.funktion.getAdapter()).setSelectionID(schicht.getInt("funktioni"));
                         vAdd.funktion.setSelection(((ListSpinnerAdapter) vAdd.funktion.getAdapter()).getSelection());
 
-                        vAdd.aufdb.setText(schicht.getString("aufdb"));
-                        vAdd.aufde.setText(schicht.getString("aufde"));
+                        vAdd.aufdb.setText(String.format(Locale.GERMAN, "%02d:%02d", TimeUnit.MINUTES.toHours(schicht.getInt("aufdb")), schicht.getInt("aufdb") - TimeUnit.HOURS.toMinutes(TimeUnit.MINUTES.toHours(schicht.getInt("aufdb")))));
+                        vAdd.aufde.setText(String.format(Locale.GERMAN, "%02d:%02d", TimeUnit.MINUTES.toHours(schicht.getInt("aufde")), schicht.getInt("aufde") - TimeUnit.HOURS.toMinutes(TimeUnit.MINUTES.toHours(schicht.getInt("aufde")))));
 
                         if (schicht.getInt("est") == OSES.getSession().getEst()) {
                             vAdd.aufdz.setText(String.format(Locale.GERMAN, "%02d:%02d", TimeUnit.MINUTES.toHours(schicht.getInt("aufdz")), schicht.getInt("aufdz") - TimeUnit.HOURS.toMinutes(TimeUnit.MINUTES.toHours(schicht.getInt("aufdz")))));
@@ -1535,8 +1535,8 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
                                     ((ListSpinnerAdapter) vAdd.funktion.getAdapter()).setSelectionID(schicht.getInt("funktioni"));
                                     vAdd.funktion.setSelection(((ListSpinnerAdapter) vAdd.funktion.getAdapter()).getSelection());
 
-                                    vAdd.aufdb.setText(schicht.getString("aufdb"));
-                                    vAdd.aufde.setText(schicht.getString("aufde"));
+                                    vAdd.aufdb.setText(String.format(Locale.GERMAN, "%02d:%02d", TimeUnit.MINUTES.toHours(schicht.getInt("aufdb")), schicht.getInt("aufdb") - TimeUnit.HOURS.toMinutes(TimeUnit.MINUTES.toHours(schicht.getInt("aufdb")))));
+                                    vAdd.aufde.setText(String.format(Locale.GERMAN, "%02d:%02d", TimeUnit.MINUTES.toHours(schicht.getInt("aufde")), schicht.getInt("aufde") - TimeUnit.HOURS.toMinutes(TimeUnit.MINUTES.toHours(schicht.getInt("aufde")))));
 
                                     if (schicht.getInt("est") == OSES.getSession().getEst()) {
                                         vAdd.aufdz.setText(String.format(Locale.GERMAN, "%02d:%02d", TimeUnit.MINUTES.toHours(schicht.getInt("aufdz")), schicht.getInt("aufdz") - TimeUnit.HOURS.toMinutes(TimeUnit.MINUTES.toHours(schicht.getInt("aufdz")))));

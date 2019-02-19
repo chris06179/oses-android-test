@@ -29,29 +29,33 @@ public class ArbeitsauftragBuilder {
     public static final int TYPE_ONLINE = 3;
     public static final int TYPE_EXTRACTING = 4;
 
+    private static final int DOCTYPE_UNKNOWN = -1;
+    private static final int DOCTYPE_EDITH = 0;
+    private static final int DOCTYPE_SBAHN_A = 1;
+
     private VerwendungClass verwendung;
 
     public ArbeitsauftragBuilder(VerwendungClass verwendung) {
         this.verwendung = verwendung;
     }
 
-    private List<File> findFile( File aFile, String[] toFind){
+    private List<File> findFile(File aFile, String[] toFind) {
         List<File> result = new ArrayList<>();
-        if(aFile.isFile() && aFile.getName().endsWith(".pdf") && (aFile.length() / 1024 / 1024) < 25 ) {
+        if (aFile.isFile() && aFile.getName().endsWith(".pdf") && (aFile.length() / 1024 / 1024) < 25) {
             if (toFind != null) {
-                String fileName = aFile.getName().replaceAll("[^A-Za-z0-9]", "");
-                for (String s : toFind)
-                {
+                String fileName = aFile.getAbsolutePath().replaceAll("[^A-Za-z0-9]", "");
+                for (String s : toFind) {
                     if (fileName.contains(s)) {
                         result.add(aFile);
+                        break;
                     }
                 }
             } else {
                 result.add(aFile);
             }
-        } else if( aFile.isDirectory() ) {
-            for( File child : aFile.listFiles() ){
-                result.addAll(findFile(child, toFind ));
+        } else if (aFile.isDirectory()) {
+            for (File child : aFile.listFiles()) {
+                result.addAll(findFile(child, toFind));
             }
         }
         return result;
@@ -62,23 +66,25 @@ public class ArbeitsauftragBuilder {
 
         File cache = getExtractedCacheFile();
 
-        File searchDirectory = new File(Environment.getExternalStorageDirectory(),"/sync/data/");
-        String[] searchDates = new String[] {verwendung.getDatumFormatted("ddMMyyyy"), verwendung.getDatumFormatted("ddMMyy"), verwendung.getDatumFormatted("yyyyMMdd"), verwendung.getDatumFormatted("yyMMdd")};
+        // Alle PDF Dokumente mit Datumsbezug
+        File dilocDirectory = new File(Environment.getExternalStorageDirectory(), "/sync/data/");
+        String[] searchDates = new String[]{verwendung.getDatumFormatted("ddMMyyyy"), verwendung.getDatumFormatted("ddMMyy"), verwendung.getDatumFormatted("yyyyMMdd"), verwendung.getDatumFormatted("yyMMdd")};
+        List<File> possibleFiles = findFile(dilocDirectory, searchDates);
 
-        List<File> possibleFiles = findFile(searchDirectory, searchDates);
-        List<File> dilocArbeitsaufträge = new ArrayList<>();
+        // Alle PDF Dokumente im Postfach (ohne Datumsbezug, Priorität)
+        File userfileDirectory = new File(Environment.getExternalStorageDirectory(), "/sync/data/userfilebox/");
+        possibleFiles.addAll(0, findFile(userfileDirectory, null));
 
-        // Aussortieren, logische Reihenfolge
+        List<File> dilocArbeitsauftraege = new ArrayList<>();
+
+        // Aussortieren wenn nicht verändert
         for (File file : possibleFiles) {
             if (cache == null || cache.lastModified() < file.lastModified()) {
-                if (file.getName().toLowerCase().contains(verwendung.getEst().toLowerCase()) || file.getName().toLowerCase().contains("schicht") || file.getAbsolutePath().toLowerCase().contains("arbeitsauftr"))
-                    dilocArbeitsaufträge.add(0, file);
-                else
-                    dilocArbeitsaufträge.add(file);
+                dilocArbeitsauftraege.add(file);
             }
         }
 
-        return dilocArbeitsaufträge;
+        return dilocArbeitsauftraege;
 
     }
 
@@ -86,7 +92,7 @@ public class ArbeitsauftragBuilder {
 
         File cache = getExtractedCacheFile();
 
-        File searchDirectory = new File(Environment.getExternalStorageDirectory(),"/OSES/Dokumente/Grundschichten/");
+        File searchDirectory = new File(Environment.getExternalStorageDirectory(), "/OSES/Dokumente/Grundschichten/");
 
         List<File> possibleFiles = findFile(searchDirectory, null);
         List<File> OSESArbeitsaufträge = new ArrayList<>();
@@ -109,7 +115,7 @@ public class ArbeitsauftragBuilder {
 
         File cache = getExtractedCacheFile();
 
-        File searchDirectory = new File(Environment.getExternalStorageDirectory(),"/");
+        File searchDirectory = new File(Environment.getExternalStorageDirectory(), "/");
 
         List<File> possibleFiles = findFile(searchDirectory, null);
         List<File> DeviceArbeitsaufträge = new ArrayList<>();
@@ -145,11 +151,13 @@ public class ArbeitsauftragBuilder {
 
         int count = 1;
 
-        Log.d("AA", "Start: "+verwendung.getBezeichner());
+        Log.d("AA", "Start: " + verwendung.getBezeichner());
         for (File pdf : files) {
             try {
 
-                Log.d("AA", String.valueOf(count)+" / "+String.valueOf(files.size())+": "+pdf.getName());
+                int docType = DOCTYPE_UNKNOWN;
+
+                Log.d("AA", String.valueOf(count) + " / " + String.valueOf(files.size()) + ": " + pdf.getName());
                 count++;
 
                 EventBus.getDefault().post(new ArbeitsauftragIntentService.ArbeitsauftragProgressEvent(verwendung.getId()));
@@ -165,19 +173,50 @@ public class ArbeitsauftragBuilder {
                 int lastpageadded = -1;
 
                 String bezeichner = Pattern.quote(verwendung.getBezeichner().replaceAll("[^0-9]", ""));
-                Pattern pSchicht = Pattern.compile(".*Schicht:\\s*[VF]?\\s*" + bezeichner + "\\s*([(][VF]\\s*[0-9]*[)])?$.*", Pattern.DOTALL + Pattern.MULTILINE);
-                Pattern pDatum = Pattern.compile(".*^Gültig am:$.*^.*" + Pattern.quote(verwendung.getDatumFormatted("dd.MM.yyyy")) + "$.*", Pattern.DOTALL + Pattern.MULTILINE);
-                Pattern pDatumsbereich = Pattern.compile(".*^\\d{2}\\.\\d{2}\\.\\d{4}\\s-\\s\\d{2}\\.\\d{2}\\.\\d{4}$.*", Pattern.DOTALL + Pattern.MULTILINE);
-                Pattern pIsArbeitsauftragFirstSite = Pattern.compile(".*Schicht:\\s*[VF]?\\s*[0-9]*\\s*([(][VF]\\s*[0-9]*[)])?$.*", Pattern.DOTALL+Pattern.MULTILINE);
+                Pattern pIsArbeitsauftragEDITH = Pattern.compile(".*Schicht:\\s*[VF]?\\s*[0-9]*\\s*([(][VF]\\s*[0-9]*[)])?$.*", Pattern.DOTALL + Pattern.MULTILINE);
+                Pattern pIsArbeitsauftragSBAHNA = Pattern.compile(".*Schicht\\n[0-9]+$.*", Pattern.DOTALL + Pattern.MULTILINE);
+
+                Pattern pSchicht = null;
+                Pattern pDatum = null;
+                Pattern pDatumsbereich = null;
+
 
                 for (int i = 1; i <= read.getNumberOfPages(); i++) {
 
                     strategy = parser.processContent(i, new SimpleTextExtractionStrategy());
                     String text = strategy.getResultantText();
 
-                    if (i == 1) { // Prüfe auf der ersten Seite ob es sich um ein Dokument mit Arbeitsaufträgen handelt
-                        if (!pIsArbeitsauftragFirstSite.matcher(text).matches())
+                    if (docType == DOCTYPE_UNKNOWN) { // Prüfe auf den ersten Seiten ob es sich um ein Dokument mit Arbeitsaufträgen handelt
+                        if (pIsArbeitsauftragEDITH.matcher(text).matches())
+                            docType = DOCTYPE_EDITH;
+                        if (pIsArbeitsauftragSBAHNA.matcher(text).matches())
+                            docType = DOCTYPE_SBAHN_A;
+                    }
+
+                    Log.d("AA", "Seite: "+String.valueOf(i)+" - docType: "+String.valueOf(docType));
+
+                    if (docType == DOCTYPE_UNKNOWN) {
+                        if (i < 4) {
+                            continue;
+                        } else {
                             break;
+                        }
+                    }
+
+
+
+
+
+                    switch (docType) {
+                        case DOCTYPE_EDITH:
+                            pSchicht = Pattern.compile(".*Schicht:\\s*[VF]?\\s*" + bezeichner + "\\s*([(][VF]\\s*[0-9]*[)])?$.*", Pattern.DOTALL + Pattern.MULTILINE);
+                            pDatum = Pattern.compile(".*^Gültig am:$.*^.*" + Pattern.quote(verwendung.getDatumFormatted("dd.MM.yyyy")) + "$.*", Pattern.DOTALL + Pattern.MULTILINE);
+                            pDatumsbereich = Pattern.compile(".*^\\d{2}\\.\\d{2}\\.\\d{4}\\s-\\s\\d{2}\\.\\d{2}\\.\\d{4}$.*", Pattern.DOTALL + Pattern.MULTILINE);
+                            break;
+                        case DOCTYPE_SBAHN_A:
+                            pSchicht = Pattern.compile(".*Schicht\\n" +bezeichner+ "$.*", Pattern.DOTALL + Pattern.MULTILINE);
+                            pDatum = Pattern.compile(".*[A-Za-z]{2},\\sden\\s" + Pattern.quote(verwendung.getDatumFormatted("dd.MM.yyyy")) + "$.*", Pattern.DOTALL + Pattern.MULTILINE);
+                            pDatumsbereich = Pattern.compile(".*^\\d{2}\\.\\d{2}\\.\\d{4}\\s-\\s\\d{2}\\.\\d{2}\\.\\d{4}$.*", Pattern.DOTALL + Pattern.MULTILINE); // TODO
                     }
 
                     // Auf Schichtbezeichnung und Datum prüfen

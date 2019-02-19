@@ -195,7 +195,7 @@ public class StartActivity extends AppCompatActivity {
                     switch (selected) {
                         case 11:
                             setMenuSelection(id);
-                            ChangeFragment(new BrowserFragment(), "aktuell");
+                            openWebView("aktuell");
                             setDrawer(false);
                             return;
                         case 22:
@@ -214,36 +214,36 @@ public class StartActivity extends AppCompatActivity {
                             setDrawer(false);
                             return;
                         case 81:
-                            setMenuSelection(id);
-                            ChangeFragment(new SettingsFragment(), "settings");
+                            DoBenutzerprofil();
                             setDrawer(false);
                             return;
                         case 82:
                             setMenuSelection(id);
-                            //ChangeFragment(new EinladungFragment(), "einladung");
+                            ChangeFragment(new SettingsFragment(), "settings");
                             setDrawer(false);
                             return;
-                        case 83:
+                        case 84:
                             DoLogout();
                             setDrawer(false);
                             return;
                         case 92:
-                            DoDokumentation();
+                            setMenuSelection(id);
+                            openWebView("hilfe");
                             setDrawer(false);
                             return;
                         case 93:
                             setMenuSelection(id);
-                            ChangeFragment(new BrowserFragment(), "anb");
+                            openWebView("anb");
                             setDrawer(false);
                             return;
                         case 94:
                             setMenuSelection(id);
-                            ChangeFragment(new BrowserFragment(), "impressum");
+                            openWebView("impressum");
                             setDrawer(false);
                             return;
                         case 95:
                             setMenuSelection(id);
-                            ChangeFragment(new BrowserFragment(), "spenden");
+                            openWebView("spenden");
                             setDrawer(false);
                             return;
                         case 99:
@@ -381,6 +381,40 @@ public class StartActivity extends AppCompatActivity {
 
     }
 
+    private void DoBenutzerprofil() {
+        new AlertDialog.Builder(this)
+                .setTitle("Benutzerprofil")
+                .setMessage("Das Benutzerprofil kann derzeit nicht in der Android-App bearbeitet werden, bitte melde dich dafür in der Webversion an!")
+                .setPositiveButton("Weiter zur Webversion", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String url = "https://oses.mobi/system.php?action=pers#ESTA";
+                        Intent i = new Intent(Intent.ACTION_VIEW);
+                        i.setData(Uri.parse(url));
+                        startActivity(i);
+                    }
+                })
+                .setNegativeButton("Später", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .show();
+    }
+
+    private void openWebView(String request) {
+
+        FragmentManager fragmentManager = getFragmentManager();
+        Fragment running = fragmentManager.findFragmentById(R.id.content_frame);
+
+        if (running instanceof BrowserFragment) {
+            ((BrowserFragment) running).setRequest(request);
+        } else
+
+        ChangeFragment(new BrowserFragment(), request);
+
+    }
+
     private void DoDokumentation() {
         FileDownload download = new FileDownload(StartActivity.this);
         download.setTitle("Dokumentation");
@@ -488,19 +522,19 @@ public class StartActivity extends AppCompatActivity {
 
     private void ChangeFragment(Fragment fragment, String ident, Bundle args) {
 
-        mHandler.postDelayed(new ChangeFragmentRunnable(fragment, ident, args), 350);
+        mHandler.postDelayed(new ChangeFragmentRunnable(fragment, ident, args), 300);
 
     }
 
     private void ChangeFragment(Fragment fragment, String ident) {
 
-        mHandler.postDelayed(new ChangeFragmentRunnable(fragment, ident), 350);
+        mHandler.postDelayed(new ChangeFragmentRunnable(fragment, ident), 300);
 
     }
 
     private void ChangeFragment(Fragment fragment, String ident, boolean AddToBackStack) {
 
-        mHandler.postDelayed(new ChangeFragmentRunnable(fragment, ident, AddToBackStack), 350);
+        mHandler.postDelayed(new ChangeFragmentRunnable(fragment, ident, AddToBackStack), 300);
 
     }
 
@@ -566,11 +600,11 @@ public class StartActivity extends AppCompatActivity {
         items.add(new MenuClass(R.drawable.ic_action_download_grey, "Dokumente", 31, ""));
         //items.add(new MenuClass(R.drawable.ic_action_cloud,"Ereignisse",32,""));
         items.add(new MenuClass("System"));
-        items.add(new MenuClass(R.drawable.ic_action_settings, "Einstellungen", 81, ""));
-        //items.add(new MenuClass(R.drawable.ic_action_person_add,"Einladungen",82,"1"));
-        items.add(new MenuClass(R.drawable.ic_action_cancel, "Abmelden", 83, ""));
+        items.add(new MenuClass(R.drawable.ic_user_profile,"Benutzerprofil",81,""));
+        items.add(new MenuClass(R.drawable.ic_action_settings, "Einstellungen", 82, ""));
+        items.add(new MenuClass(R.drawable.ic_action_cancel, "Abmelden", 84, ""));
         items.add(new MenuClass("Sonstiges"));
-        items.add(new MenuClass(R.drawable.ic_action_help, "Dokumentation", 92, ""));
+        items.add(new MenuClass(R.drawable.ic_action_help, "Hilfe", 92, ""));
         items.add(new MenuClass(R.drawable.ic_action_donate, "Spenden", 95, ""));
         items.add(new MenuClass(R.drawable.ic_action_about, "Nutzungsbedingungen", 93, ""));
         items.add(new MenuClass(R.drawable.ic_action_para, "Impressum", 94, ""));
