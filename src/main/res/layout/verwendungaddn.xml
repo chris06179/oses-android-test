@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+    <androidx.appcompat.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/verwendungadd_toolbar"
         android:layout_width="match_parent"
@@ -83,7 +83,7 @@
             android:orientation="vertical"
             android:padding="2dp">
 
-            <android.support.v7.widget.CardView
+            <androidx.cardview.widget.CardView
                 android:id="@+id/verwendungadd_kategorie_box"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -133,9 +133,9 @@
                     </LinearLayout>
                 </LinearLayout>
 
-            </android.support.v7.widget.CardView>
+            </androidx.cardview.widget.CardView>
 
-            <android.support.v7.widget.CardView
+            <androidx.cardview.widget.CardView
                 android:id="@+id/verwendungadd_urlaub_box"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -226,9 +226,9 @@
                 </LinearLayout>
             </LinearLayout>
 
-            </android.support.v7.widget.CardView>
+            </androidx.cardview.widget.CardView>
 
-            <android.support.v7.widget.CardView
+            <androidx.cardview.widget.CardView
                 android:id="@+id/verwendungadd_buero_box"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -320,9 +320,9 @@
                 </LinearLayout>
             </LinearLayout>
 
-            </android.support.v7.widget.CardView>
+            </androidx.cardview.widget.CardView>
 
-            <android.support.v7.widget.CardView
+            <androidx.cardview.widget.CardView
                 android:id="@+id/verwendungadd_dispo_box"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -387,9 +387,9 @@
 
             </LinearLayout>
 
-            </android.support.v7.widget.CardView>
+            </androidx.cardview.widget.CardView>
 
-            <android.support.v7.widget.CardView
+            <androidx.cardview.widget.CardView
                 android:id="@+id/verwendungadd_schicht_box"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -577,9 +577,9 @@
 
                     </LinearLayout>
                 </LinearLayout>
-            </android.support.v7.widget.CardView>
+            </androidx.cardview.widget.CardView>
 
-            <android.support.v7.widget.CardView
+            <androidx.cardview.widget.CardView
                 android:id="@+id/verwendungadd_datum_box"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -696,9 +696,9 @@
                         </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
-            </android.support.v7.widget.CardView>
+            </androidx.cardview.widget.CardView>
 
-            <android.support.v7.widget.CardView
+            <androidx.cardview.widget.CardView
                 android:id="@+id/verwendungadd_az_box"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -874,9 +874,9 @@
 
                 </LinearLayout>
 
-            </android.support.v7.widget.CardView>
+            </androidx.cardview.widget.CardView>
 
-            <android.support.v7.widget.CardView
+            <androidx.cardview.widget.CardView
                 android:id="@+id/verwendungadd_oaz_box"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -963,9 +963,9 @@
                     </LinearLayout>
                 </LinearLayout>
 
-            </android.support.v7.widget.CardView>
+            </androidx.cardview.widget.CardView>
 
-            <android.support.v7.widget.CardView
+            <androidx.cardview.widget.CardView
                 android:id="@+id/verwendungadd_auf_box"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -1125,9 +1125,9 @@
                         </LinearLayout>
                 </LinearLayout>
 
-            </android.support.v7.widget.CardView>
+            </androidx.cardview.widget.CardView>
 
-            <android.support.v7.widget.CardView
+            <androidx.cardview.widget.CardView
                 android:id="@+id/verwendungadd_sonstiges_box"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -1229,9 +1229,9 @@
                     </LinearLayout>
                 </LinearLayout>
 
-            </android.support.v7.widget.CardView>
+            </androidx.cardview.widget.CardView>
 
-            <android.support.v7.widget.CardView
+            <androidx.cardview.widget.CardView
                 android:id="@+id/verwendungadd_abweichungen_box"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -1459,7 +1459,7 @@
                     </LinearLayout>
                 </LinearLayout>
 
-            </android.support.v7.widget.CardView>
+            </androidx.cardview.widget.CardView>
 
 
         </LinearLayout>

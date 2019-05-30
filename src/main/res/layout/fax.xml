@@ -3,7 +3,7 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.v7.widget.Toolbar xmlns:app="http://schemas.android.com/apk/res-auto"
+    <androidx.appcompat.widget.Toolbar xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/fax_toolbar"
         android:layout_height="?attr/actionBarSize"
@@ -87,7 +87,7 @@
                 android:layout_height="fill_parent"
                 layout="@layout/list_error" />
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:id="@+id/fax_destinations"

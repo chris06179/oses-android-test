@@ -27,12 +27,11 @@ import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.support.v4.app.NotificationCompat;
+import androidx.core.app.NotificationCompat;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import de.stm.oses.OSESActivity;
 import de.stm.oses.R;
 import de.stm.oses.StartActivity;
 import de.stm.oses.helper.OSESBase;

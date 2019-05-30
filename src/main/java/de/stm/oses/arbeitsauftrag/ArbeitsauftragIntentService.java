@@ -1,13 +1,11 @@
 package de.stm.oses.arbeitsauftrag;
 
-import android.app.ActivityManager;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.Base64;
 import android.util.Base64OutputStream;
-import android.util.Log;
 
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
@@ -16,6 +14,8 @@ import org.greenrobot.eventbus.EventBus;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -77,9 +77,9 @@ public class ArbeitsauftragIntentService extends IntentService {
         super("ArbeitsauftragIntentService");
     }
 
-    public String getStringFile(File f) {
+    public  String getStringFile(File f) {
         InputStream inputStream;
-        String encodedFile= "", lastVal;
+        String encodedFile = "", lastVal;
         try {
             inputStream = new FileInputStream(f.getAbsolutePath());
 
@@ -92,14 +92,13 @@ public class ArbeitsauftragIntentService extends IntentService {
                 output64.write(buffer, 0, bytesRead);
             }
             output64.close();
-            encodedFile =  output.toString();
+            encodedFile = output.toString();
         } catch (IOException e) {
             e.printStackTrace();
         }
         lastVal = encodedFile;
         return lastVal;
     }
-
 
 
     @Override

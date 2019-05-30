@@ -12,7 +12,7 @@
         android:weightSum="1"
         android:padding="2dp">
 
-        <android.support.v7.widget.CardView
+        <androidx.cardview.widget.CardView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             card_view:cardUseCompatPadding="true">
@@ -103,9 +103,9 @@
             </LinearLayout>
         </LinearLayout>
 
-        </android.support.v7.widget.CardView>
+        </androidx.cardview.widget.CardView>
 
-        <android.support.v7.widget.CardView
+        <androidx.cardview.widget.CardView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             card_view:cardUseCompatPadding="true">
@@ -189,9 +189,9 @@
             </LinearLayout>
         </LinearLayout>
 
-        </android.support.v7.widget.CardView>
+        </androidx.cardview.widget.CardView>
 
-        <android.support.v7.widget.CardView
+        <androidx.cardview.widget.CardView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             card_view:cardUseCompatPadding="true">
@@ -232,9 +232,9 @@
 
             </RelativeLayout>
 
-        </android.support.v7.widget.CardView>
+        </androidx.cardview.widget.CardView>
 
-        <android.support.v7.widget.CardView
+        <androidx.cardview.widget.CardView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             card_view:cardUseCompatPadding="true" >
@@ -276,7 +276,7 @@
 
         </LinearLayout>
 
-        </android.support.v7.widget.CardView>
+        </androidx.cardview.widget.CardView>
 
     </LinearLayout>
 

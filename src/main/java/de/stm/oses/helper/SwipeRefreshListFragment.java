@@ -19,17 +19,17 @@ package de.stm.oses.helper;
 import android.app.ListFragment;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
+
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
 /**
- * Subclass of {@link android.support.v4.app.ListFragment} which provides automatic support for
+ * Subclass of {@link androidx.fragment.app.ListFragment} which provides automatic support for
  * providing the 'swipe-to-refresh' UX gesture by wrapping the the content view in a
- * {@link android.support.v4.widget.SwipeRefreshLayout}.
+ * {@link SwipeRefreshLayout}.
  */
 public class SwipeRefreshListFragment extends ListFragment {
 
@@ -63,58 +63,58 @@ public class SwipeRefreshListFragment extends ListFragment {
     }
 
     /**
-     * Set the {@link android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener} to listen for
+     * Set the {@link SwipeRefreshLayout.OnRefreshListener} to listen for
      * initiated refreshes.
      *
-     * @see android.support.v4.widget.SwipeRefreshLayout#setOnRefreshListener(android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener)
+     * @see SwipeRefreshLayout#setOnRefreshListener(SwipeRefreshLayout.OnRefreshListener)
      */
     public void setOnRefreshListener(SwipeRefreshLayout.OnRefreshListener listener) {
         mSwipeRefreshLayout.setOnRefreshListener(listener);
     }
 
     /**
-     * Returns whether the {@link android.support.v4.widget.SwipeRefreshLayout} is currently
+     * Returns whether the {@link SwipeRefreshLayout} is currently
      * refreshing or not.
      *
-     * @see android.support.v4.widget.SwipeRefreshLayout#isRefreshing()
+     * @see SwipeRefreshLayout#isRefreshing()
      */
     public boolean isRefreshing() {
         return mSwipeRefreshLayout.isRefreshing();
     }
 
     /**
-     * Set whether the {@link android.support.v4.widget.SwipeRefreshLayout} should be displaying
+     * Set whether the {@link SwipeRefreshLayout} should be displaying
      * that it is refreshing or not.
      *
-     * @see android.support.v4.widget.SwipeRefreshLayout#setRefreshing(boolean)
+     * @see SwipeRefreshLayout#setRefreshing(boolean)
      */
     public void setRefreshing(boolean refreshing) {
         mSwipeRefreshLayout.setRefreshing(refreshing);
     }
 
     /**
-     * Set the color scheme for the {@link android.support.v4.widget.SwipeRefreshLayout}.
+     * Set the color scheme for the {@link SwipeRefreshLayout}.
      *
-     * @see android.support.v4.widget.SwipeRefreshLayout setColorScheme(int, int, int, int)
+     * @see SwipeRefreshLayout setColorScheme(int, int, int, int)
      */
     public void setColorScheme(int colorRes1, int colorRes2, int colorRes3, int colorRes4) {
         mSwipeRefreshLayout.setColorSchemeResources(colorRes1, colorRes2, colorRes3, colorRes4);
     }
 
     /**
-     * @return the fragment's {@link android.support.v4.widget.SwipeRefreshLayout} widget.
+     * @return the fragment's {@link SwipeRefreshLayout} widget.
      */
     public SwipeRefreshLayout getSwipeRefreshLayout() {
         return mSwipeRefreshLayout;
     }
 
     /**
-     * Sub-class of {@link android.support.v4.widget.SwipeRefreshLayout} for use in this
-     * {@link android.support.v4.app.ListFragment}. The reason that this is needed is because
-     * {@link android.support.v4.widget.SwipeRefreshLayout} only supports a single child, which it
+     * Sub-class of {@link SwipeRefreshLayout} for use in this
+     * {@link androidx.fragment.app.ListFragment}. The reason that this is needed is because
+     * {@link SwipeRefreshLayout} only supports a single child, which it
      * expects to be the one which triggers refreshes. In our case the layout's child is the content
      * view returned from
-     * {@link android.support.v4.app.ListFragment#onCreateView(android.view.LayoutInflater, android.view.ViewGroup, android.os.Bundle)}
+     * {@link androidx.fragment.app.ListFragment#onCreateView(android.view.LayoutInflater, android.view.ViewGroup, android.os.Bundle)}
      * which is a {@link android.view.ViewGroup}.
      *
      * <p>To enable 'swipe-to-refresh' support via the {@link android.widget.ListView} we need to

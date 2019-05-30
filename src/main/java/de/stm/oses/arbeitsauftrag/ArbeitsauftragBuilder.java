@@ -4,17 +4,35 @@ import android.os.Environment;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
+import com.itextpdf.text.pdf.PRIndirectReference;
+import com.itextpdf.text.pdf.PRStream;
+import com.itextpdf.text.pdf.PdfArray;
+import com.itextpdf.text.pdf.PdfDictionary;
+import com.itextpdf.text.pdf.PdfDocument;
+import com.itextpdf.text.pdf.PdfFormXObject;
+import com.itextpdf.text.pdf.PdfName;
+import com.itextpdf.text.pdf.PdfNumber;
+import com.itextpdf.text.pdf.PdfObject;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfStamper;
+import com.itextpdf.text.pdf.PdfStream;
+import com.itextpdf.text.pdf.PdfString;
+import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.pdf.parser.PdfReaderContentParser;
 import com.itextpdf.text.pdf.parser.SimpleTextExtractionStrategy;
 import com.itextpdf.text.pdf.parser.TextExtractionStrategy;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -193,7 +211,7 @@ public class ArbeitsauftragBuilder {
                             docType = DOCTYPE_SBAHN_A;
                     }
 
-                    Log.d("AA", "Seite: "+String.valueOf(i)+" - docType: "+String.valueOf(docType));
+                    Log.d("AA", "Seite: " + String.valueOf(i) + " - docType: " + String.valueOf(docType));
 
                     if (docType == DOCTYPE_UNKNOWN) {
                         if (i < 4) {
@@ -204,9 +222,6 @@ public class ArbeitsauftragBuilder {
                     }
 
 
-
-
-
                     switch (docType) {
                         case DOCTYPE_EDITH:
                             pSchicht = Pattern.compile(".*Schicht:\\s*[VF]?\\s*" + bezeichner + "\\s*([(][VF]\\s*[0-9]*[)])?$.*", Pattern.DOTALL + Pattern.MULTILINE);
@@ -214,7 +229,7 @@ public class ArbeitsauftragBuilder {
                             pDatumsbereich = Pattern.compile(".*^\\d{2}\\.\\d{2}\\.\\d{4}\\s-\\s\\d{2}\\.\\d{2}\\.\\d{4}$.*", Pattern.DOTALL + Pattern.MULTILINE);
                             break;
                         case DOCTYPE_SBAHN_A:
-                            pSchicht = Pattern.compile(".*Schicht\\n" +bezeichner+ "$.*", Pattern.DOTALL + Pattern.MULTILINE);
+                            pSchicht = Pattern.compile(".*Schicht\\n" + bezeichner + "$.*", Pattern.DOTALL + Pattern.MULTILINE);
                             pDatum = Pattern.compile(".*[A-Za-z]{2},\\sden\\s" + Pattern.quote(verwendung.getDatumFormatted("dd.MM.yyyy")) + "$.*", Pattern.DOTALL + Pattern.MULTILINE);
                             pDatumsbereich = Pattern.compile(".*^\\d{2}\\.\\d{2}\\.\\d{4}\\s-\\s\\d{2}\\.\\d{2}\\.\\d{4}$.*", Pattern.DOTALL + Pattern.MULTILINE); // TODO
                     }
@@ -235,15 +250,90 @@ public class ArbeitsauftragBuilder {
                     continue;
                 }
 
+                Log.d("AA", verwendung.getBezeichner()+ ": "+String.valueOf(pages.size())+" Seite(n) gefunden!");
+
                 read.selectPages(pages);
+
+                // Aufräumen - PDF Splitter - eingebettete Dateien
+
+                PdfDictionary root = read.getCatalog();
+                PdfDictionary names = root.getAsDict(PdfName.NAMES);
+                names.remove(PdfName.EMBEDDEDFILES);
+
+                // Aufräumen - Grafiküberlagerung (Roter Balken) / Wasserzeichen entfernen
+
+                for (int i = 1; i <= read.getNumberOfPages(); i++) {
+                    PdfDictionary dict = read.getPageN(i);
+                    PdfArray contents = dict.getAsArray(PdfName.CONTENTS);
+
+                    if (contents == null)  {
+
+                        PdfObject content = dict.getAsIndirectObject(PdfName.CONTENTS);
+
+                        if (content == null)
+                            continue;
+
+                        contents = new PdfArray();
+                        contents.add(content);
+
+                    }
+
+
+                    for (int k = 0; k < contents.size(); k++) {
+                        PdfObject object = contents.getDirectObject(k);
+
+                        if (object instanceof PRStream) {
+                            PRStream stream = (PRStream) object;
+
+                            String data = new String(PdfReader.getStreamBytes(stream), "ISO-8859-2");
+
+                            if (docType == DOCTYPE_EDITH) {
+
+                                int size = data.length();
+                                Pattern pImage = Pattern.compile("q.[0-9]+\\s[0-9]+\\s[0-9]+\\s[0-9]+\\s[0-9]+\\s[0-9]+\\scm.\\/[^X][a-zA-Z]*[0-9]+\\sDo.Q", Pattern.MULTILINE + Pattern.DOTALL);
+                                data = pImage.matcher(data).replaceAll("");
+                                stream.setData(data.getBytes("ISO-8859-2"));
+
+                                if (data.length() != size)
+                                    Log.d("AA", "Grafiküberlagerung entfernt!");
+
+                            }
+
+                            if (data.contains("www.A-PDF.com")) {
+                                contents.remove(k);
+                                Log.d("AA", "Wasserzeichen entfernt!");
+                            }
+                        }
+                    }
+                }
+
+                // EDITH - Roten Balken auf Android entfernen (keine Ahnung warum das funktioniert, aber egal)
+
+                if (docType == 9999) {
+
+                    for (int i = 0; i < read.getXrefSize(); i++) {
+                        PdfObject pdfobj = read.getPdfObject(i);
+                        if (pdfobj == null || !pdfobj.isStream()) {
+                            continue;
+                        }
+                        PdfStream stream = (PdfStream) pdfobj;
+                        PdfObject pdfsubtype = stream.get(PdfName.SUBTYPE);
+                        if (pdfsubtype != null && pdfsubtype.toString().equals(PdfName.IMAGE.toString())) {
+                            stream.put(PdfName.SUBTYPE, PdfName.IMAGEI);
+                        }
+                    }
+
+                }
+
+                read.removeAnnotations();
+                read.removeUnusedObjects();
 
                 String path = Environment.getExternalStorageDirectory().getPath() + "/OSES/Dokumente/Arbeitsaufträge/" + verwendung.getDatumFormatted("yyyy/MM - MMMM") + "/Arbeitsauftrag_" + verwendung.getDatumFormatted("dd.MM.yyyy_EE").replaceAll(".$", "") + "_" + verwendung.getBezeichner().replaceAll("[^A-Za-z0-9]", "_") + ".pdf";
 
                 File file = new File(path);
                 file.getParentFile().mkdirs();
 
-                PdfStamper pdfStamper = new PdfStamper(read,
-                        new FileOutputStream(path));
+                PdfStamper pdfStamper = new PdfStamper(read, new FileOutputStream(path));
                 pdfStamper.close();
 
                 System.gc();
@@ -262,6 +352,17 @@ public class ArbeitsauftragBuilder {
 
         return null;
 
+    }
+
+    public static String convertStreamToString(InputStream is) throws Exception {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+        String line = null;
+        while ((line = reader.readLine()) != null) {
+            sb.append(line).append("\n");
+        }
+        reader.close();
+        return sb.toString();
     }
 
     public File getExtractedCacheFile() {

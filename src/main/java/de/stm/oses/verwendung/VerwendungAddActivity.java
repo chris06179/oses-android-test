@@ -9,11 +9,11 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
+import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -1651,7 +1651,7 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
                         DatumCheck(datumSet);
                     }
                 }, cSet.get(Calendar.YEAR), cSet.get(Calendar.MONTH), cSet.get(Calendar.DAY_OF_MONTH));
-        dpd.show(getFragmentManager(), "Datepickerdialog");
+        dpd.show(getSupportFragmentManager(), "Datepickerdialog");
 
 
     }
@@ -1698,7 +1698,7 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
                     Zeit.setError(null);
                 }
             }, hour, minute, true);
-            tpd.show(getFragmentManager(), "timepickerdialog");
+            tpd.show(getSupportFragmentManager(), "timepickerdialog");
         }
     }
 

@@ -10,8 +10,8 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.SwitchPreference;
 import android.provider.Settings;
-import android.support.v13.app.FragmentCompat;
-import android.support.v7.app.AppCompatActivity;
+import androidx.legacy.app.FragmentCompat;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 

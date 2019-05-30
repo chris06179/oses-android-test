@@ -4,8 +4,8 @@ import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -735,7 +735,7 @@ private class SaveSchicht extends AsyncTask<Void, Void, String> {
                 }, cSet.get(Calendar.YEAR), cSet.get(Calendar.MONTH), cSet.get(Calendar.DAY_OF_MONTH));
 
 
-        dpd.show(getFragmentManager(), "Datepickerdialog");
+        dpd.show(getSupportFragmentManager(), "Datepickerdialog");
 
     }
 	
@@ -783,7 +783,7 @@ private class SaveSchicht extends AsyncTask<Void, Void, String> {
                     Zeit.setError(null);
                 }
             }, hour, minute, true);
-            tpd.show(getFragmentManager(), "timepickerdialog");
+            tpd.show(getSupportFragmentManager(), "timepickerdialog");
         }
 		
     }
