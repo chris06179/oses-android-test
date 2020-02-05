@@ -1,8 +1,11 @@
 package de.stm.oses.fcm;
 
 import android.app.Notification;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+
+import androidx.annotation.NonNull;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -14,7 +17,7 @@ import java.util.Map;
 import de.stm.oses.helper.OSESBase;
 import de.stm.oses.notification.NotificationHelper;
 
-public class ListenerService extends FirebaseMessagingService {
+public class MessagingService extends FirebaseMessagingService {
 
     public static class RefreshVerwendungEvent {
     }
@@ -81,4 +84,13 @@ public class ListenerService extends FirebaseMessagingService {
         }
     }
 
+    @Override
+    public void onNewToken(@NonNull String token) {
+
+        SharedPreferences prefs = getSharedPreferences("OSESPrefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("SessionFcmInstanceId", token);
+        editor.apply();
+
+    }
 }

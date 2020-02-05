@@ -35,7 +35,7 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="Arbeitsaufträge (nur EDITH-PDF)"
+        android:title="Index Arbeitsaufträge"
         android:key="aaCategory">
         <CheckBoxPreference
             android:key="scanDiloc"
@@ -44,17 +44,15 @@
             android:defaultValue="true" />
 
         <CheckBoxPreference
-            android:key="scanOSES"
-            android:title="OSES-Verzeichnis durchsuchen"
-            android:summary="Durchsucht das OSES-Verzeichnis im internen Speicher (/OSES/Dokumente/Grundschichten/) nach Grundschichten"
-            android:defaultValue="false" />
-
-        <CheckBoxPreference
             android:key="scanAgressive"
             android:title="Aggressiver Suchalgorithmus"
             android:summary="Durchsucht das gesamte Endgerät nach Grundschichten. Dies kann unter Umständen erheblich länger dauern und die System- und Akkuleistung beeinträchtigen!"
             android:defaultValue="false" />
 
+        <Preference
+            android:key="index"
+            android:title="Dateindex zurücksetzen">
+        </Preference>
 
     </PreferenceCategory>
 

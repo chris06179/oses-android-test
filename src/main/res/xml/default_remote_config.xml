@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- START xml_defaults -->
+<defaultsMap>
+
+    <!-- Arbeitsauftrag Upload -->
+    <entry>
+        <key>allow_arbeitsauftrag_upload</key>
+        <value>true</value>
+    </entry>
+
+    <!-- Arbeistauftrag Pattern Index -->
+    <entry>
+        <key>isArbeitsauftragEDITH</key>
+        <value>.*Schicht:\s*[VF]?\s*[0-9]*\s*([(][VF]\s*[0-9]*[)])?$.*</value>
+    </entry>
+    <entry>
+        <key>isArbeitsauftragMBRAIL</key>
+        <value>.*Schicht\n[0-9]+$.*</value>
+    </entry>
+
+
+    <!-- Arbeistauftrag Pattern EDITH -->
+    <entry>
+        <key>schichtEDITH</key>
+        <value>Schicht:\s*[VF]?\s*(\d*)\s*(?:[(][VF]\s*[0-9]*[)])?$</value>
+    </entry>
+    <entry>
+        <key>datumEDITH</key>
+        <value>Gültig am:$.*den\s(\d{2}\.\d{2}\.\d{4})$</value>
+    </entry>
+    <entry>
+        <key>datumsbereichEDITH</key>
+        <value>^(\d{2}\.\d{2}\.\d{4})\s-\s(\d{2}\.\d{2}\.\d{4})$</value>
+    </entry>
+    <entry>
+        <key>letzteBearbeitungEDITH</key>
+        <value>Letzte Bearbeitung:\s*(\d{2}\.\d{2}\.\d{4},\s\d{2}:\d{2})</value>
+    </entry>
+
+    <!-- Arbeistauftrag Pattern MBRAIL -->
+    <entry>
+        <key>schichtMBRAIL</key>
+        <value>Schicht\n([0-9]+)$</value>
+    </entry>
+    <entry>
+        <key>datumMBRAIL</key>
+        <value>[A-Za-z]{2},\sden\s(\d{2}\.\d{2}\.\d{4})$</value>
+    </entry>
+    <entry>
+        <key>letzteBearbeitungMBRAIL</key>
+        <value>Stand:\s*(\d{2}\.\d{2}\.\d{4})$</value>
+    </entry>
+
+</defaultsMap>
+    <!-- END xml_defaults -->

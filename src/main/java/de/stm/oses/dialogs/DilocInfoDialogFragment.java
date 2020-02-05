@@ -1,14 +1,15 @@
 package de.stm.oses.dialogs;
 
 import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import android.view.LayoutInflater;
-import android.view.View;
+import androidx.fragment.app.DialogFragment;
 
 import de.stm.oses.R;
 

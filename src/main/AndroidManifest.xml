@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="de.stm.oses"
-    android:versionCode="377"
-    android:versionName="3.7.5"
+    android:versionCode="380"
+    android:versionName="3.8"
     android:installLocation="auto">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -35,21 +35,16 @@
         <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
         <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyDwPTQAcqsl_U3YMiWsayPxa59g5FClWJg" />
 
+
         <service
-            android:name=".fcm.InstanceIdListenerService"
-            tools:ignore="ExportedService">
-            <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
-            </intent-filter>
-        </service>
-        <service android:name=".fcm.ListenerService"
-            tools:ignore="ExportedService">
+            android:name=".fcm.MessagingService"
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
         <service
-            android:name=".arbeitsauftrag.ArbeitsauftragIntentService"
+            android:name=".index.IndexIntentService"
             android:exported="false"/>
 
         <activity

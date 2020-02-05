@@ -12,13 +12,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import androidx.annotation.NonNull;
-import androidx.legacy.app.FragmentCompat;
-import androidx.core.content.FileProvider;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.view.ActionMode;
 import android.view.HapticFeedbackConstants;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,6 +21,13 @@ import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
+import androidx.core.content.FileProvider;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 
@@ -43,14 +43,14 @@ import java.util.Calendar;
 
 import de.stm.oses.R;
 import de.stm.oses.arbeitsauftrag.ArbeitsauftragBuilder;
-import de.stm.oses.arbeitsauftrag.ArbeitsauftragIntentService;
 import de.stm.oses.dialogs.DilocInfoDialogFragment;
 import de.stm.oses.dialogs.ZeitraumDialogFragment;
 import de.stm.oses.fax.FaxActivity;
-import de.stm.oses.fcm.ListenerService;
+import de.stm.oses.fcm.MessagingService;
 import de.stm.oses.helper.FileDownload;
 import de.stm.oses.helper.OSESBase;
 import de.stm.oses.helper.SwipeRefreshListFragment;
+import de.stm.oses.index.IndexIntentService;
 
 
 public class VerwendungFragment extends SwipeRefreshListFragment implements ActionMode.Callback, DilocInfoDialogFragment.DilocInfoDialogListener {
@@ -168,7 +168,7 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
         return true;
     }
 
-    // Called each time the action mode is shown. Always called after onCreateActionMode, but
+    // Called each lastModified the action mode is shown. Always called after onCreateActionMode, but
     // may be called multiple times if the mode is invalidated.
     @Override
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
@@ -466,7 +466,7 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessageEvent(ListenerService.RefreshVerwendungEvent event) {
+    public void onMessageEvent(MessagingService.RefreshVerwendungEvent event) {
         setRefreshing(true);
         task = new GetVerwendung().execute(query);
     }
@@ -566,19 +566,7 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessageEvent(ArbeitsauftragIntentService.ArbeitsauftragProgressEvent event) {
-
-        getListAdapter().getItemByID(event.id).setArbeitsauftragExtracting();
-        getListAdapter().notifyDataSetChanged();
-
-        if (mActionMode != null) {
-            mActionMode.invalidate();
-        }
-
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessageEvent(ArbeitsauftragIntentService.ArbeitsauftragResultEvent event) {
+    public void onMessageEvent(IndexIntentService.ArbeitsauftragResultEvent event) {
 
         File result = event.result;
 
@@ -611,7 +599,7 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
     @Override
     public void onDilocInfoDialogRequestPermission() {
 
-        FragmentCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_STORAGE_DILOC);
+        requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_STORAGE_DILOC);
 
     }
 
@@ -631,7 +619,7 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
                 if (getActivity() != null && response != null) {
                     ArrayList<VerwendungClass> list = VerwendungClass.getNewListFromJSON(response, getActivity());
 
-                    ArbeitsauftragIntentService.tryStartService(getActivity(), OSES, list);
+                    IndexIntentService.tryStartService(getActivity(), OSES, list);
 
                     Calendar c = Calendar.getInstance();
                     if (selectedyear == c.get(Calendar.YEAR) && selectedmonth == c.get(Calendar.MONTH) + 1)

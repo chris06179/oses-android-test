@@ -238,7 +238,7 @@ public class SchichtenFragment extends SwipeRefreshListFragment implements Actio
         return true;
     }
 
-    // Called each time the action mode is shown. Always called after onCreateActionMode, but
+    // Called each lastModified the action mode is shown. Always called after onCreateActionMode, but
     // may be called multiple times if the mode is invalidated.
     @Override
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {

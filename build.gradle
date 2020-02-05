@@ -1,5 +1,3 @@
-import com.google.gms.googleservices.GoogleServicesPlugin
-
 buildscript {
     repositories {
         mavenCentral()
@@ -9,9 +7,9 @@ buildscript {
         maven { url 'https://maven.google.com' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.4.1'
-        classpath 'com.google.gms:google-services:4.2.0'
-        classpath 'io.fabric.tools:gradle:1.28.0'
+        classpath 'com.android.tools.build:gradle:3.5.3'
+        classpath 'com.google.gms:google-services:4.3.3'
+        classpath 'io.fabric.tools:gradle:1.31.2'
     }
 }
 
@@ -36,13 +34,13 @@ apply plugin: 'io.fabric'
 
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     dexOptions {
         javaMaxHeapSize "4g"
     }
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 28
+        targetSdkVersion 29
         applicationId "de.stm.oses"
     }
     lintOptions {
@@ -61,34 +59,41 @@ android {
         sourceCompatibility = '1.8'
         targetCompatibility = '1.8'
     }
-    buildToolsVersion = '28.0.3'
+    buildToolsVersion = '29.0.3'
 }
 
 
 dependencies {
     implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
-    implementation 'com.google.firebase:firebase-messaging:18.0.0'
-    implementation 'com.google.firebase:firebase-core:16.0.9'
-    implementation 'com.google.firebase:firebase-config:17.0.0'
-    implementation 'com.google.android.gms:play-services-location:16.0.0'
-    implementation 'com.google.android.gms:play-services-maps:16.1.0'
+    implementation 'com.google.firebase:firebase-messaging:20.1.0'
+    implementation 'com.google.firebase:firebase-core:17.2.2'
+    implementation 'com.google.firebase:firebase-config:19.1.1'
+    implementation 'com.google.android.gms:play-services-location:17.0.0'
+    implementation 'com.google.android.gms:play-services-maps:17.0.0'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.legacy:legacy-support-v13:1.0.0'
-    implementation 'androidx.vectordrawable:vectordrawable-animated:1.0.0'
-    implementation 'androidx.recyclerview:recyclerview:1.0.0'
-    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.vectordrawable:vectordrawable-animated:1.1.0'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.browser:browser:1.0.0'
-    implementation 'com.wdullaer:materialdatetimepicker:4.1.2'
+    implementation 'androidx.browser:browser:1.2.0'
+    implementation 'com.wdullaer:materialdatetimepicker:4.2.3'
     implementation 'com.code-troopers.betterpickers:library:3.1.0'
     implementation 'com.itextpdf:itextg:5.5.10'
     //implementation 'com.tom_roush:pdfbox-android:1.8.9.1'
     implementation 'org.greenrobot:eventbus:3.1.1'
+    implementation 'androidx.room:room-runtime:2.2.3'
+    implementation 'androidx.preference:preference:1.1.0'
+
+    annotationProcessor 'androidx.room:room-compiler:2.2.3'
+
+    debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'
+
 }
 
 apply plugin: 'com.google.gms.google-services'
-GoogleServicesPlugin.config.disableVersionCheck = true
 
 
 

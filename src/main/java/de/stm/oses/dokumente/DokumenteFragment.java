@@ -1,16 +1,11 @@
 package de.stm.oses.dokumente;
 
-import androidx.fragment.app.DialogFragment;
-import androidx.core.content.FileProvider;
-import androidx.appcompat.app.AlertDialog;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,6 +21,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.json.JSONArray;
@@ -40,13 +41,13 @@ import java.util.Locale;
 
 import de.stm.oses.R;
 import de.stm.oses.dialogs.FaxProtokollDetailDialogFragment;
+import de.stm.oses.dialogs.ZeitraumDialogFragment;
 import de.stm.oses.fax.FaxActivity;
 import de.stm.oses.helper.FileDownload;
 import de.stm.oses.helper.FileDownload.OnDownloadFinishedListener;
 import de.stm.oses.helper.ListClass;
 import de.stm.oses.helper.ListSpinnerAdapter;
 import de.stm.oses.helper.OSESBase;
-import de.stm.oses.dialogs.ZeitraumDialogFragment;
 
 public class DokumenteFragment extends Fragment implements View.OnClickListener {
 
@@ -441,8 +442,11 @@ public class DokumenteFragment extends Fragment implements View.OnClickListener 
 
                     details.putString("id", eintrag.optString("id"));
 
-                    final String startdate = outputdate.format(inputdate.parse(eintrag.optString("time", "")));
-
+                    final String startdate;
+                    if (!eintrag.isNull("time"))
+                        startdate = outputdate.format(inputdate.parse(eintrag.optString("time", "")));
+                    else
+                        startdate = "";
                     final String completedate;
 
                     if (!eintrag.isNull("completiontime"))

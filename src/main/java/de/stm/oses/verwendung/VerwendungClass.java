@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
+
 import androidx.core.content.ContextCompat;
 
 import org.json.JSONArray;
@@ -25,7 +26,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
-import java.util.TimeZone;
 
 import de.stm.oses.arbeitsauftrag.ArbeitsauftragBuilder;
 
@@ -435,9 +435,8 @@ public class VerwendungClass implements Parcelable {
     public String getDatumFormatted(String format) {
 
         long unixSeconds = datum;
-        Date date = new Date((unixSeconds + 3600) * 1000L); // *1000 is to convert seconds to milliseconds
+        Date date = new Date((unixSeconds) * 1000L); // *1000 is to convert seconds to milliseconds
         SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.GERMANY); // the format of your date
-        sdf.setTimeZone(TimeZone.getTimeZone("GMT+1"));
         return sdf.format(date);
 
     }
@@ -445,7 +444,7 @@ public class VerwendungClass implements Parcelable {
     public Date getDatumDate() {
 
         long unixSeconds = datum;
-        return new Date((unixSeconds + 3600) * 1000L);
+        return new Date((unixSeconds) * 1000L);
 
     }
 

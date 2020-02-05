@@ -36,15 +36,6 @@
                         android:defaultValue="true"
                         android:summary="Erlaubt es der Anwendung Benachrichtigungen auf deinem Telefon anzuzeigen"
                         android:key="allowNotification" />
-                    <RingtonePreference
-                    android:title="Benachrichtigungston"
-                    android:summary="Benachrichtigungston auswählen"
-                    android:showDefault="true"
-                    android:showSilent="true"
-                    android:defaultValue="content://settings/system/notification_sound"
-         			android:key="ringtoneOnNotification"
-         			android:ringtoneType="notification"
-         			android:dependency="allowNotification" />                
                  <CheckBoxPreference
                         android:title="Vibration"
                         android:defaultValue="true"
@@ -63,16 +54,15 @@
             android:defaultValue="true" />
 
         <CheckBoxPreference
-            android:key="scanOSES"
-            android:title="OSES-Verzeichnis durchsuchen"
-            android:summary="Durchsucht das OSES-Verzeichnis im internen Speicher (/OSES/Dokumente/Grundschichten/) nach Grundschichten (nur EDITH-Schichten als PDF)"
-            android:defaultValue="false" />
-
-        <CheckBoxPreference
             android:key="scanAgressive"
             android:title="Aggressiver Suchalgorithmus"
             android:summary="Durchsucht das gesamte Endgerät nach Schichten im EDITH-Format. Dies kann unter Umständen erheblich länger dauern und die System- und Akkuleistung beeinträchtigen!"
             android:defaultValue="false" />
+
+        <Preference
+            android:key="index"
+            android:title="Dateindex zurücksetzen">
+        </Preference>
 
 
     </PreferenceCategory>
