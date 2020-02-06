@@ -172,7 +172,7 @@ public class ArbeitsauftragIndexer {
             Log.d("AAINDEXER", String.valueOf(arbeitsauftragList.size()));
 
 
-        } catch (Exception e) {
+        } catch (Exception | OutOfMemoryError | NoClassDefFoundError e) {
             e.printStackTrace();
         }
 
@@ -274,7 +274,7 @@ public class ArbeitsauftragIndexer {
             Log.d("AAINDEXER", String.valueOf(arbeitsauftragList.size()));
 
 
-        } catch (Exception e) {
+        } catch (Exception | OutOfMemoryError | NoClassDefFoundError e) {
             e.printStackTrace();
         }
 

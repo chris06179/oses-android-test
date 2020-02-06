@@ -75,6 +75,11 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         Preference index = findPreference("index");
 
         new Thread(() -> {
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             long count = FileSystemDatabase.getInstance(requireContext()).fileSystemEntryDao().getCount();
             if (count == 0) {
                 index.setSummary("Derzeit sind keine Dateien indiziert!");

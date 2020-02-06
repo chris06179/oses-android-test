@@ -141,7 +141,7 @@ public class FileSystemIndexer {
 
             }
 
-        } catch (Exception | NoClassDefFoundError e) {
+        } catch (Exception | OutOfMemoryError | NoClassDefFoundError e) {
             return FileSystemEntry.FILECONTENT_EXCEPTION;
         }
 
