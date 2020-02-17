@@ -51,6 +51,7 @@ android {
     lintOptions {
         checkReleaseBuilds true
         abortOnError true
+        disable 'InvalidPackage'
     }
     buildTypes {
         release {
