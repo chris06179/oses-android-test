@@ -46,7 +46,7 @@ public class DilocInfoDialogFragment extends DialogFragment {
         final View dialogLayout = inflater.inflate(R.layout.diloc_dialog, null);
 
         final AlertDialog dilocInfoDialog = new AlertDialog.Builder(getActivity())
-                .setTitle("Synchronisation mit Diloc|Sync (BETA)")
+                .setTitle("Synchronisation mit Diloc|Sync")
                 .setPositiveButton("Ja", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

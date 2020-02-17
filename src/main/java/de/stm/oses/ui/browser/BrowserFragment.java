@@ -1,4 +1,4 @@
-package de.stm.oses;
+package de.stm.oses.ui.browser;
 
 import android.annotation.TargetApi;
 import android.content.Intent;
@@ -24,6 +24,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 
+import de.stm.oses.R;
 import de.stm.oses.helper.OSESBase;
 
 
@@ -69,7 +70,7 @@ public class BrowserFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(R.id.refreshlayout);
+        mRefreshLayout = getActivity().findViewById(R.id.refreshlayout);
         mRefreshLayout.setColorSchemeResources(R.color.oses_green, R.color.oses_green_dark, R.color.oses_green, R.color.oses_green_dark);
         mRefreshLayout.setSize(SwipeRefreshLayout.LARGE);
 
@@ -144,7 +145,7 @@ public class BrowserFragment extends Fragment {
 		super.onActivityCreated(savedInstanceState);
         
      // WebView definieren
-        engine = (WebView) getActivity().findViewById(R.id.browser_view);
+        engine = getActivity().findViewById(R.id.browser_view);
         
         // WEbViewClient festlegen       			
 		engine.setWebViewClient(new WebViewClient() {
@@ -238,7 +239,7 @@ public class BrowserFragment extends Fragment {
         if (getActivity() == null)
             return;
 
-        LinearLayout progress = (LinearLayout)   getActivity().findViewById(R.id.progress_container_id);
+        LinearLayout progress = getActivity().findViewById(R.id.progress_container_id);
 
         if (progress == null)
            return;

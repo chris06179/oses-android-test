@@ -16,7 +16,6 @@
 
 package de.stm.oses.dialogs;
 
-import androidx.appcompat.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -27,6 +26,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.DatePicker.OnDateChangedListener;
+
+import androidx.appcompat.app.AlertDialog;
 
 import java.lang.reflect.Field;
 
@@ -109,7 +110,7 @@ public class ZeitraumDialog extends AlertDialog implements OnClickListener,
                 (LayoutInflater) themeContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.oses_date_picker_dialog, null);
         setView(view);
-        mDatePicker = (DatePicker) view.findViewById(R.id.datePicker);
+        mDatePicker = view.findViewById(R.id.datePicker);
         mDatePicker.init(year, monthOfYear, dayOfMonth, this);
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

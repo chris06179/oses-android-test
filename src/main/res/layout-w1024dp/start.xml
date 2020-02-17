@@ -8,15 +8,6 @@
     android:animateLayoutChanges="true">
 
     <include
-        android:id="@+id/index_progress_card"
-        layout="@layout/index_progress_layout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/menu_list" />
-
-    <include
         android:id="@+id/main_toolbar"
         layout="@layout/toolbar"
         app:layout_constraintEnd_toEndOf="parent"
@@ -41,7 +32,7 @@
         android:id="@+id/content_frame"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/index_progress_card"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/menu_list"
         app:layout_constraintTop_toBottomOf="@+id/main_toolbar">

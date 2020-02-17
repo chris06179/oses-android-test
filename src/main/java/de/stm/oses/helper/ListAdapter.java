@@ -103,15 +103,15 @@ public class ListAdapter extends ArrayAdapter<ListClass> implements Serializable
 
             if (type == TYPE_HEADER) {
 
-                TextView titleView = (TextView) rowView.findViewById(R.id.list_header);
+                TextView titleView = rowView.findViewById(R.id.list_header);
                 titleView.setText(listClassArrayList.get(position).getHeaderText());
 
             }
 
             if (type == TYPE_ITEM) {
 
-                TextView titleView = (TextView) rowView.findViewById(R.id.list_title);
-                RadioButton radio = (RadioButton) rowView.findViewById(R.id.list_selected);
+                TextView titleView = rowView.findViewById(R.id.list_title);
+                RadioButton radio = rowView.findViewById(R.id.list_selected);
 
                 titleView.setText(listClassArrayList.get(position).getTitle());
 
@@ -120,7 +120,7 @@ public class ListAdapter extends ArrayAdapter<ListClass> implements Serializable
                 else
                     radio.setChecked(false);
 
-                ImageView icon = (ImageView) rowView.findViewById(R.id.list_icon);
+                ImageView icon = rowView.findViewById(R.id.list_icon);
 
                 if (listClassArrayList.get(position).getIcon() > 0) {
                     icon.setVisibility(View.VISIBLE);

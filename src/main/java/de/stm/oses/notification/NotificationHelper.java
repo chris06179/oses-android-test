@@ -27,14 +27,15 @@ import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+
 import androidx.core.app.NotificationCompat;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import de.stm.oses.R;
-import de.stm.oses.StartActivity;
 import de.stm.oses.helper.OSESBase;
+import de.stm.oses.ui.start.StartActivity;
 
 /**
  * Helper class to manage notification channels, and create notifications.
@@ -43,6 +44,7 @@ public class NotificationHelper extends ContextWrapper {
     private NotificationManager manager;
     public static final String SDL = "sdl";
     public static final String AUSBLEIBE_FAHRAUSLAGEN = "ausbleibe_fahrauslagen";
+    public static final String INDEX = "index";
     public static final String FAX = "fax";
     public static final String NEWS = "news";
     public static final String APPUPDATES = "appupdates";
@@ -75,6 +77,11 @@ public class NotificationHelper extends ContextWrapper {
             //ausbleibe_fahrauslagen.setGroup("dokumente");
             //notificationChannels.add(ausbleibe_fahrauslagen);
 
+            NotificationChannel index = new NotificationChannel(INDEX, "Dateiindex", NotificationManager.IMPORTANCE_LOW);
+            index.setDescription("Zeigt den Status der Indizierung von Dokumenten im DiLoc|Sync-Verzeichnis an");
+            index.setGroup("dokumente");
+            notificationChannels.add(index);
+
 
             NotificationChannel fax = new NotificationChannel(FAX, "Faxversand", NotificationManager.IMPORTANCE_MIN);
             fax.setDescription("Zeige Informationen über den Status des Faxversandes an");
@@ -96,7 +103,7 @@ public class NotificationHelper extends ContextWrapper {
             notificationChannels.add(sonstige);
 
 
-            OSESBase OSES = new OSESBase(ctx);
+            OSESBase OSES = new OSESBase(getApplicationContext());
 
             if (OSES.getSession().getGroup() == 1) {
                 notificationChannelGroups.add(new NotificationChannelGroup("admin", "Administration"));
@@ -153,7 +160,7 @@ public class NotificationHelper extends ContextWrapper {
                 .setSmallIcon(R.drawable.ic_not_icon)
                 .setContentTitle(title)
                 .setContentText(body)
-                .setCategory(NotificationCompat.CATEGORY_STATUS)
+                .setCategory(NotificationCompat.CATEGORY_RECOMMENDATION)
                 .setOnlyAlertOnce(true)
                 .setAutoCancel(true)
                 .setLargeIcon(getLargeIcon());
@@ -171,7 +178,7 @@ public class NotificationHelper extends ContextWrapper {
                 .setSmallIcon(R.drawable.ic_not_icon)
                 .setContentTitle(title)
                 .setContentText(body)
-                .setCategory(NotificationCompat.CATEGORY_STATUS)
+                .setCategory(NotificationCompat.CATEGORY_PROGRESS)
                 .setLargeIcon(getLargeIcon());
 
         if (progress) mBuilder.setProgress(0,0, true);
@@ -179,6 +186,32 @@ public class NotificationHelper extends ContextWrapper {
         return mBuilder;
     }
 
+    private NotificationCompat.Builder getIndexNotification(String title, String body, int max, int progress) {
+        NotificationCompat.Builder mBuilder =  new NotificationCompat.Builder(this, INDEX)
+                .setSmallIcon(R.drawable.ic_not_icon)
+                .setContentTitle(title)
+                .setContentText(body)
+                .setCategory(NotificationCompat.CATEGORY_PROGRESS)
+                .setOngoing(true)
+                .setTimeoutAfter(120000)
+                .setLargeIcon(getLargeIcon());
+
+        if (max == 0) {
+            mBuilder.setProgress(0,0, true);
+        } else {
+            mBuilder.setProgress(max, progress, false);
+        }
+
+        return mBuilder;
+    }
+
+    public void showIndexNotification(String appTitle, String body, int max, int progress) {
+        getManager().notify("index",0, getIndexNotification(appTitle+"-Verzeichnis wird indiziert...", body, max, progress).build());
+    }
+
+    public void removeIndexNotification() {
+        getManager().cancel("index", 0);
+    }
 
     public void notify(int id, String tag, Notification notification) {
         getManager().notify(tag, id, notification);

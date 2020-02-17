@@ -9,11 +9,12 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Environment;
-import android.preference.PreferenceManager;
+import android.webkit.URLUtil;
+
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.AppCompatActivity;
-import android.webkit.URLUtil;
+import androidx.preference.PreferenceManager;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -29,7 +30,7 @@ import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import de.stm.oses.StartActivity;
+import de.stm.oses.ui.start.StartActivity;
 
 public class FileDownload extends AsyncTask<String, Integer, Object> {
 
@@ -240,7 +241,7 @@ public class FileDownload extends AsyncTask<String, Integer, Object> {
                     InputStream input = new BufferedInputStream(url.openStream());
                     OutputStream output = new FileOutputStream(file);
 
-                    byte data[] = new byte[1024];
+                    byte[] data = new byte[1024];
                     long total = 0;
                     int count;
                     while ((count = input.read(data)) != -1) {

@@ -1,14 +1,18 @@
 package de.stm.oses.helper;
 
 import android.Manifest;
+import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Environment;
-import android.preference.PreferenceManager;
-import androidx.core.content.ContextCompat;
 import android.view.ContextThemeWrapper;
+
+import androidx.core.content.ContextCompat;
+import androidx.preference.PreferenceManager;
+
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,43 +35,30 @@ import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import de.stm.oses.BuildConfig;
 import de.stm.oses.R;
 
-public class OSESBase {
+public class OSESBase extends Application {
 
-    public static final int DILOC_STATUS_UNKNOWN = -1;
-    public static final int DILOC_STATUS_NOT_INSTALLED = 0;
-    public static final int DILOC_STATUS_INSTALLED = 1;
+    public static final int STATUS_NOT_ALLOWED = -1;
+    public static final int STATUS_UNKNOWN = -1;
+    public static final int STATUS_NOT_INSTALLED = 0;
+    public static final int STATUS_INSTALLED = 1;
 
 
     private Context context;
     private OSESSession session;
-    private String sVersion;
-    private Integer iVersionCode;
-    private Integer iSDKLevel;
-    private String sSDKString;
     private int iDilocStatus;
-
+    private int iFassiStatus;
 
     public OSESBase(Context context) {
+
         this.context = context;
 
         session = new OSESSession(context);
 
-        PackageInfo packageInfo;
-        try {
-            packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-            this.iVersionCode = packageInfo.versionCode;
-            this.sVersion = packageInfo.versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            this.iVersionCode = 0;
-            this.sVersion = "";
-        }
-
-        this.iSDKLevel = android.os.Build.VERSION.SDK_INT;
-        this.sSDKString = android.os.Build.VERSION.RELEASE;
-
-        this.iDilocStatus = DILOC_STATUS_UNKNOWN;
+        this.iDilocStatus = STATUS_UNKNOWN;
+        this.iFassiStatus = STATUS_UNKNOWN;
 
     }
 
@@ -349,19 +340,19 @@ public class OSESBase {
     }
 
     public String getVersion() {
-        return sVersion;
+        return BuildConfig.VERSION_NAME;
     }
 
     public Integer getVersionCode() {
-        return iVersionCode;
+        return BuildConfig.VERSION_CODE;
     }
 
     public Integer getSDKLevel() {
-        return iSDKLevel;
+        return Build.VERSION.SDK_INT;
     }
 
     public String getSDKString() {
-        return sSDKString;
+        return Build.VERSION.RELEASE;
     }
 
     public String getJSON(String url, Map<String, String> params, int timeout) {
@@ -462,16 +453,31 @@ public class OSESBase {
     }
 
     public int getDilocStatus() {
-        if (iDilocStatus == DILOC_STATUS_UNKNOWN) {
+        if (iDilocStatus == STATUS_UNKNOWN) {
             if (isPackageInstalled("de.diloc.DiLocSyncMobile", context.getPackageManager())) {
-                iDilocStatus = DILOC_STATUS_INSTALLED;
+                iDilocStatus = STATUS_INSTALLED;
             } else {
-                iDilocStatus = DILOC_STATUS_NOT_INSTALLED;
+                iDilocStatus = STATUS_NOT_INSTALLED;
             }
         }
 
         return iDilocStatus;
     }
+
+    public int getFassiStatus() {
+        if (!FirebaseRemoteConfig.getInstance().getBoolean("allow_scan_fassi"))
+            return STATUS_NOT_ALLOWED;
+        if (iFassiStatus == STATUS_UNKNOWN) {
+            if (isPackageInstalled("de.bahn.dbs.mc", context.getPackageManager())) {
+                iFassiStatus = STATUS_INSTALLED;
+            } else {
+                iFassiStatus = STATUS_NOT_INSTALLED;
+            }
+        }
+
+        return iFassiStatus;
+    }
+
 
     public boolean hasStoragePermission() {
        return ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
@@ -497,13 +503,13 @@ public class OSESBase {
             if (!olddir.exists())
                 return;
 
-            File files[] = olddir.listFiles();
+            File[] files = olddir.listFiles();
 
             for (File file :
                     files) {
 
                 if (file.getName().contains(".pdf")) {
-                    String split[] = file.getName().split("_");
+                    String[] split = file.getName().split("_");
 
                     if (split.length != 3)
                         continue;

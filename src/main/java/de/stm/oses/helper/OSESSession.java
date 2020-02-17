@@ -2,10 +2,9 @@ package de.stm.oses.helper;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
+import androidx.preference.PreferenceManager;
 
 import com.crashlytics.android.Crashlytics;
-import com.google.firebase.iid.FirebaseInstanceId;
 
 import de.stm.oses.R;
 
@@ -25,6 +24,7 @@ public class OSESSession {
     private String SessionFcmInstanceId = "";
     private String SessionLastVerwendung;
     private boolean SessionDilocReminder;
+    private boolean SessionIndexReminder;
 
     private SharedPreferences preferences;
 
@@ -54,21 +54,7 @@ public class OSESSession {
         SessionFcmInstanceId = settings.getString("SessionFcmInstanceId", "");
         SessionLastVerwendung = settings.getString("SessionLastVerwendung", null);
         SessionDilocReminder = settings.getBoolean("SessionDilocReminder", false);
-
-        if (SessionFcmInstanceId.isEmpty()) {
-
-            String firebaseInstanceId = FirebaseInstanceId.getInstance().getToken();
-
-            if (firebaseInstanceId != null && !firebaseInstanceId.isEmpty())    {
-
-                SharedPreferences.Editor edit = settings.edit();
-                edit.putString("SessionFcmInstanceId", firebaseInstanceId);
-                edit.apply();
-
-                SessionFcmInstanceId = firebaseInstanceId;
-            }
-
-        }
+        SessionIndexReminder = settings.getBoolean("SessionIndexReminder", false);
 
     }
 
@@ -116,7 +102,7 @@ public class OSESSession {
     }
     public void setSessionLastVerwendung(String sessionLastVerwendung) {
         SessionLastVerwendung = sessionLastVerwendung;
-        SharedPreferences settings = context.getSharedPreferences("OSESPrefs", context.MODE_PRIVATE);
+        SharedPreferences settings = context.getSharedPreferences("OSESPrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = settings.edit();
         editor.putString("SessionLastVerwendung", SessionLastVerwendung);
         editor.apply();
@@ -126,9 +112,20 @@ public class OSESSession {
     }
     public void setSessionDilocReminder(boolean sessionDilocReminder) {
         SessionDilocReminder = sessionDilocReminder;
-        SharedPreferences settings = context.getSharedPreferences("OSESPrefs", context.MODE_PRIVATE);
+        SharedPreferences settings = context.getSharedPreferences("OSESPrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = settings.edit();
         editor.putBoolean("SessionDilocReminder", SessionDilocReminder);
+        editor.apply();
+    }
+
+    public boolean getSessionIndexReminder() {
+        return SessionIndexReminder;
+    }
+    public void setSessionIndexReminder(boolean sessionIndexReminder) {
+        SessionIndexReminder = sessionIndexReminder;
+        SharedPreferences settings = context.getSharedPreferences("OSESPrefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putBoolean("SessionIndexReminder", SessionIndexReminder);
         editor.apply();
     }
 }

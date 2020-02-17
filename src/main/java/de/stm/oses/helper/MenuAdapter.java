@@ -41,9 +41,9 @@ public class MenuAdapter extends ArrayAdapter<MenuClass> {
                 rowView = inflater.inflate(R.layout.menu_item, parent, false);
  
                 // 3. Get icon,title & counter views from the rowView
-                ImageView imgView = (ImageView) rowView.findViewById(R.id.item_icon); 
-                TextView titleView = (TextView) rowView.findViewById(R.id.item_title);
-                TextView counterView = (TextView) rowView.findViewById(R.id.item_counter);
+                ImageView imgView = rowView.findViewById(R.id.item_icon);
+                TextView titleView = rowView.findViewById(R.id.item_title);
+                TextView counterView = rowView.findViewById(R.id.item_counter);
  
                 // 4. Set the text for textView 
                 imgView.setImageResource(MenuClassArrayList.get(position).getIcon());
@@ -56,7 +56,7 @@ public class MenuAdapter extends ArrayAdapter<MenuClass> {
 
                 if(MenuClassArrayList.get(position).isSelected()) {
 
-                    RelativeLayout container = (RelativeLayout) rowView.findViewById(R.id.menu_layout);
+                    RelativeLayout container = rowView.findViewById(R.id.menu_layout);
                     View block = rowView.findViewById(R.id.menu_select_block);
 
                     //container.setBackgroundColor(Color.parseColor("#E9E9E9"));
@@ -67,7 +67,7 @@ public class MenuAdapter extends ArrayAdapter<MenuClass> {
             }
             else{
                     rowView = inflater.inflate(R.layout.menu_item_header, parent, false);
-                    TextView titleView = (TextView) rowView.findViewById(R.id.header);
+                    TextView titleView = rowView.findViewById(R.id.header);
                     titleView.setText(MenuClassArrayList.get(position).getTitle());
  
             }

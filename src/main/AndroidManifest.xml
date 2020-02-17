@@ -2,9 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="de.stm.oses"
-    android:versionCode="380"
-    android:versionName="3.8"
-    android:installLocation="auto">
+    android:installLocation="auto"
+    android:versionCode="387"
+    android:versionName="3.8">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -21,20 +21,29 @@
     <application
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
-        android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
-        android:theme="@style/Theme.OSES"
+        android:requestLegacyExternalStorage="true"
         android:resizeableActivity="true"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsPictureInPicture="true"
+        android:theme="@style/Theme.OSES"
         tools:ignore="GoogleAppIndexingWarning,UnusedAttribute">
 
-        <meta-data android:name="com.samsung.android.sdk.multiwindow.enable" android:value="true"/>
-        <meta-data android:name="android.intent.category.MULTIWINDOW_LAUNCHER" android:value="true"/>
-        <meta-data android:name="com.sec.android.intent.category.MULTIWINDOW_LAUNCHER" android:value="true"/>
-
-        <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
-        <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyDwPTQAcqsl_U3YMiWsayPxa59g5FClWJg" />
-
+        <meta-data
+            android:name="com.samsung.android.sdk.multiwindow.enable"
+            android:value="true" />
+        <meta-data
+            android:name="android.intent.category.MULTIWINDOW_LAUNCHER"
+            android:value="true" />
+        <meta-data
+            android:name="com.sec.android.intent.category.MULTIWINDOW_LAUNCHER"
+            android:value="true" />
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDwPTQAcqsl_U3YMiWsayPxa59g5FClWJg" />
 
         <service
             android:name=".fcm.MessagingService"
@@ -45,19 +54,23 @@
         </service>
         <service
             android:name=".index.IndexIntentService"
-            android:exported="false"/>
+            android:exported="false" />
+        <service
+            android:name=".arbeitsauftrag.ArbeitsausftragIntentService"
+            android:exported="false" />
 
         <activity
-            android:name=".OSESActivity"
+            android:name=".LoginActivity"
             android:label="@string/app_name"
             android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".StartActivity"
+            android:name=".ui.start.StartActivity"
             android:configChanges="keyboardHidden" />
         <activity
             android:name=".fax.FaxActivity"
@@ -65,13 +78,13 @@
         <activity
             android:name=".verwendung.VerwendungAddActivity"
             android:label="@string/verwendung_hinzuf_gen"
-            android:parentActivityName=".StartActivity"
+            android:parentActivityName=".ui.start.StartActivity"
             android:theme="@style/Theme.OSES.DialogWhenLarge"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".schichten.SchichtenAddActivity"
             android:label="@string/referenz_add"
-            android:parentActivityName=".StartActivity"
+            android:parentActivityName=".ui.start.StartActivity"
             android:theme="@style/Theme.OSES.DialogWhenLarge"
             android:windowSoftInputMode="stateHidden" />
 
@@ -82,7 +95,7 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths"/>
+                android:resource="@xml/provider_paths" />
         </provider>
     </application>
 

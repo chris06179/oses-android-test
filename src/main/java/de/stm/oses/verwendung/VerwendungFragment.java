@@ -1,6 +1,7 @@
 package de.stm.oses.verwendung;
 
 import android.Manifest;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -27,7 +28,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.content.FileProvider;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 
@@ -43,7 +43,10 @@ import java.util.Calendar;
 
 import de.stm.oses.R;
 import de.stm.oses.arbeitsauftrag.ArbeitsauftragBuilder;
+import de.stm.oses.arbeitsauftrag.ArbeitsausftragIntentService;
 import de.stm.oses.dialogs.DilocInfoDialogFragment;
+import de.stm.oses.dialogs.IndexInfoDialog;
+import de.stm.oses.dialogs.NoPdfReaderInstalledDialog;
 import de.stm.oses.dialogs.ZeitraumDialogFragment;
 import de.stm.oses.fax.FaxActivity;
 import de.stm.oses.fcm.MessagingService;
@@ -253,6 +256,16 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
         mActionMode = null;
     }
 
+    private void startFileIndexer() {
+        if (IndexIntentService.startService(getActivity(), OSES)) {
+            if (!OSES.getSession().getSessionIndexReminder()) {
+                IndexInfoDialog dialog = IndexInfoDialog.newInstance();
+                dialog.show(getChildFragmentManager(), "indexInfoDialog");
+                OSES.getSession().setSessionIndexReminder(true);
+            }
+        }
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -271,7 +284,7 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
         query = "https://oses.mobi/api.php?request=verwendung_show&json=true&session=" + OSES.getSession().getIdentifier();
         task = new GetVerwendung().execute(query);
 
-        if (!OSES.getSession().getSessionDilocReminder() && OSES.getDilocStatus() == OSESBase.DILOC_STATUS_INSTALLED && !OSES.hasStoragePermission()) {
+        if (!OSES.getSession().getSessionDilocReminder() && OSES.getDilocStatus() == OSESBase.STATUS_INSTALLED && !OSES.hasStoragePermission()) {
 
             DilocInfoDialogFragment dilocDialog = DilocInfoDialogFragment.newInstance();
             dilocDialog.setTargetFragment(this, 0);
@@ -290,6 +303,7 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     setRefreshing(true);
+                    startFileIndexer();
                     task = new GetVerwendung().execute(query);
                     OSES.rebuildWorkingDirectory();
                 }
@@ -298,16 +312,15 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-
+    public void onStart() {
+        super.onStart();
         EventBus.getDefault().register(this);
 
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    public void onStop() {
+        super.onStop();
         EventBus.getDefault().unregister(this);
     }
 
@@ -364,13 +377,10 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
 
         setColorScheme(R.color.oses_green, R.color.oses_green_dark, R.color.oses_green, R.color.oses_green_dark);
 
-        setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
+        setOnRefreshListener(() -> {
+            startFileIndexer();
+            task = new GetVerwendung().execute(query);
 
-                task = new GetVerwendung().execute(query);
-
-            }
         });
 
         if (savedInstanceState == null) {
@@ -531,7 +541,7 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
 
         }, selectedyear, selectedmonth - 1, 1);
 
-        zeitraum.show(((AppCompatActivity) getActivity()).getSupportFragmentManager(), "zeitraumdialog");
+        zeitraum.show(getActivity().getSupportFragmentManager(), "zeitraumdialog");
     }
 
     public void showCurrentMonth() {
@@ -558,15 +568,17 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
 
         if (schicht.getArbeitsauftragType() == ArbeitsauftragBuilder.TYPE_CACHED) {
             File cache = schicht.getArbeitsauftragCacheFile();
-            ShowPDFFile(cache);
+            showPdfFile(cache);
 
         } else if (schicht.getArbeitsauftragType() == ArbeitsauftragBuilder.TYPE_ONLINE) {
             downloadArbeitsauftrag(schicht);
         }
     }
 
+
+
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessageEvent(IndexIntentService.ArbeitsauftragResultEvent event) {
+    public void onMessageEvent(ArbeitsausftragIntentService.ArbeitsauftragResultEvent event) {
 
         File result = event.result;
 
@@ -584,15 +596,25 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
 
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(IndexIntentService.IndexFinishedEvent event) {
+        ArbeitsausftragIntentService.startService(requireActivity(),OSES, getListAdapter().getArrayList());
+    }
 
-    public void ShowPDFFile(File file) {
+    private void showPdfFile(File file) {
 
-        Uri fileUri = FileProvider.getUriForFile(getActivity(), "de.stm.oses.FileProvider", file);
+        Uri fileUri = FileProvider.getUriForFile(requireContext(), "de.stm.oses.FileProvider", file);
 
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setDataAndType(fileUri, "application/pdf");
         intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION + Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-        startActivity(intent);
+
+        // Falls keine entsprechende Activity existiert (kein PDF-Reader installiert)
+        try {
+            startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            new NoPdfReaderInstalledDialog().show(getChildFragmentManager(), "no_pdf_dialog");
+        }
 
     }
 
@@ -619,7 +641,7 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
                 if (getActivity() != null && response != null) {
                     ArrayList<VerwendungClass> list = VerwendungClass.getNewListFromJSON(response, getActivity());
 
-                    IndexIntentService.tryStartService(getActivity(), OSES, list);
+                    ArbeitsausftragIntentService.startService(requireActivity(), OSES, list);
 
                     Calendar c = Calendar.getInstance();
                     if (selectedyear == c.get(Calendar.YEAR) && selectedmonth == c.get(Calendar.MONTH) + 1)
@@ -747,12 +769,7 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
                 verwendung.setArbeitsauftragCacheFile(file);
                 getListAdapter().notifyDataSetChanged();
 
-                Uri fileUri = FileProvider.getUriForFile(getActivity(), "de.stm.oses.FileProvider", file);
-
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setDataAndType(fileUri, "application/pdf");
-                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION + Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                startActivity(intent);
+                showPdfFile(file);
             }
 
             @Override
@@ -789,7 +806,7 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
 
             @Override
             public void onUnknownStatus(int status) {
-                Toast.makeText(getActivity(), "Anwendungsfehler: Der Server hat mit einem unbekannten Statuscode geantwortet! (" + String.valueOf(status) + ")", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "Anwendungsfehler: Der Server hat mit einem unbekannten Statuscode geantwortet! (" + status + ")", Toast.LENGTH_LONG).show();
             }
         });
         download.execute();
@@ -802,17 +819,11 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
         download.setTitle("Sonderleistung");
         download.setMessage("Das Dokument wird heruntergeladen, dieser Vorgang kann einen Moment dauern...");
         download.setURL(url);
-        download.setLocalDirectory("Dokumente/Nebengeld");
+        download.setLocalDirectory("Dokumente/Nebengeld/");
         download.setOnDownloadFinishedListener(new FileDownload.OnDownloadFinishedListener() {
             @Override
             public void onDownloadFinished(File file) {
-
-                Uri fileUri = FileProvider.getUriForFile(getActivity(), "de.stm.oses.FileProvider", file);
-
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setDataAndType(fileUri, "application/pdf");
-                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION + Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                startActivity(intent);
+                showPdfFile(file);
             }
 
             @Override
@@ -849,7 +860,7 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
 
             @Override
             public void onUnknownStatus(int status) {
-                Toast.makeText(getActivity(), "Anwendungsfehler: Der Server hat mit einem unbekannten Statuscode geantwortet! (" + String.valueOf(status) + ")", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "Anwendungsfehler: Der Server hat mit einem unbekannten Statuscode geantwortet! (" + status + ")", Toast.LENGTH_LONG).show();
             }
         });
         download.execute();

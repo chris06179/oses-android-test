@@ -2,10 +2,31 @@
 <!-- START xml_defaults -->
 <defaultsMap>
 
+    <!-- DiLoc Verzeichnis -->
+    <entry>
+        <key>dilocPath</key>
+        <value>/sync/fs-data/</value>
+    </entry>
+
+    <!-- FASSI Verzeichnis -->
+    <entry>
+        <key>fassiPath</key>
+        <value>/fassi-move-unknown-folder-placeholder/</value>
+    </entry>
+
+
+
+
     <!-- Arbeitsauftrag Upload -->
     <entry>
         <key>allow_arbeitsauftrag_upload</key>
         <value>true</value>
+    </entry>
+
+    <!-- FASSI -->
+    <entry>
+        <key>allow_scan_fassi</key>
+        <value>false</value>
     </entry>
 
     <!-- Arbeistauftrag Pattern Index -->

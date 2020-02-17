@@ -1,5 +1,6 @@
 package de.stm.oses.dokumente;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -41,6 +42,7 @@ import java.util.Locale;
 
 import de.stm.oses.R;
 import de.stm.oses.dialogs.FaxProtokollDetailDialogFragment;
+import de.stm.oses.dialogs.NoPdfReaderInstalledDialog;
 import de.stm.oses.dialogs.ZeitraumDialogFragment;
 import de.stm.oses.fax.FaxActivity;
 import de.stm.oses.helper.FileDownload;
@@ -88,8 +90,8 @@ public class DokumenteFragment extends Fragment implements View.OnClickListener 
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        type = (Spinner) getActivity().findViewById(R.id.dokumente_typ);
-        exclude = (Spinner) getActivity().findViewById(R.id.dokumente_skip);
+        type = getActivity().findViewById(R.id.dokumente_typ);
+        exclude = getActivity().findViewById(R.id.dokumente_skip);
 
         type.setAdapter(OSES.getDokumenteAdapter());
         ((ListSpinnerAdapter) type.getAdapter()).setshowRadio(false);
@@ -104,7 +106,7 @@ public class DokumenteFragment extends Fragment implements View.OnClickListener 
         super.onActivityCreated(savedInstanceState);
         if (((AppCompatActivity) getActivity()).getSupportActionBar() != null)
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Dokumente");
-        date_text = ((EditText) getActivity().findViewById(R.id.dokumente_date_text));
+        date_text = getActivity().findViewById(R.id.dokumente_date_text);
 
         setDateText();
 
@@ -124,7 +126,7 @@ public class DokumenteFragment extends Fragment implements View.OnClickListener 
         exclude.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                LinearLayout excludebox = (LinearLayout) getActivity().findViewById(R.id.LinearLayout20);
+                LinearLayout excludebox = getActivity().findViewById(R.id.LinearLayout20);
                 if (id > 0)
                     excludebox.setVisibility(View.VISIBLE);
                 else
@@ -187,7 +189,7 @@ public class DokumenteFragment extends Fragment implements View.OnClickListener 
 
     public void ErstellenOnClick(int action) {
 
-        EditText Excludes = (EditText) getActivity().findViewById(R.id.editText1);
+        EditText Excludes = getActivity().findViewById(R.id.editText1);
 
         final String typ;
         String zeitraum;
@@ -248,7 +250,13 @@ public class DokumenteFragment extends Fragment implements View.OnClickListener 
                     Intent intent = new Intent(Intent.ACTION_VIEW);
                     intent.setDataAndType(fileUri, "application/pdf");
                     intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION+Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                    startActivity(intent);
+
+                    // Falls keine entsprechende Activity existiert (kein PDF-Reader installiert)
+                    try {
+                        startActivity(intent);
+                    } catch (ActivityNotFoundException e) {
+                        new NoPdfReaderInstalledDialog().show(getChildFragmentManager(), "no_pdf_dialog");
+                    }
                 }
 
                 @Override
@@ -341,7 +349,7 @@ public class DokumenteFragment extends Fragment implements View.OnClickListener 
                     extra.putString("status", String.valueOf(status));
                     mFirebaseAnalytics.logEvent("OSES_download_doc", extra);
 
-                    Toast.makeText(getActivity(), "Anwendungsfehler: Der Server hat mit einem unbekannten Statuscode geantwortet! (" + String.valueOf(status) + ")", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), "Anwendungsfehler: Der Server hat mit einem unbekannten Statuscode geantwortet! (" + status + ")", Toast.LENGTH_LONG).show();
                 }
             });
             download.execute();
@@ -386,7 +394,7 @@ public class DokumenteFragment extends Fragment implements View.OnClickListener 
                 if (type.getSelectedItemPosition() == 2)
                     zeitraum.setHideMonth(true);
 
-                zeitraum.show(((AppCompatActivity) getActivity()).getSupportFragmentManager(), "zeitraumdialog");
+                zeitraum.show(getActivity().getSupportFragmentManager(), "zeitraumdialog");
                 break;
         }
     }
@@ -405,7 +413,7 @@ public class DokumenteFragment extends Fragment implements View.OnClickListener 
             if (getActivity() == null)
                 return;
 
-            final LinearLayout list = (LinearLayout) getActivity().findViewById(R.id.dokumente_fax_protokoll);
+            final LinearLayout list = getActivity().findViewById(R.id.dokumente_fax_protokoll);
 
             if (list == null)
                 return;
@@ -427,15 +435,15 @@ public class DokumenteFragment extends Fragment implements View.OnClickListener 
 
                     View rowView = inflater.inflate(R.layout.fax_protokoll_item, list, false);
 
-                    TextView datum = (TextView) rowView.findViewById(R.id.fax_protokoll_date);
-                    TextView description = (TextView) rowView.findViewById(R.id.fax_protokoll_description);
-                    TextView destination = (TextView) rowView.findViewById(R.id.fax_protokoll_destination);
+                    TextView datum = rowView.findViewById(R.id.fax_protokoll_date);
+                    TextView description = rowView.findViewById(R.id.fax_protokoll_description);
+                    TextView destination = rowView.findViewById(R.id.fax_protokoll_destination);
 
-                    TextView units = (TextView) rowView.findViewById(R.id.fax_protokoll_units);
-                    TextView costs = (TextView) rowView.findViewById(R.id.fax_protokoll_costs);
-                    TextView sum = (TextView) rowView.findViewById(R.id.fax_protokoll_sum);
+                    TextView units = rowView.findViewById(R.id.fax_protokoll_units);
+                    TextView costs = rowView.findViewById(R.id.fax_protokoll_costs);
+                    TextView sum = rowView.findViewById(R.id.fax_protokoll_sum);
 
-                    ImageView icon = (ImageView) rowView.findViewById(R.id.fax_protokoll_icon);
+                    ImageView icon = rowView.findViewById(R.id.fax_protokoll_icon);
 
                     SimpleDateFormat inputdate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.GERMAN);
                     SimpleDateFormat outputdate = new SimpleDateFormat("dd. MMMM yyyy HH:mm:ss", Locale.GERMAN);
@@ -509,7 +517,7 @@ public class DokumenteFragment extends Fragment implements View.OnClickListener 
                         public void onClick(View v) {
 
                             DialogFragment faxDetail = FaxProtokollDetailDialogFragment.newInstance(details);
-                            faxDetail.show(((AppCompatActivity) getActivity()).getSupportFragmentManager(), "faxdetail");
+                            faxDetail.show(getActivity().getSupportFragmentManager(), "faxdetail");
 
                         }
                     });

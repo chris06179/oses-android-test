@@ -1,14 +1,15 @@
-package de.stm.oses;
+package de.stm.oses.ui.settings;
 
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceFragmentCompat;
@@ -16,22 +17,30 @@ import androidx.preference.SwitchPreference;
 
 import java.util.Calendar;
 
+import de.stm.oses.R;
 import de.stm.oses.helper.OSESBase;
-import de.stm.oses.index.database.FileSystemDatabase;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
 
     private static final int PERMISSION_REQUEST_STORAGE_DILOC = 5600;
 
-    public SettingsFragment() {
-        // Required empty public constructor
-        //lol
-    }
+    private SettingsViewModel model;
 
-    private void resetIndex() {
-        new Thread(() -> {
-           FileSystemDatabase.getInstance(requireContext()).clearAllTables();
-        }).start();
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        model = new ViewModelProvider(this).get(SettingsViewModel.class);
+
+        Preference index = findPreference("index");
+        model.getFileSystemStatus().observe(getViewLifecycleOwner(), fileSystemStatus -> {
+            if (fileSystemStatus.fileSystemCount == 0) {
+                index.setEnabled(false);
+                index.setSummary("Derzeit sind keine Dateien indiziert!");
+            } else {
+                index.setEnabled(true);
+                index.setSummary("Derzeit sind "+fileSystemStatus.fileSystemCount+" Dateien mit "+fileSystemStatus.arbeitsauftragCount+" Arbeitsaufträgen indiziert");
+            }
+       });
     }
 
     @Override
@@ -39,19 +48,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         final OSESBase OSES = new OSESBase(getActivity());
         addPreferencesFromResource(R.xml.preferences);
 
-        String strVersion;
-        int iVersionCode;
 
-        PackageInfo packageInfo;
-        try {
-            packageInfo = requireContext().getPackageManager().getPackageInfo(requireContext().getPackageName(), 0);
-            strVersion = packageInfo.versionName;
-            iVersionCode = packageInfo.versionCode;
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-            strVersion = "?";
-            iVersionCode = 0;
-        }
 
         Preference notificationsv26 = findPreference("notificationsv26");
 
@@ -65,33 +62,16 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         }
 
         Preference version = findPreference("version");
-        version.setSummary(strVersion);
+        version.setSummary(OSES.getVersion());
 
         Preference versioncode = findPreference("versioncode");
-        versioncode.setSummary(String.valueOf(iVersionCode));
+        versioncode.setSummary(String.valueOf(OSES.getVersionCode()));
 
         Preference copyright = findPreference("copyright");
 
         Preference index = findPreference("index");
-
-        new Thread(() -> {
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            long count = FileSystemDatabase.getInstance(requireContext()).fileSystemEntryDao().getCount();
-            if (count == 0) {
-                index.setSummary("Derzeit sind keine Dateien indiziert!");
-            } else {
-                index.setSummary("Derzeit sind "+count+" Dateien mit "+FileSystemDatabase.getInstance(requireContext()).arbeitsauftragEntryDao().getCount()+" Arbeitsaufträgen indiziert");
-            }
-        }).start();
-
-
         index.setOnPreferenceClickListener(preference -> {
-            resetIndex();
-            index.setSummary("Derzeit sind keine Dateien indiziert!");
+            model.resetIndex();
             return true;
         });
 
@@ -101,38 +81,48 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
         copyright.setSummary("© " + year + " Steiner Media");
 
-        PreferenceCategory aaCat = findPreference("aaCategory");
-        Preference scanDiloc = aaCat.findPreference("scanDiloc");
+        Preference scanDiloc = findPreference("scanDiloc");
 
         scanDiloc.setOnPreferenceChangeListener((preference, newValue) -> {
             if (((boolean) newValue) && !OSES.hasStoragePermission()) {
                 requestPermissions(new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_STORAGE_DILOC);
+            } else {
+                model.resetIndex();
             }
-            resetIndex();
-            index.setSummary("Derzeit sind keine Dateien indiziert!");
+
             return true;
         });
 
-        if (OSES.getDilocStatus() == OSESBase.DILOC_STATUS_INSTALLED) {
+        if (OSES.getDilocStatus() == OSESBase.STATUS_INSTALLED) {
             scanDiloc.setEnabled(true);
         } else {
             scanDiloc.setEnabled(false);
             scanDiloc.setSummary("Diloc|Sync wurde auf diesem Endgerät nicht gefunden. Funktion nicht verfügbar.");
         }
 
-        if (OSES.getSession().getGroup() > 20) {
-            Preference scanOSES = aaCat.findPreference("scanOSES");
-            aaCat.removePreference(scanOSES);
+        Preference scanFassi = findPreference("scanFassi");
+
+        scanFassi.setOnPreferenceChangeListener((preference, newValue) -> {
+            if (((boolean) newValue) && !OSES.hasStoragePermission()) {
+                requestPermissions(new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_STORAGE_DILOC);
+            } else {
+                model.resetIndex();
+            }
+            return true;
+        });
+
+        if (OSES.getFassiStatus() == OSESBase.STATUS_INSTALLED) {
+            scanFassi.setEnabled(true);
+        } if (OSES.getFassiStatus() == OSESBase.STATUS_NOT_ALLOWED) {
+            scanFassi.setEnabled(false);
+            scanFassi.setSummary("Die Unterstützung für FASSI-MOVE ist derzeit noch nicht verfügbar!");
+        } else {
+            scanFassi.setEnabled(false);
+            scanFassi.setSummary("FASSI-MOVE wurde auf diesem Endgerät nicht gefunden. Funktion nicht verfügbar.");
         }
 
+
         if (OSES.getSession().getGroup() > 10) {
-            Preference scanAgressive = aaCat.findPreference("scanAgressive");
-            scanAgressive.setOnPreferenceClickListener(preference -> {
-                resetIndex();
-                index.setSummary("Derzeit sind keine Dateien indiziert!");
-                return  true;
-            });
-            aaCat.removePreference(scanAgressive);
             PreferenceCategory devCat = findPreference("debugCategory");
             getPreferenceScreen().removePreference(devCat);
         } else {

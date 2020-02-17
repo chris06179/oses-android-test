@@ -1,8 +1,9 @@
 package de.stm.oses.fax;
 
 
-import android.app.Fragment;
 import android.os.Bundle;
+
+import androidx.fragment.app.Fragment;
 
 public class FaxListFragment extends Fragment {
 

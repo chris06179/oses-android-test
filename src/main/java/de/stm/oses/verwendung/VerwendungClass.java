@@ -6,9 +6,9 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.preference.PreferenceManager;
 
 import androidx.core.content.ContextCompat;
+import androidx.preference.PreferenceManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;

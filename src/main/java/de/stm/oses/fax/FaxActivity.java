@@ -1,7 +1,6 @@
 package de.stm.oses.fax;
 
 import android.Manifest;
-import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,16 +10,6 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.DialogFragment;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.SimpleItemAnimator;
-import androidx.appcompat.widget.Toolbar;
 import android.view.HapticFeedbackConstants;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -32,14 +21,25 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SimpleItemAnimator;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -185,7 +185,7 @@ public class FaxActivity extends AppCompatActivity implements
             }
         }
 
-        FragmentManager fm = getFragmentManager();
+        FragmentManager fm = getSupportFragmentManager();
         mFaxListFragment = (FaxListFragment) fm.findFragmentByTag("fax_list_fragment");
 
         // If the Fragment is non-null, then it is currently being
@@ -199,34 +199,31 @@ public class FaxActivity extends AppCompatActivity implements
         fm.findFragmentById(R.id.map).setRetainInstance(true);
 
 
-        MapFragment mapFragment = ((MapFragment) fm.findFragmentById(R.id.map));
-        mapFragment.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(GoogleMap googleMap) {
-                map = googleMap;
+        SupportMapFragment mapFragment = ((SupportMapFragment) fm.findFragmentById(R.id.map));
+        mapFragment.getMapAsync(googleMap -> {
+            map = googleMap;
 
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.1681391, 10.2928216), 5));
-                if (ActivityCompat.checkSelfPermission(FaxActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    map.setMyLocationEnabled(true);
-                }
-                map.getUiSettings().setMapToolbarEnabled(false);
-
-                map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-                    @Override
-                    public boolean onMarkerClick(Marker marker) {
-                        FaxClass item = getFaxAdapter().setSelectionByMarker(marker);
-                        getFaxList().smoothScrollToPosition(getFaxAdapter().getItems().indexOf(item));
-                        map.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
-                        marker.showInfoWindow();
-                        save.setEnabled(true);
-                        return true;
-                    }
-                });
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.1681391, 10.2928216), 5));
+            if (ActivityCompat.checkSelfPermission(FaxActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                map.setMyLocationEnabled(true);
             }
+            map.getUiSettings().setMapToolbarEnabled(false);
+
+            map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(Marker marker) {
+                    FaxClass item = getFaxAdapter().setSelectionByMarker(marker);
+                    getFaxList().smoothScrollToPosition(getFaxAdapter().getItems().indexOf(item));
+                    map.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
+                    marker.showInfoWindow();
+                    save.setEnabled(true);
+                    return true;
+                }
+            });
         });
 
-        cancel = (Button) findViewById(R.id.fax_back);
-        save = (Button) findViewById(R.id.fax_send);
+        cancel = findViewById(R.id.fax_back);
+        save = findViewById(R.id.fax_send);
 
         getFaxList().setHasFixedSize(true);
         LinearLayoutManager llm = new LinearLayoutManager(FaxActivity.this);
@@ -271,7 +268,7 @@ public class FaxActivity extends AppCompatActivity implements
 
         buildGoogleApiClient();
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.fax_toolbar);
+        Toolbar toolbar = findViewById(R.id.fax_toolbar);
         setSupportActionBar(toolbar);
         assert getSupportActionBar() != null;
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -317,7 +314,7 @@ public class FaxActivity extends AppCompatActivity implements
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+                                           String[] permissions, int[] grantResults) {
         switch (requestCode) {
             case PERMISSIONS_REQUEST_LOCATION: {
                 // If request is cancelled, the result arrays are empty.
@@ -392,8 +389,8 @@ public class FaxActivity extends AppCompatActivity implements
         View wait = findViewById(R.id.fax_wait);
         View error = findViewById(R.id.list_error);
 
-        TextView errortext = (TextView) findViewById(R.id.list_error_text);
-        ImageView errorimage = (ImageView) findViewById(R.id.list_error_image);
+        TextView errortext = findViewById(R.id.list_error_text);
+        ImageView errorimage = findViewById(R.id.list_error_image);
 
         errortext.setText(message);
         errorimage.setImageResource(image);

@@ -89,10 +89,7 @@ public class VerwendungAdapter extends ArrayAdapter<VerwendungClass> {
 
         VerwendungClass item = VerwendungClassArrayList.get(selection);
 
-        if (item != null)
-            return item;
-
-        return null;
+        return item;
     }
 
     public VerwendungClass getItemByID(int id) {
@@ -164,12 +161,12 @@ public class VerwendungAdapter extends ArrayAdapter<VerwendungClass> {
                 sumHolder = (SumHolder) rowView.getTag();
             else {
                 sumHolder = new SumHolder();
-                sumHolder.sumTitel = (TextView) rowView.findViewById(R.id.verwendung_sum_monat);
-                sumHolder.sumSchichten = (TextView) rowView.findViewById(R.id.verwendung_sum_schichten);
-                sumHolder.sumUrlaub = (TextView) rowView.findViewById(R.id.verwendung_sum_urlaub);
-                sumHolder.sumSoll = (TextView) rowView.findViewById(R.id.verwendung_sum_soll);
-                sumHolder.sumIst = (TextView) rowView.findViewById(R.id.verwendung_sum_ist);
-                sumHolder.sumDifferenz = (TextView) rowView.findViewById(R.id.verwendung_sum_differenz);
+                sumHolder.sumTitel = rowView.findViewById(R.id.verwendung_sum_monat);
+                sumHolder.sumSchichten = rowView.findViewById(R.id.verwendung_sum_schichten);
+                sumHolder.sumUrlaub = rowView.findViewById(R.id.verwendung_sum_urlaub);
+                sumHolder.sumSoll = rowView.findViewById(R.id.verwendung_sum_soll);
+                sumHolder.sumIst = rowView.findViewById(R.id.verwendung_sum_ist);
+                sumHolder.sumDifferenz = rowView.findViewById(R.id.verwendung_sum_differenz);
                 rowView.setTag(sumHolder);
             }
 
@@ -197,26 +194,26 @@ public class VerwendungAdapter extends ArrayAdapter<VerwendungClass> {
                 itemHolder = (ItemHolder) rowView.getTag();
             else {
                 itemHolder = new ItemHolder();
-                itemHolder.container = (FrameLayout) rowView.findViewById(R.id.verwendung_container);
-                itemHolder.bezeichner = (TextView) rowView.findViewById(R.id.verwendung_bezeichner);
-                itemHolder.von = (TextView) rowView.findViewById(R.id.verwendung_von);
-                itemHolder.bis = (TextView) rowView.findViewById(R.id.verwendung_bis);
-                itemHolder.pause = (TextView) rowView.findViewById(R.id.verwendung_pause);
-                itemHolder.datum = (TextView) rowView.findViewById(R.id.verwendung_datum);
-                itemHolder.est = (TextView) rowView.findViewById(R.id.verwendung_est);
-                itemHolder.az = (TextView) rowView.findViewById(R.id.verwendung_az);
-                itemHolder.mdifferenz = (TextView) rowView.findViewById(R.id.verwendung_mdifferenz);
-                itemHolder.funktion = (TextView) rowView.findViewById(R.id.verwendung_funktion);
-                itemHolder.dbr = (TextView) rowView.findViewById(R.id.verwendung_dbr);
-                itemHolder.der = (TextView) rowView.findViewById(R.id.verwendung_der);
-                itemHolder.apauser = (TextView) rowView.findViewById(R.id.verwendung_apauser);
-                itemHolder.notiz = (TextView) rowView.findViewById(R.id.verwendung_notiz);
-                itemHolder.info = (TextView) rowView.findViewById(R.id.verwendung_info);
-                itemHolder.aa_icon = (ImageView) rowView.findViewById(R.id.verwendung_aa_icon);
+                itemHolder.container = rowView.findViewById(R.id.verwendung_container);
+                itemHolder.bezeichner = rowView.findViewById(R.id.verwendung_bezeichner);
+                itemHolder.von = rowView.findViewById(R.id.verwendung_von);
+                itemHolder.bis = rowView.findViewById(R.id.verwendung_bis);
+                itemHolder.pause = rowView.findViewById(R.id.verwendung_pause);
+                itemHolder.datum = rowView.findViewById(R.id.verwendung_datum);
+                itemHolder.est = rowView.findViewById(R.id.verwendung_est);
+                itemHolder.az = rowView.findViewById(R.id.verwendung_az);
+                itemHolder.mdifferenz = rowView.findViewById(R.id.verwendung_mdifferenz);
+                itemHolder.funktion = rowView.findViewById(R.id.verwendung_funktion);
+                itemHolder.dbr = rowView.findViewById(R.id.verwendung_dbr);
+                itemHolder.der = rowView.findViewById(R.id.verwendung_der);
+                itemHolder.apauser = rowView.findViewById(R.id.verwendung_apauser);
+                itemHolder.notiz = rowView.findViewById(R.id.verwendung_notiz);
+                itemHolder.info = rowView.findViewById(R.id.verwendung_info);
+                itemHolder.aa_icon = rowView.findViewById(R.id.verwendung_aa_icon);
                 itemHolder.aa_extracting = rowView.findViewById(R.id.verwendung_aa_extracting);
-                itemHolder.abweichung_container = (RelativeLayout) rowView.findViewById(R.id.verwendung_abweichung_container);
-                itemHolder.info_container = (RelativeLayout) rowView.findViewById(R.id.verwendung_info_container);
-                itemHolder.notiz_container = (RelativeLayout) rowView.findViewById(R.id.verwendung_notiz_container);
+                itemHolder.abweichung_container = rowView.findViewById(R.id.verwendung_abweichung_container);
+                itemHolder.info_container = rowView.findViewById(R.id.verwendung_info_container);
+                itemHolder.notiz_container = rowView.findViewById(R.id.verwendung_notiz_container);
                 itemHolder.type_block = rowView.findViewById(R.id.verwendung_type_block);
                 rowView.setTag(itemHolder);
             }

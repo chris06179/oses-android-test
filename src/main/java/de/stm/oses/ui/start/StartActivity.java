@@ -1,4 +1,4 @@
-package de.stm.oses;
+package de.stm.oses.ui.start;
 
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
@@ -12,7 +12,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.View;
 import android.webkit.WebView;
@@ -20,7 +19,6 @@ import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,34 +28,37 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.Toolbar;
-import androidx.cardview.widget.CardView;
 import androidx.core.content.FileProvider;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.preference.PreferenceManager;
 
 import com.crashlytics.android.Crashlytics;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import de.stm.oses.LoginActivity;
+import de.stm.oses.R;
+import de.stm.oses.dialogs.IndexInfoDialog;
+import de.stm.oses.dialogs.NoPdfReaderInstalledDialog;
 import de.stm.oses.dokumente.DokumenteFragment;
 import de.stm.oses.helper.FileDownload;
 import de.stm.oses.helper.FileDownload.OnDownloadFinishedListener;
 import de.stm.oses.helper.MenuAdapter;
 import de.stm.oses.helper.MenuClass;
 import de.stm.oses.helper.OSESBase;
-import de.stm.oses.index.FileSystemIndexer;
+import de.stm.oses.index.IndexIntentService;
 import de.stm.oses.schichten.SchichtenFragment;
+import de.stm.oses.ui.browser.BrowserFragment;
+import de.stm.oses.ui.settings.SettingsFragment;
 import de.stm.oses.verwendung.VerwendungFragment;
 
 
@@ -78,10 +79,6 @@ public class StartActivity extends AppCompatActivity {
 
     public FileDownload CurrentFileDownload;
     private FirebaseAnalytics mFirebaseAnalytics;
-    private TextView indexInfoText;
-    private CardView indexProgressCard;
-    private ProgressBar indexProgressBar;
-    private TextView indexProgressSubtitle;
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -106,6 +103,16 @@ public class StartActivity extends AppCompatActivity {
 
     }
 
+    private void startFileIndexer() {
+        if (IndexIntentService.startService(this, OSES)) {
+            if (!OSES.getSession().getSessionIndexReminder()) {
+                IndexInfoDialog dialog = IndexInfoDialog.newInstance();
+                dialog.show(getSupportFragmentManager(), "indexInfoDialog");
+                OSES.getSession().setSessionIndexReminder(true);
+            }
+        }
+    }
+
 
     // Called when the activity is first created.
     @Override
@@ -115,11 +122,6 @@ public class StartActivity extends AppCompatActivity {
 
         // Obtain the FirebaseAnalytics instance.
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
-
-        indexInfoText = findViewById(R.id.index_info_text);
-        indexProgressSubtitle = findViewById(R.id.index_progress_subtitle);
-        indexProgressCard = findViewById(R.id.index_progress_card);
-        indexProgressBar = findViewById(R.id.index_progressbar);
 
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(StartActivity.this);
@@ -132,6 +134,7 @@ public class StartActivity extends AppCompatActivity {
         }
 
         OSES = new OSESBase(this);
+        startFileIndexer();
 
         mFirebaseAnalytics.setUserProperty("est", OSES.getSession().getEstText());
         mFirebaseAnalytics.setUserProperty("funktion", String.valueOf(OSES.getSession().getFunktion()));
@@ -417,40 +420,6 @@ public class StartActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        EventBus.getDefault().register(this);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        EventBus.getDefault().unregister(this);
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessageEvent(FileSystemIndexer.IndexProgressEvent event) {
-        if (event.show) {
-            indexProgressCard.setVisibility(View.VISIBLE);
-            indexInfoText.setText(event.message);
-            indexProgressSubtitle.setText(event.subtitle);
-            if (event.max == 0) {
-                indexProgressBar.setIndeterminate(true);
-            } else {
-                indexProgressBar.setIndeterminate(false);
-                indexProgressBar.setMax(event.max);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    indexProgressBar.setProgress(event.progress, true);
-                } else {
-                    indexProgressBar.setProgress(event.progress);
-                }
-            }
-        } else {
-            indexProgressCard.setVisibility(View.GONE);
-        }
-    }
-
     private void DoDokumentation() {
         FileDownload download = new FileDownload(StartActivity.this);
         download.setTitle("Dokumentation");
@@ -466,7 +435,13 @@ public class StartActivity extends AppCompatActivity {
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setDataAndType(fileUri, "application/pdf");
                 intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION+Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                startActivity(intent);
+
+                // Falls keine entsprechende Activity existiert (kein PDF-Reader installiert)
+                try {
+                    startActivity(intent);
+                } catch (ActivityNotFoundException e) {
+                    new NoPdfReaderInstalledDialog().show(getSupportFragmentManager(), "no_pdf_dialog");
+                }
             }
 
             @Override
@@ -640,7 +615,7 @@ public class StartActivity extends AppCompatActivity {
         items.add(new MenuClass(R.drawable.ic_action_settings, "Einstellungen", 82, ""));
         items.add(new MenuClass(R.drawable.ic_action_cancel, "Abmelden", 84, ""));
         items.add(new MenuClass("Sonstiges"));
-        items.add(new MenuClass(R.drawable.ic_action_help, "Hilfe", 92, ""));
+        //items.add(new MenuClass(R.drawable.ic_action_help, "Hilfe", 92, ""));
         items.add(new MenuClass(R.drawable.ic_action_donate, "Spenden", 95, ""));
         items.add(new MenuClass(R.drawable.ic_action_about, "Nutzungsbedingungen", 93, ""));
         items.add(new MenuClass(R.drawable.ic_action_para, "Impressum", 94, ""));
@@ -729,7 +704,7 @@ public class StartActivity extends AppCompatActivity {
                         editor.clear();
                         editor.apply();
 
-                        Intent intent = new Intent(StartActivity.this, OSESActivity.class);
+                        Intent intent = new Intent(StartActivity.this, LoginActivity.class);
                         startActivity(intent);
                         StartActivity.this.finish();
 
@@ -1115,7 +1090,7 @@ public class StartActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int id) {
 
                                 dialog.dismiss();
-                                Intent intent = new Intent(StartActivity.this, OSESActivity.class);
+                                Intent intent = new Intent(StartActivity.this, LoginActivity.class);
                                 startActivity(intent);
                                 StartActivity.this.finish();
 

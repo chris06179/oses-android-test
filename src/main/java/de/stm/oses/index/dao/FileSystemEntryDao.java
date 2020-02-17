@@ -1,5 +1,6 @@
 package de.stm.oses.index.dao;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -10,6 +11,7 @@ import java.util.List;
 
 import de.stm.oses.index.entities.FileSystemArbeitsauftragEntry;
 import de.stm.oses.index.entities.FileSystemEntry;
+import de.stm.oses.index.entities.FileSystemStatus;
 
 @Dao
 public interface FileSystemEntryDao {
@@ -18,6 +20,9 @@ public interface FileSystemEntryDao {
 
     @Query("SELECT count(*) FROM files")
     long getCount();
+
+    @Query("SELECT (SELECT count(*) FROM files) as fileSystemCount, (SELECT count(*) FROM arbeitsauftrag) as arbeitsauftragCount")
+    LiveData<FileSystemStatus> getStatus();
 
     @Query("SELECT * FROM files WHERE content_type = " + FileSystemEntry.FILECONTENT_UNKNOWN)
     List<FileSystemEntry> getUnknown();

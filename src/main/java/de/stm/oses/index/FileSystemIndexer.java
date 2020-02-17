@@ -3,53 +3,51 @@ package de.stm.oses.index;
 import android.database.sqlite.SQLiteConstraintException;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-
+import com.crashlytics.android.Crashlytics;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.parser.PdfReaderContentParser;
 import com.itextpdf.text.pdf.parser.SimpleTextExtractionStrategy;
 import com.itextpdf.text.pdf.parser.TextExtractionStrategy;
 
-import org.greenrobot.eventbus.EventBus;
-
 import java.io.File;
 import java.io.FileInputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.stm.oses.index.database.FileSystemDatabase;
+import de.stm.oses.index.entities.ArbeitsauftragEntry;
 import de.stm.oses.index.entities.FileSystemEntry;
+import de.stm.oses.notification.NotificationHelper;
 
 public class FileSystemIndexer {
 
     private final FileSystemDatabase mIndex;
     private final String mPath;
     private final FirebaseRemoteConfig mFirebaseRemoteConfig;
+    private final NotificationHelper mNotificationHelper;
+    private String mAppTitle;
 
-    public FileSystemIndexer(String path, FileSystemDatabase database) {
+    public FileSystemIndexer(String path, FileSystemDatabase database, NotificationHelper notificationHelper, String appTitle) {
         mIndex = database;
         mPath = path;
+        mNotificationHelper = notificationHelper;
+        mAppTitle = appTitle;
 
         // Remote Config
         mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
     }
 
-    public static class IndexProgressEvent {
-        public int progress;
-        public int max;
-        public String message;
-        public boolean show;
-        public String subtitle;
+    public void execute() {
 
-        IndexProgressEvent(int progress, int max, @NonNull String message, @NonNull String subtitle, boolean show) {
-            this.progress = progress;
-            this.max = max;
-            this.message = message;
-            this.subtitle = subtitle;
-            this.show = show;
-        }
+        checkUpdatedFiles();
+        addNewFiles();
+        updateContentType();
+
     }
 
     private List<File> findFile(File aFile) {
@@ -78,8 +76,8 @@ public class FileSystemIndexer {
 
     private void addNewFiles() {
 
-        if (mIndex.fileSystemEntryDao().getCount() == 0)
-            EventBus.getDefault().postSticky(new IndexProgressEvent(0,0, "Prüfe auf neue Dateien...", "Der Index wird zum ersten mal erstellt, dies kann einige Minuten dauern...", true));
+
+        mNotificationHelper.showIndexNotification(mAppTitle,"Prüfe auf neue Dateien...", 0,0);
 
         File directory = new File(mPath);
         List<File> fsFiles = findFile(directory);
@@ -104,7 +102,9 @@ public class FileSystemIndexer {
     }
 
     @FileSystemEntry.FileContent
-    private int checkFileContent(File file) {
+    private int checkFileContent(FileSystemEntry databaseFile) {
+
+        File file = databaseFile.getFile();
 
         if (!file.getName().substring(file.getName().lastIndexOf(".") + 1).toLowerCase().equals("pdf"))
             return FileSystemEntry.FILECONTENT_OTHER;
@@ -128,11 +128,23 @@ public class FileSystemIndexer {
 
 
                 if (pIsArbeitsauftragEDITH.matcher(text).matches()) {
-                    return FileSystemEntry.FILECONTENT_EDITH;
+                    List<ArbeitsauftragEntry> result = scanEdith(read, parser, databaseFile);
+                    if (result.isEmpty()) {
+                        return FileSystemEntry.FILECONTENT_OTHER;
+                    } else {
+                        mIndex.arbeitsauftragEntryDao().insertAll(result);
+                        return FileSystemEntry.FILECONTENT_EDITH;
+                    }
                 }
 
                 if (pIsArbeitsauftragMBRAIL.matcher(text).matches()) {
-                    return FileSystemEntry.FILECONTENT_MBRAIL;
+                    List<ArbeitsauftragEntry> result = scanMBRail(read, parser, databaseFile);
+                    if (result.isEmpty()) {
+                        return FileSystemEntry.FILECONTENT_OTHER;
+                    } else {
+                        mIndex.arbeitsauftragEntryDao().insertAll(result);
+                        return FileSystemEntry.FILECONTENT_MBRAIL;
+                    }
                 }
 
                 if (k == 10) {
@@ -142,6 +154,8 @@ public class FileSystemIndexer {
             }
 
         } catch (Exception | OutOfMemoryError | NoClassDefFoundError e) {
+            Crashlytics.setString("File", file.getAbsolutePath());
+            Crashlytics.logException(e);
             return FileSystemEntry.FILECONTENT_EXCEPTION;
         }
 
@@ -158,25 +172,234 @@ public class FileSystemIndexer {
             FileSystemEntry databaseFile = all.get(i);
 
             Log.d("INDEXER", i+1 + " / " + all.size() + ": " + databaseFile.filename);
-            if (all.size() > 100)
-                EventBus.getDefault().postSticky(new IndexProgressEvent(i, all.size()-1, "Ermittle Inhalt von PDF-Dateien - "+(i+1)+" / "+all.size()+" Dateien durchsucht...", "Es müssen viele neue Dateien geprüft werden, dies kann einige Minuten dauern...", true));
 
-            databaseFile.contentType = checkFileContent(databaseFile.getFile());
+            mNotificationHelper.showIndexNotification(mAppTitle,(i+1)+" / "+all.size()+" Dateien durchsucht", all.size()-1,i);
+
+            databaseFile.contentType = checkFileContent(databaseFile);
             mIndex.fileSystemEntryDao().update(databaseFile);
 
         }
 
-        if (all.size() > 100)
-            EventBus.getDefault().postSticky(new IndexProgressEvent(0,0, "Erstelle Liste mit Arbeitsaufträgen - Vorbereitung", "Es müssen viele neue Dateien geprüft werden, dies kann einige Minuten dauern...", true));
+        mNotificationHelper.removeIndexNotification();
 
     }
 
+    private ArrayList<ArbeitsauftragEntry> scanEdith(PdfReader read, PdfReaderContentParser parser, FileSystemEntry databaseFile) {
 
-    public void execute() {
+        ArrayList<ArbeitsauftragEntry> arbeitsauftragList = new ArrayList<>();
 
-        checkUpdatedFiles();
-        addNewFiles();
-        updateContentType();
+        try {
+
+            FirebaseRemoteConfig mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+            String schichtEDITH = mFirebaseRemoteConfig.getString("schichtEDITH");
+            String datumEDITH = mFirebaseRemoteConfig.getString("datumEDITH");
+            String datumsbereichEDITH = mFirebaseRemoteConfig.getString("datumsbereichEDITH");
+            String letzteBearbeitungEDITH = mFirebaseRemoteConfig.getString("letzteBearbeitungEDITH");
+
+            Pattern pSchicht = Pattern.compile(schichtEDITH, Pattern.MULTILINE);
+            Pattern pDatum = Pattern.compile(datumEDITH, Pattern.DOTALL + Pattern.MULTILINE);
+            Pattern pDatumsbereich = Pattern.compile(datumsbereichEDITH, Pattern.MULTILINE);
+            Pattern pLetzteBearbeitung = Pattern.compile(letzteBearbeitungEDITH, Pattern.MULTILINE);
+
+            Log.d("AAINDEXER", databaseFile.filename);
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMAN);
+            SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd.MM.yyyy, HH:mm", Locale.GERMAN);
+
+
+            String lastBezeichner = "";
+
+            for (int i = 1; i <= read.getNumberOfPages(); i++) {
+
+                try {
+
+                    TextExtractionStrategy strategy = parser.processContent(i, new SimpleTextExtractionStrategy());
+                    String text = strategy.getResultantText();
+
+                    String bezeichner = null;
+
+                    // Bezeichner
+                    Matcher bezeichnerMatcher = pSchicht.matcher(text);
+                    if (bezeichnerMatcher.find() && bezeichnerMatcher.groupCount() == 1) {
+                        bezeichner = bezeichnerMatcher.group(1);
+                        Log.d("AAINDEXER Bezeichner", bezeichner != null ? bezeichner : "");
+                    }
+
+                    if (bezeichner == null) {
+                        continue;
+                    }
+
+                    if (!lastBezeichner.equals(bezeichner)) {
+
+                        ArbeitsauftragEntry entry = new ArbeitsauftragEntry();
+                        lastBezeichner = bezeichner;
+
+                        entry.bezeichner = bezeichner;
+                        entry.fileId = databaseFile.id;
+
+                        // Datum
+                        Matcher datumMatcher = pDatum.matcher(text);
+                        if (datumMatcher.find() && datumMatcher.groupCount() == 1) {
+                            String datum = datumMatcher.group(1);
+                            if (datum != null) {
+                                entry.datum = dateFormat.parse(datum);
+                            }
+                        }
+
+                        // Letzte Bearbeitung
+                        Matcher letzteBearbeitungMatcher = pLetzteBearbeitung.matcher(text);
+                        if (letzteBearbeitungMatcher.find() && letzteBearbeitungMatcher.groupCount() == 1) {
+                            String letzteBearbeitung = letzteBearbeitungMatcher.group(1);
+                            if (letzteBearbeitung != null) {
+                                entry.lastEdit = dateTimeFormat.parse(letzteBearbeitung);
+                            }
+                        }
+
+                        // Datumsbereich
+                        Matcher datumsbereichMatcher = pDatumsbereich.matcher(text);
+                        if (datumsbereichMatcher.find() && datumsbereichMatcher.groupCount() == 2) {
+                            String datumStart = datumsbereichMatcher.group(1);
+                            String datumEnd = datumsbereichMatcher.group(2);
+                            if (datumStart != null && datumEnd != null) {
+                                entry.datumVon = dateFormat.parse(datumStart);
+                                entry.datumBis = dateFormat.parse(datumEnd);
+                            }
+                        }
+
+                        entry.pages.add(i);
+
+                        arbeitsauftragList.add(entry);
+
+                    } else {
+
+                        // Letzte Bearbeitung
+                        Matcher letzteBearbeitungMatcher = pLetzteBearbeitung.matcher(text);
+                        if (letzteBearbeitungMatcher.find() && letzteBearbeitungMatcher.groupCount() == 1) {
+                            String letzteBearbeitung = letzteBearbeitungMatcher.group(1);
+                            if (letzteBearbeitung != null) {
+                                arbeitsauftragList.get(arbeitsauftragList.size() - 1).lastEdit = dateTimeFormat.parse(letzteBearbeitung);
+                            }
+                        }
+                        arbeitsauftragList.get(arbeitsauftragList.size() - 1).pages.add(i);
+                    }
+
+                } catch (Exception e) {
+                    Crashlytics.setString("File", databaseFile.getFile().getAbsolutePath());
+                    Crashlytics.logException(e);
+                }
+
+            }
+
+            Log.d("AAINDEXER", String.valueOf(arbeitsauftragList.size()));
+
+        } catch (Exception | OutOfMemoryError | NoClassDefFoundError e) {
+            Crashlytics.setString("File", databaseFile.getFile().getAbsolutePath());
+            Crashlytics.logException(e);
+        }
+
+        return arbeitsauftragList;
+    }
+
+    private ArrayList<ArbeitsauftragEntry> scanMBRail(PdfReader read, PdfReaderContentParser parser, FileSystemEntry databaseFile) {
+
+        ArrayList<ArbeitsauftragEntry> arbeitsauftragList = new ArrayList<>();
+
+        try {
+
+            FirebaseRemoteConfig mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+            String schichtMBRAIL = mFirebaseRemoteConfig.getString("schichtMBRAIL");
+            String datumMBRAIL = mFirebaseRemoteConfig.getString("datumMBRAIL");
+            String letzteBearbeitungMBRAIL = mFirebaseRemoteConfig.getString("letzteBearbeitungMBRAIL");
+
+            Pattern pSchicht = Pattern.compile(schichtMBRAIL, Pattern.MULTILINE);
+            Pattern pDatum = Pattern.compile(datumMBRAIL, Pattern.MULTILINE);
+            Pattern pLetzteBearbeitung = Pattern.compile(letzteBearbeitungMBRAIL, Pattern.MULTILINE);
+
+            Log.d("AAINDEXER", databaseFile.filename);
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMAN);
+
+            String lastBezeichner = "";
+
+            for (int i = 1; i <= read.getNumberOfPages(); i++) {
+
+                try {
+
+                    TextExtractionStrategy strategy = parser.processContent(i, new SimpleTextExtractionStrategy());
+                    String text = strategy.getResultantText();
+
+                    String bezeichner = null;
+
+                    // Bezeichner
+                    Matcher bezeichnerMatcher = pSchicht.matcher(text);
+                    if (bezeichnerMatcher.find() && bezeichnerMatcher.groupCount() == 1) {
+                        bezeichner = bezeichnerMatcher.group(1);
+                        Log.d("AAINDEXER Bezeichner", bezeichner != null ? bezeichner : "");
+                    }
+
+                    if (bezeichner == null) {
+                        continue;
+                    }
+
+                    if (!lastBezeichner.equals(bezeichner)) {
+
+                        ArbeitsauftragEntry entry = new ArbeitsauftragEntry();
+                        lastBezeichner = bezeichner;
+
+                        entry.bezeichner = bezeichner;
+                        entry.fileId = databaseFile.id;
+
+                        // Datum
+                        Matcher datumMatcher = pDatum.matcher(text);
+                        if (datumMatcher.find() && datumMatcher.groupCount() == 1) {
+                            String datum = datumMatcher.group(1);
+                            if (datum != null) {
+                                entry.datum = dateFormat.parse(datum);
+                            }
+                        }
+
+                        // Letzte Bearbeitung
+                        Matcher letzteBearbeitungMatcher = pLetzteBearbeitung.matcher(text);
+                        if (letzteBearbeitungMatcher.find() && letzteBearbeitungMatcher.groupCount() == 1) {
+                            String letzteBearbeitung = letzteBearbeitungMatcher.group(1);
+                            if (letzteBearbeitung != null) {
+                                entry.lastEdit = dateFormat.parse(letzteBearbeitung);
+                            }
+                        }
+
+                        entry.pages.add(i);
+
+                        arbeitsauftragList.add(entry);
+
+                    } else {
+
+                        // Letzte Bearbeitung
+                        Matcher letzteBearbeitungMatcher = pLetzteBearbeitung.matcher(text);
+                        if (letzteBearbeitungMatcher.find() && letzteBearbeitungMatcher.groupCount() == 1) {
+                            String letzteBearbeitung = letzteBearbeitungMatcher.group(1);
+                            if (letzteBearbeitung != null) {
+                                arbeitsauftragList.get(arbeitsauftragList.size() - 1).lastEdit = dateFormat.parse(letzteBearbeitung);
+                            }
+                        }
+                        arbeitsauftragList.get(arbeitsauftragList.size() - 1).pages.add(i);
+                    }
+
+                } catch (Exception e) {
+                    Crashlytics.setString("File", databaseFile.getFile().getAbsolutePath());
+                    Crashlytics.logException(e);
+                }
+
+            }
+
+            Log.d("AAINDEXER", String.valueOf(arbeitsauftragList.size()));
+
+
+        } catch (Exception | OutOfMemoryError | NoClassDefFoundError e) {
+            Crashlytics.setString("File", databaseFile.getFile().getAbsolutePath());
+            Crashlytics.logException(e);
+        }
+
+        return  arbeitsauftragList;
 
     }
 

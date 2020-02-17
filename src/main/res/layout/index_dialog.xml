@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:adjustViewBounds="true"
+        android:scaleType="fitStart"
+        app:srcCompat="@drawable/index_info" />
+
+    <TextView
+        android:id="@+id/textView52"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:text="OSES muss nun dein DiLoc|Sync-Verzeichnis indizieren, um weiterhin Arbeitsaufträge extrahieren zu können. Dabei muss der Inhalt jeder Datei auf mögliche Arbeitsaufträge geprüft werden. Dieser Vorgang nimmt unter Umständen bis zu 10 Minuten in Anspruch. Du kannst den Fortschritt in der Benachrichtigungsleiste deines Endgerätes verfolgen. In Zukunft dauert dieser Vorgang nur noch wenige Sekunden, da nur noch die geänderten Dateien überprüft werden müssen."
+        android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
+
+</LinearLayout>

@@ -50,10 +50,10 @@ public class ListSpinnerAdapter extends ListAdapter {
 
                 rowView = inflater.inflate(R.layout.kategorie_item, parent, false);
 
-                TextView titleView = (TextView) rowView.findViewById(R.id.list_title);
+                TextView titleView = rowView.findViewById(R.id.list_title);
                 titleView.setText(listClassArrayList.get(position).getTitle());
 
-                ImageView icon = (ImageView) rowView.findViewById(R.id.list_icon);
+                ImageView icon = rowView.findViewById(R.id.list_icon);
                 icon.setVisibility(View.VISIBLE);
                 icon.setImageResource(listClassArrayList.get(position).getIcon());
                 icon.setColorFilter(Color.parseColor(listClassArrayList.get(position).getColor()), PorterDuff.Mode.MULTIPLY);
@@ -62,7 +62,7 @@ public class ListSpinnerAdapter extends ListAdapter {
 
                 rowView = inflater.inflate(R.layout.list_item_spinner, parent, false);
 
-                TextView titleView = (TextView) rowView.findViewById(R.id.list_title);
+                TextView titleView = rowView.findViewById(R.id.list_title);
                 titleView.setText(listClassArrayList.get(position).getTitle());
 
             }
@@ -99,15 +99,15 @@ public class ListSpinnerAdapter extends ListAdapter {
 
         if (type == TYPE_HEADER) {
 
-            TextView titleView = (TextView) rowView.findViewById(R.id.list_header);
+            TextView titleView = rowView.findViewById(R.id.list_header);
             titleView.setText(listClassArrayList.get(position).getHeaderText());
 
         }
 
         if (type == TYPE_ITEM) {
 
-            TextView titleView = (TextView) rowView.findViewById(R.id.list_title);
-            RadioButton radio = (RadioButton) rowView.findViewById(R.id.list_selected);
+            TextView titleView = rowView.findViewById(R.id.list_title);
+            RadioButton radio = rowView.findViewById(R.id.list_selected);
 
             titleView.setText(listClassArrayList.get(position).getTitle());
             if (showRadio) {
@@ -118,7 +118,7 @@ public class ListSpinnerAdapter extends ListAdapter {
             } else
                 radio.setVisibility(View.GONE);
 
-            ImageView icon = (ImageView) rowView.findViewById(R.id.list_icon);
+            ImageView icon = rowView.findViewById(R.id.list_icon);
 
             if (listClassArrayList.get(position).getIcon() > 0) {
                 icon.setVisibility(View.VISIBLE);

@@ -8,7 +8,8 @@ import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
+
+import androidx.preference.PreferenceManager;
 
 import com.crashlytics.android.Crashlytics;
 

@@ -121,7 +121,6 @@ public class ArbeitsauftragBuilder {
             return file;
 
         } catch (OutOfMemoryError | NoClassDefFoundError | DocumentException | IOException e) {
-            System.gc();
             Crashlytics.setString("Bezeichner", verwendung.getBezeichner());
             Crashlytics.setString("Datum", verwendung.getDatumFormatted("dd.MM.yyyy"));
             Crashlytics.setString("Est", verwendung.getEst());

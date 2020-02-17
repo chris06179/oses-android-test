@@ -1,124 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory
-        android:title="Eingabe">
+    <PreferenceCategory android:title="Eingabe">
         <CheckBoxPreference
-            android:title="Alternative Zeiteingabe"
             android:defaultValue="false"
+            android:key="useAlternateTimePicker"
             android:summaryOff="Es wird die Standard Android Zeiteingabe verwendet"
             android:summaryOn="Es wird die alternative Zeiteingabe mit Nummernblock verwendet"
-            android:key="useAlternateTimePicker" />
+            android:title="Alternative Zeiteingabe" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Verwendung">
+        <ListPreference
+            android:defaultValue="BOTTOM"
+            android:dialogTitle="Monatszusammenfassung konfigurieren"
+            android:entries="@array/pref_sum_pos_entries"
+            android:entryValues="@array/pref_sum_pos_values"
+            android:key="sumPosition"
+            android:summary="Zeigt eine Zusammenfassung im Bereich Verwendung an"
+            android:title="Monatszusammenfassung" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="changeVerwendungColor"
+            android:summary="Farbe der Aktionsleiste beim Hinzufügen einer Verwendung an die Kategorie anpassen"
+            android:title="Farbwechsel" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Benachrichtigungseinstellungen">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="allowNotification"
+            android:summary="Erlaubt es der Anwendung Benachrichtigungen auf deinem Telefon anzuzeigen"
+            android:title="Benachrichtigungen" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:dependency="allowNotification"
+            android:key="vibrateOnNotification"
+            android:summary="Bei neuer Benachrichtigung vibrieren"
+            android:title="Vibration" />
     </PreferenceCategory>
 
     <PreferenceCategory
-    android:title="Verwendung">
-    <ListPreference
-        android:key="sumPosition"
-        android:title="Monatszusammenfassung"
-        android:summary="Zeigt eine Zusammenfassung im Bereich Verwendung an"
-        android:dialogTitle="Monatszusammenfassung konfigurieren"
-        android:entries="@array/pref_sum_pos_entries"
-        android:entryValues="@array/pref_sum_pos_values"
-        android:defaultValue="BOTTOM" />
+        android:key="aaCategory"
+        android:title="Arbeitsaufträge">
 
-    <CheckBoxPreference
-        android:title="Farbwechsel"
+        <CheckBoxPreference
         android:defaultValue="true"
-        android:summary="Farbe der Aktionsleiste beim Hinzufügen einer Verwendung an die Kategorie anpassen"
-        android:key="changeVerwendungColor" />
-</PreferenceCategory>
-
-                <PreferenceCategory
-                android:title="Benachrichtigungseinstellungen">
-                    <SwitchPreference
-                        android:title="Benachrichtigungen"
-                        android:defaultValue="true"
-                        android:summary="Erlaubt es der Anwendung Benachrichtigungen auf deinem Telefon anzuzeigen"
-                        android:key="allowNotification" />
-                 <CheckBoxPreference
-                        android:title="Vibration"
-                        android:defaultValue="true"
-                        android:summary="Bei neuer Benachrichtigung vibrieren"
-                        android:key="vibrateOnNotification" 
-                        android:dependency="allowNotification" />
-        </PreferenceCategory>
-
-    <PreferenceCategory
-        android:title="Arbeitsaufträge"
-        android:key="aaCategory">
-        <CheckBoxPreference
-            android:key="scanDiloc"
-            android:title="Diloc|Sync-Verzeichnis durchsuchen (DB Regio)"
-            android:summary="Durchsucht das Diloc|Sync-Verzeichnis nach tagesaktuellen Arbeitsauträgen"
-            android:defaultValue="true" />
+        android:key="scanDiloc"
+        android:summary="Durchsucht das Diloc|Sync-Verzeichnis nach tagesaktuellen Arbeitsaufträgen"
+        android:title="Diloc|Sync-Verzeichnis durchsuchen (DB Regio)" />
 
         <CheckBoxPreference
-            android:key="scanAgressive"
-            android:title="Aggressiver Suchalgorithmus"
-            android:summary="Durchsucht das gesamte Endgerät nach Schichten im EDITH-Format. Dies kann unter Umständen erheblich länger dauern und die System- und Akkuleistung beeinträchtigen!"
-            android:defaultValue="false" />
+            android:defaultValue="true"
+            android:key="scanFassi"
+            android:summary="Durchsucht das FASSI-MOVE-Verzeichnis nach tagesaktuellen Arbeitsaufträgen"
+            android:title="FASSI-MOVE-Verzeichnis durchsuchen (DB Regio)" />
 
         <Preference
             android:key="index"
-            android:title="Dateindex zurücksetzen">
+            android:summary="Ermittle Datenbankinhalt..."
+            android:title="Datei-Index zurücksetzen" />
+
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Anwendungsinformationen">
+        <Preference
+            android:key="version"
+            android:title="Version" />
+        <Preference
+            android:key="versioncode"
+            android:title="Versionscode" />
+        <Preference
+            android:key="copyright"
+            android:title="Urheberrecht" />
+        <Preference
+            android:key="contact"
+            android:summary="E-Mail an info@oses.mobi"
+            android:title="Kontakt">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="mailto:info@oses.mobi?subject=OSES Benutzeranfrage" />
         </Preference>
-
-
     </PreferenceCategory>
 
-    <PreferenceCategory
-        android:title="Sonstiges">
-    <PreferenceScreen
-        android:key="about"
-        android:title="Anwendungsinformationen"
-        android:persistent="false">
-        <PreferenceCategory
-            android:title="Anwendungsinformationen">
-            <Preference
-                android:key="version"
-                android:title="Version">
-            </Preference>
-            <Preference
-                android:key="versioncode"
-                android:title="Versionscode">
-            </Preference>
-            <Preference
-                android:key="copyright"
-                android:title="Urheberrecht">
-            </Preference>
-            <Preference
-                android:key="contact"
-                android:title="Kontakt"
-                android:summary="E-Mail an info@oses.mobi">
-                <intent
-                    android:action="android.intent.action.VIEW"
-                    android:data="mailto:info@oses.mobi?subject=OSES Benutzeranfrage">
-                </intent>
-            </Preference>
-        </PreferenceCategory>
-    </PreferenceScreen>
-    </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="Debug"
-        android:key="debugCategory">
+        android:key="debugCategory"
+        android:title="Debug">
         <SwitchPreference
-            android:title="Entwicklungsserver verwenden"
-            android:summary="Benutername und Passwort ergänzen, nur für berechtigte Personen!"
             android:defaultValue="false"
-            android:key="debugUseDevServer" />
+            android:key="debugUseDevServer"
+            android:summary="Benutername und Passwort ergänzen, nur für berechtigte Personen!"
+            android:title="Entwicklungsserver verwenden" />
         <EditTextPreference
-            android:title="Benutzername"
-            android:key="debugDevServerUser"
-            android:defaultValue=""
-            android:dependency="debugUseDevServer" />
-        <EditTextPreference
-            android:title="Passwort"
-            android:key="debugDevServerPass"
             android:defaultValue=""
             android:dependency="debugUseDevServer"
-            android:inputType="textPassword" />
+            android:key="debugDevServerUser"
+            android:title="Benutzername" />
+        <EditTextPreference
+            android:defaultValue=""
+            android:dependency="debugUseDevServer"
+            android:inputType="textPassword"
+            android:key="debugDevServerPass"
+            android:title="Passwort" />
     </PreferenceCategory>
 
 </PreferenceScreen>
