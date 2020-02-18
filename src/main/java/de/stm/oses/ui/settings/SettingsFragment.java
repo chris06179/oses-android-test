@@ -95,7 +95,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
         if (OSES.getDilocStatus() == OSESBase.STATUS_INSTALLED) {
             scanDiloc.setEnabled(true);
-        } if (OSES.getDilocStatus() == OSESBase.STATUS_NOT_ALLOWED) {
+        } else if (OSES.getDilocStatus() == OSESBase.STATUS_NOT_ALLOWED) {
             scanDiloc.setVisible(false);
         } else {
             scanDiloc.setEnabled(false);
@@ -115,7 +115,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
         if (OSES.getFassiStatus() == OSESBase.STATUS_INSTALLED) {
             scanFassi.setEnabled(true);
-        } if (OSES.getFassiStatus() == OSESBase.STATUS_NOT_ALLOWED) {
+        } else if (OSES.getFassiStatus() == OSESBase.STATUS_NOT_ALLOWED) {
             scanFassi.setVisible(false);
         } else {
             scanFassi.setEnabled(false);
