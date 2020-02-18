@@ -278,7 +278,7 @@ public class SchichtenFragment extends SwipeRefreshListFragment implements Actio
         setHasOptionsMenu(true);
         setRetainInstance(true);
 
-        OSES = new OSESBase(getActivity().getApplicationContext());
+        OSES = new OSESBase(requireContext());
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(getActivity());
 

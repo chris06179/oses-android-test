@@ -45,7 +45,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        final OSESBase OSES = new OSESBase(getActivity());
+        final OSESBase OSES = new OSESBase(requireContext());
         addPreferencesFromResource(R.xml.preferences);
 
 
@@ -95,6 +95,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
         if (OSES.getDilocStatus() == OSESBase.STATUS_INSTALLED) {
             scanDiloc.setEnabled(true);
+        } if (OSES.getDilocStatus() == OSESBase.STATUS_NOT_ALLOWED) {
+            scanDiloc.setVisible(false);
         } else {
             scanDiloc.setEnabled(false);
             scanDiloc.setSummary("Diloc|Sync wurde auf diesem Endgerät nicht gefunden. Funktion nicht verfügbar.");
@@ -114,8 +116,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         if (OSES.getFassiStatus() == OSESBase.STATUS_INSTALLED) {
             scanFassi.setEnabled(true);
         } if (OSES.getFassiStatus() == OSESBase.STATUS_NOT_ALLOWED) {
-            scanFassi.setEnabled(false);
-            scanFassi.setSummary("Die Unterstützung für FASSI-MOVE ist derzeit noch nicht verfügbar!");
+            scanFassi.setVisible(false);
         } else {
             scanFassi.setEnabled(false);
             scanFassi.setSummary("FASSI-MOVE wurde auf diesem Endgerät nicht gefunden. Funktion nicht verfügbar.");

@@ -269,7 +269,7 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        OSES = new OSESBase(getActivity());
+        OSES = new OSESBase(requireContext());
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(getActivity());
 

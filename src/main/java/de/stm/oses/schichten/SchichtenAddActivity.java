@@ -179,7 +179,7 @@ public class SchichtenAddActivity extends AppCompatActivity implements View.OnCl
 
         setResult(400);
 
-        OSES = new OSESBase(SchichtenAddActivity.this);
+        OSES = new OSESBase(this);
 
         try {
             ests = OSES.getEstAdapter(OSES.getSession().getEst(), true);

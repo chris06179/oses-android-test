@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import androidx.annotation.NonNull;
-import androidx.preference.PreferenceManager;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -34,7 +33,8 @@ public class MessagingService extends FirebaseMessagingService {
             return;
 
         OSESBase OSES = new OSESBase(this);
-        SharedPreferences notificationSettings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
+        SharedPreferences notificationSettings = OSES.getSession().getPreferences();
 
         if (OSES.getSession().getIdentifier().isEmpty()) {
             return;

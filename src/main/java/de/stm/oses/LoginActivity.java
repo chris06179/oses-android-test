@@ -21,6 +21,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.preference.PreferenceManager;
 
 import com.crashlytics.android.Crashlytics;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -47,9 +48,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        OSES = new OSESBase(this);
 
-        OSES = new OSESBase(LoginActivity.this);
         new NotificationHelper(this);
+
+        try {
+            PreferenceManager.setDefaultValues(this, R.xml.preferences, true);
+        } catch (Exception e) {
+            Crashlytics.logException(e);
+        }
 
         // Obtain the FirebaseAnalytics instance.
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);

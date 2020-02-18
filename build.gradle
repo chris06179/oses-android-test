@@ -51,7 +51,7 @@ android {
     lintOptions {
         checkReleaseBuilds true
         abortOnError true
-        disable 'InvalidPackage'
+        disable 'InvalidPackage' // Fix for ITextG
     }
     buildTypes {
         release {

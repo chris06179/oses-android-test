@@ -110,7 +110,7 @@ public class VerwendungFragmentNew extends RecyclerFragment implements ActionMod
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        OSES = new OSESBase(getActivity());
+        OSES = new OSESBase(requireContext());
         setHasOptionsMenu(true);
         setRetainInstance(true);
 

@@ -90,7 +90,7 @@ public class BrowserFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
 
-        OSES = new OSESBase(getActivity());
+        OSES = new OSESBase(requireContext());
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(getActivity());
     }

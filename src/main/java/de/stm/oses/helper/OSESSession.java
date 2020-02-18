@@ -2,11 +2,8 @@ package de.stm.oses.helper;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+
 import androidx.preference.PreferenceManager;
-
-import com.crashlytics.android.Crashlytics;
-
-import de.stm.oses.R;
 
 public class OSESSession {
 
@@ -30,13 +27,6 @@ public class OSESSession {
 
     OSESSession(Context context) {
         this.context = context;
-
-        // Fix für API < 20
-        try {
-            PreferenceManager.setDefaultValues(context, R.xml.preferences, true);
-        } catch (Exception e) {
-            Crashlytics.logException(e);
-        }
 
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
 

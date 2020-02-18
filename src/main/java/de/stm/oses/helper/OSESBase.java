@@ -1,7 +1,6 @@
 package de.stm.oses.helper;
 
 import android.Manifest;
-import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -38,7 +37,7 @@ import javax.net.ssl.HttpsURLConnection;
 import de.stm.oses.BuildConfig;
 import de.stm.oses.R;
 
-public class OSESBase extends Application {
+public class OSESBase {
 
     public static final int STATUS_NOT_ALLOWED = -1;
     public static final int STATUS_UNKNOWN = -1;
@@ -48,21 +47,17 @@ public class OSESBase extends Application {
 
     private Context context;
     private OSESSession session;
-    private int iDilocStatus;
-    private int iFassiStatus;
+    private int iDilocStatus = STATUS_UNKNOWN;
+    private int iFassiStatus = STATUS_UNKNOWN;;
 
     public OSESBase(Context context) {
-
         this.context = context;
-
-        session = new OSESSession(context);
-
-        this.iDilocStatus = STATUS_UNKNOWN;
-        this.iFassiStatus = STATUS_UNKNOWN;
-
     }
 
     public OSESSession getSession() {
+        if (session == null) {
+            session = new OSESSession(context);
+        }
         return session;
     }
 
@@ -453,6 +448,8 @@ public class OSESBase extends Application {
     }
 
     public int getDilocStatus() {
+        if (!FirebaseRemoteConfig.getInstance().getBoolean("allow_scan_diloc"))
+            return STATUS_NOT_ALLOWED;
         if (iDilocStatus == STATUS_UNKNOWN) {
             if (isPackageInstalled("de.diloc.DiLocSyncMobile", context.getPackageManager())) {
                 iDilocStatus = STATUS_INSTALLED;

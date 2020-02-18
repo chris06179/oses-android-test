@@ -71,7 +71,7 @@ public class DokumenteFragment extends Fragment implements View.OnClickListener 
         setHasOptionsMenu(true);
         setRetainInstance(true);
 
-        OSES = new OSESBase(getActivity());
+        OSES = new OSESBase(requireContext());
         selectedDate = Calendar.getInstance();
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(getActivity());

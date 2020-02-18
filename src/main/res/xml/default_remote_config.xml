@@ -14,12 +14,15 @@
         <value>/fassi-move-unknown-folder-placeholder/</value>
     </entry>
 
-
-
-
     <!-- Arbeitsauftrag Upload -->
     <entry>
         <key>allow_arbeitsauftrag_upload</key>
+        <value>true</value>
+    </entry>
+
+    <!-- DiLOC -->
+    <entry>
+        <key>allow_scan_diloc</key>
         <value>true</value>
     </entry>
 

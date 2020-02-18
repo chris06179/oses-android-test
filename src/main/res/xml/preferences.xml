@@ -95,12 +95,12 @@
             android:summary="Benutername und Passwort ergänzen, nur für berechtigte Personen!"
             android:title="Entwicklungsserver verwenden" />
         <EditTextPreference
-            android:defaultValue=""
+            android:defaultValue="Username"
             android:dependency="debugUseDevServer"
             android:key="debugDevServerUser"
             android:title="Benutzername" />
         <EditTextPreference
-            android:defaultValue=""
+            android:defaultValue="Password"
             android:dependency="debugUseDevServer"
             android:inputType="textPassword"
             android:key="debugDevServerPass"

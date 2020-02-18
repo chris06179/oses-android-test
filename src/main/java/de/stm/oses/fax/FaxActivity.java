@@ -195,7 +195,7 @@ public class FaxActivity extends AppCompatActivity implements
             fm.beginTransaction().add(mFaxListFragment, "fax_list_fragment").commit();
         }
 
-        OSES = new OSESBase(FaxActivity.this);
+        OSES = new OSESBase(this);
         fm.findFragmentById(R.id.map).setRetainInstance(true);
 
 
