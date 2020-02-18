@@ -39,7 +39,7 @@ import de.stm.oses.R;
 
 public class OSESBase {
 
-    public static final int STATUS_NOT_ALLOWED = -1;
+    public static final int STATUS_NOT_ALLOWED = -2;
     public static final int STATUS_UNKNOWN = -1;
     public static final int STATUS_NOT_INSTALLED = 0;
     public static final int STATUS_INSTALLED = 1;
@@ -48,7 +48,7 @@ public class OSESBase {
     private Context context;
     private OSESSession session;
     private int iDilocStatus = STATUS_UNKNOWN;
-    private int iFassiStatus = STATUS_UNKNOWN;;
+    private int iFassiStatus = STATUS_UNKNOWN;
 
     public OSESBase(Context context) {
         this.context = context;
@@ -448,10 +448,10 @@ public class OSESBase {
     }
 
     public int getDilocStatus() {
-        if (!FirebaseRemoteConfig.getInstance().getBoolean("allow_scan_diloc"))
-            return STATUS_NOT_ALLOWED;
         if (iDilocStatus == STATUS_UNKNOWN) {
-            if (isPackageInstalled("de.diloc.DiLocSyncMobile", context.getPackageManager())) {
+            if (!FirebaseRemoteConfig.getInstance().getBoolean("allow_scan_diloc")) {
+                iDilocStatus = STATUS_NOT_ALLOWED;
+            } else if (isPackageInstalled("de.diloc.DiLocSyncMobile", context.getPackageManager())) {
                 iDilocStatus = STATUS_INSTALLED;
             } else {
                 iDilocStatus = STATUS_NOT_INSTALLED;
@@ -462,10 +462,10 @@ public class OSESBase {
     }
 
     public int getFassiStatus() {
-        if (!FirebaseRemoteConfig.getInstance().getBoolean("allow_scan_fassi"))
-            return STATUS_NOT_ALLOWED;
-        if (iFassiStatus == STATUS_UNKNOWN) {
-            if (isPackageInstalled("de.bahn.dbs.mc", context.getPackageManager())) {
+     if (iFassiStatus == STATUS_UNKNOWN) {
+            if (!FirebaseRemoteConfig.getInstance().getBoolean("allow_scan_fassi")) {
+                iFassiStatus = STATUS_NOT_ALLOWED;
+            } else if (isPackageInstalled("de.bahn.dbs.mc", context.getPackageManager())) {
                 iFassiStatus = STATUS_INSTALLED;
             } else {
                 iFassiStatus = STATUS_NOT_INSTALLED;
