@@ -9,6 +9,7 @@ public class OSESSession {
 
     private final Context context;
     private String SessionUsername = "";
+    private int SessionUserId = -1;
     private int SessionGroup = 90;
     private int SessionEst = 0;
     private String SessionEstText;
@@ -32,6 +33,7 @@ public class OSESSession {
 
         SharedPreferences settings = context.getSharedPreferences("OSESPrefs", Context.MODE_PRIVATE);
         SessionUsername = settings.getString("SessionUsername", "");
+        SessionUserId = settings.getInt("SessionUserId", -1);
         SessionGroup = settings.getInt("SessionGruppe", 90);
         SessionEst = settings.getInt("SessionEst", 0);
         SessionEstText = settings.getString("SessionEstText", "");
@@ -51,6 +53,11 @@ public class OSESSession {
     public String getUsername() {
         return SessionUsername;
     }
+
+    public int getUserId() {
+        return SessionUserId;
+    }
+
     public int getGroup() {
         return SessionGroup;
     }
