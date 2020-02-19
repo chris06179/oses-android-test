@@ -58,7 +58,9 @@ public class NotificationHelper extends ContextWrapper {
      */
     public NotificationHelper(Context ctx) {
         super(ctx);
+    }
 
+    public void refreshNotificationChannels() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
 
             List<NotificationChannelGroup> notificationChannelGroups = new ArrayList<>();
@@ -67,18 +69,9 @@ public class NotificationHelper extends ContextWrapper {
             notificationChannelGroups.add(new NotificationChannelGroup("dokumente", "Dokumente"));
             notificationChannelGroups.add(new NotificationChannelGroup("system", "System"));
 
-            //NotificationChannel sdl = new NotificationChannel(SDL, "Sonderleistungszettel", NotificationManager.IMPORTANCE_DEFAULT);
-            //sdl.setDescription("Erinnerung an Sonderleistungszettel bei Schichtende");
-            //sdl.setGroup("dokumente");
-            //notificationChannels.add(sdl);
 
-            //NotificationChannel ausbleibe_fahrauslagen = new NotificationChannel(AUSBLEIBE_FAHRAUSLAGEN, "Ausbleibezeiten & Fahrauslagen", NotificationManager.IMPORTANCE_DEFAULT);
-            //ausbleibe_fahrauslagen.setDescription("Erinnerung an Ausbleibezeit & Fahrauslagen bei Monatsende");
-            //ausbleibe_fahrauslagen.setGroup("dokumente");
-            //notificationChannels.add(ausbleibe_fahrauslagen);
-
-            NotificationChannel index = new NotificationChannel(INDEX, "Dateiindex", NotificationManager.IMPORTANCE_LOW);
-            index.setDescription("Zeigt den Status der Indizierung von Dokumenten im DiLoc|Sync-Verzeichnis an");
+            NotificationChannel index = new NotificationChannel(INDEX, "Dokumentenindex", NotificationManager.IMPORTANCE_LOW);
+            index.setDescription("Zeigt den Status der Indizierung von Dokumenten im DiLoc|Sync oder FASSI-MOVE Verzeichnis an");
             index.setGroup("dokumente");
             notificationChannels.add(index);
 

@@ -43,13 +43,13 @@
 
     <PreferenceCategory
         android:key="aaCategory"
-        android:title="Arbeitsaufträge">
+        android:title="Arbeitsaufträge (DB Regio)">
 
         <CheckBoxPreference
-        android:defaultValue="true"
-        android:key="scanDiloc"
-        android:summary="Durchsucht das Diloc|Sync-Verzeichnis nach tagesaktuellen Arbeitsaufträgen"
-        android:title="Diloc|Sync-Verzeichnis durchsuchen (DB Regio)" />
+            android:defaultValue="true"
+            android:key="scanDiloc"
+            android:summary="Durchsucht das Diloc|Sync-Verzeichnis nach tagesaktuellen Arbeitsaufträgen"
+            android:title="Diloc|Sync-Verzeichnis durchsuchen (DB Regio)" />
 
         <CheckBoxPreference
             android:defaultValue="true"
@@ -60,7 +60,7 @@
         <Preference
             android:key="index"
             android:summary="Ermittle Datenbankinhalt..."
-            android:title="Datei-Index zurücksetzen" />
+            android:title="Dokumentenindex zurücksetzen" />
 
 
     </PreferenceCategory>

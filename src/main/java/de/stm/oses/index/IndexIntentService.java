@@ -66,6 +66,7 @@ public class IndexIntentService extends IntentService {
         boolean bScanFassi = intent.getBooleanExtra("scanFassi", false);
 
         FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.getInstance();
+        FirebaseAnalytics analytics = FirebaseAnalytics.getInstance(getApplicationContext());
 
         String dilocPath = Environment.getExternalStorageDirectory()+remoteConfig.getString("dilocPath");
         String fassiPath = Environment.getExternalStorageDirectory()+remoteConfig.getString("fassiPath");
@@ -74,13 +75,13 @@ public class IndexIntentService extends IntentService {
         NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext());
 
         if (bScanDiloc)
-            new FileSystemIndexer(dilocPath, database, notificationHelper, "DiLoc|Sync").execute();
+            new FileSystemIndexer(dilocPath, database, notificationHelper, analytics, "DiLoc|Sync").execute();
         if (bScanFassi)
-            new FileSystemIndexer(fassiPath, database, notificationHelper, "FASSI-MOVE").execute();
+            new FileSystemIndexer(fassiPath, database, notificationHelper, analytics, "FASSI-MOVE").execute();
 
         EventBus.getDefault().post(new IndexFinishedEvent());
 
-        FirebaseAnalytics analytics = FirebaseAnalytics.getInstance(getApplicationContext());
+
         Bundle data = new Bundle();
         data.putLong("files", database.fileSystemEntryDao().getCount());
         data.putLong("arbeitsauftrag", database.arbeitsauftragEntryDao().getCount());

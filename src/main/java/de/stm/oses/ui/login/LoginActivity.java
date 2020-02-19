@@ -1,4 +1,4 @@
-package de.stm.oses;
+package de.stm.oses.ui.login;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
@@ -32,6 +32,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.stm.oses.R;
 import de.stm.oses.dialogs.ProgressDialogFragment;
 import de.stm.oses.helper.OSESBase;
 import de.stm.oses.helper.OSESRequest;
@@ -43,14 +44,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private OSESBase OSES;
     private FirebaseAnalytics mFirebaseAnalytics;
 
-    /** Called when the activity is first created. */
+    /**
+     * Called when the activity is first created.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         OSES = new OSESBase(this);
 
-        new NotificationHelper(this);
+        new NotificationHelper(this).refreshNotificationChannels();
 
         try {
             PreferenceManager.setDefaultValues(this, R.xml.preferences, true);
@@ -79,14 +82,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         }
 
-                
+
         TextView copyright = findViewById(R.id.textView4);
 
         Calendar c = Calendar.getInstance();
         int year = c.get(Calendar.YEAR);
 
         if (copyright != null)
-            copyright.setText("© "+ year +" Steiner Media - v "+OSES.getVersion());
+            copyright.setText("© " + year + " Steiner Media - v " + OSES.getVersion());
 
         Button button_about = findViewById(R.id.login_about);
         Button button_lost_pass = findViewById(R.id.login_lost_pass);
@@ -118,24 +121,22 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle presses on the action bar items
-        switch (item.getItemId()) {
-            case R.id.action_login_imprint:
-                ImprintOnClick();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == R.id.action_login_imprint) {
+            ImprintOnClick();
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
-    
+
     private void LoginOnClick() {
-    	
-    	boolean stop = false;
+
+        boolean stop = false;
 
         String username;
         String password;
-    	
-    	EditText usernameEdit = findViewById(R.id.username);
-		EditText passwordEdit = findViewById(R.id.password);
+
+        EditText usernameEdit = findViewById(R.id.username);
+        EditText passwordEdit = findViewById(R.id.password);
 
         if (usernameEdit != null && passwordEdit != null) {
 
@@ -177,7 +178,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             postdata.put("username", username);
             postdata.put("password", password);
             postdata.put("device", android_id);
-            postdata.put("model", android.os.Build.MODEL+"|"+android.os.Build.PRODUCT);
+            postdata.put("model", android.os.Build.MODEL + "|" + android.os.Build.PRODUCT);
             postdata.put("gcm_regid", OSES.getSession().getSessionFcmInstanceId());
             postdata.put("androidversion", String.valueOf(OSES.getVersionCode()));
 
@@ -217,7 +218,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         Toast.makeText(LoginActivity.this, "Anmeldung fehlgeschlagen! Benutzername oder Passwort ist nicht korrekt!", Toast.LENGTH_LONG).show();
 
 
-                    }  else {
+                    } else {
 
                         mFirebaseAnalytics.logEvent("OSES_login_ok", null);
 
@@ -227,7 +228,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         editor.putString("SessionIdentifier", SessionIdentifier);
                         editor.apply();
 
-                        Intent intent = new Intent(LoginActivity.this,StartActivity.class);
+                        Intent intent = new Intent(LoginActivity.this, StartActivity.class);
                         startActivity(intent);
 
                         finish();
@@ -260,7 +261,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
 
         }
-   	    
+
     }
 
     private void ShowWaitDialog() {
@@ -337,5 +338,5 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
 
     }
-    
+
 }

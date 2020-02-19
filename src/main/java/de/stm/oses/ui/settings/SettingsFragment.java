@@ -35,10 +35,10 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         model.getFileSystemStatus().observe(getViewLifecycleOwner(), fileSystemStatus -> {
             if (fileSystemStatus.fileSystemCount == 0) {
                 index.setEnabled(false);
-                index.setSummary("Derzeit sind keine Dateien indiziert!");
+                index.setSummary("Derzeit sind keine Dokumente indiziert!");
             } else {
                 index.setEnabled(true);
-                index.setSummary("Derzeit sind "+fileSystemStatus.fileSystemCount+" Dateien mit "+fileSystemStatus.arbeitsauftragCount+" Arbeitsaufträgen indiziert");
+                index.setSummary("Derzeit sind "+fileSystemStatus.fileSystemCount+" Dokumente mit "+fileSystemStatus.arbeitsauftragCount+" Arbeitsaufträgen indiziert");
             }
        });
     }

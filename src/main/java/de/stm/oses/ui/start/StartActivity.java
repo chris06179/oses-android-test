@@ -16,7 +16,6 @@ import android.view.Menu;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -45,10 +44,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import de.stm.oses.LoginActivity;
 import de.stm.oses.R;
 import de.stm.oses.dialogs.IndexInfoDialog;
-import de.stm.oses.dialogs.NoPdfReaderInstalledDialog;
 import de.stm.oses.dokumente.DokumenteFragment;
 import de.stm.oses.helper.FileDownload;
 import de.stm.oses.helper.FileDownload.OnDownloadFinishedListener;
@@ -58,6 +55,7 @@ import de.stm.oses.helper.OSESBase;
 import de.stm.oses.index.IndexIntentService;
 import de.stm.oses.schichten.SchichtenFragment;
 import de.stm.oses.ui.browser.BrowserFragment;
+import de.stm.oses.ui.login.LoginActivity;
 import de.stm.oses.ui.settings.SettingsFragment;
 import de.stm.oses.verwendung.VerwendungFragment;
 
@@ -134,11 +132,16 @@ public class StartActivity extends AppCompatActivity {
         }
 
         OSES = new OSESBase(this);
-        startFileIndexer();
+
+        // Settings holen, blockiere Upload zum Server
+        final FirebaseRemoteConfig mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+        mFirebaseRemoteConfig.setDefaultsAsync(R.xml.default_remote_config).addOnCompleteListener(task -> startFileIndexer());
+        mFirebaseRemoteConfig.fetchAndActivate();
 
         mFirebaseAnalytics.setUserProperty("est", OSES.getSession().getEstText());
         mFirebaseAnalytics.setUserProperty("funktion", String.valueOf(OSES.getSession().getFunktion()));
         mFirebaseAnalytics.setUserProperty("gb", OSES.getSession().getGBText());
+        mFirebaseAnalytics.setUserId(String.valueOf(OSES.getSession().getUserId()));
 
         Toolbar toolbar = findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
@@ -194,75 +197,68 @@ public class StartActivity extends AppCompatActivity {
         mMenuList.setAdapter(mMenuAdapter);
 
 
-        mMenuList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mMenuList.setOnItemClickListener((parent, view, position, id) -> {
+            if (id >= 0) {
+                Integer selected = mMenuAdapter.getItem((int) id).getID();
 
-            @Override
-            public void onItemClick(AdapterView<?> a, View arg1,
-                                    int position, long id) {
-
-
-                if (id >= 0) {
-                    Integer selected = mMenuAdapter.getItem((int) id).getID();
-
-                    switch (selected) {
-                        case 11:
-                            setMenuSelection(id);
-                            openWebView("aktuell");
-                            setDrawer(false);
-                            return;
-                        case 22:
-                            setMenuSelection(id);
-                            ChangeFragment(new VerwendungFragment(), "verwendung");
-                            setDrawer(false);
-                            return;
-                        case 21:
-                            setMenuSelection(id);
-                            ChangeFragment(new SchichtenFragment(), "schichten");
-                            setDrawer(false);
-                            return;
-                        case 31:
-                            setMenuSelection(id);
-                            ChangeFragment(new DokumenteFragment(), "dokumente");
-                            setDrawer(false);
-                            return;
-                        case 81:
-                            DoBenutzerprofil();
-                            setDrawer(false);
-                            return;
-                        case 82:
-                            setMenuSelection(id);
-                            ChangeFragment(new SettingsFragment(), "settings");
-                            setDrawer(false);
-                            return;
-                        case 84:
-                            DoLogout();
-                            setDrawer(false);
-                            return;
-                        case 92:
-                            setMenuSelection(id);
-                            openWebView("hilfe");
-                            setDrawer(false);
-                            return;
-                        case 93:
-                            setMenuSelection(id);
-                            openWebView("anb");
-                            setDrawer(false);
-                            return;
-                        case 94:
-                            setMenuSelection(id);
-                            openWebView("impressum");
-                            setDrawer(false);
-                            return;
-                        case 95:
-                            setMenuSelection(id);
-                            openWebView("spenden");
-                            setDrawer(false);
-                            return;
-                        case 99:
-                            OpenOSES();
-                            setDrawer(false);
-                            return;
-                    }
+                switch (selected) {
+                    case 11:
+                        setMenuSelection(id);
+                        openWebView("aktuell");
+                        setDrawer(false);
+                        return;
+                    case 22:
+                        setMenuSelection(id);
+                        ChangeFragment(new VerwendungFragment(), "verwendung");
+                        setDrawer(false);
+                        return;
+                    case 21:
+                        setMenuSelection(id);
+                        ChangeFragment(new SchichtenFragment(), "schichten");
+                        setDrawer(false);
+                        return;
+                    case 31:
+                        setMenuSelection(id);
+                        ChangeFragment(new DokumenteFragment(), "dokumente");
+                        setDrawer(false);
+                        return;
+                    case 81:
+                        DoBenutzerprofil();
+                        setDrawer(false);
+                        return;
+                    case 82:
+                        setMenuSelection(id);
+                        ChangeFragment(new SettingsFragment(), "settings");
+                        setDrawer(false);
+                        return;
+                    case 84:
+                        DoLogout();
+                        setDrawer(false);
+                        return;
+                    case 92:
+                        setMenuSelection(id);
+                        openWebView("hilfe");
+                        setDrawer(false);
+                        return;
+                    case 93:
+                        setMenuSelection(id);
+                        openWebView("anb");
+                        setDrawer(false);
+                        return;
+                    case 94:
+                        setMenuSelection(id);
+                        openWebView("impressum");
+                        setDrawer(false);
+                        return;
+                    case 95:
+                        setMenuSelection(id);
+                        openWebView("spenden");
+                        setDrawer(false);
+                        return;
+                    case 99:
+                        OpenOSES();
+                        setDrawer(false);
+                        return;
                 }
             }
         });
@@ -288,13 +284,7 @@ public class StartActivity extends AppCompatActivity {
         if (menu_gb != null)
             menu_gb.setText(OSES.getSession().getGBText());
 
-
         new CheckSession().execute();
-
-        // Settings holen, blockiere Upload zum Server
-        final FirebaseRemoteConfig mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
-        mFirebaseRemoteConfig.setDefaultsAsync(R.xml.default_remote_config);
-        mFirebaseRemoteConfig.fetchAndActivate();
 
         androidx.fragment.app.FragmentManager fragmentManager = getSupportFragmentManager();
         androidx.fragment.app.Fragment running = fragmentManager.findFragmentById(R.id.content_frame);
@@ -420,48 +410,6 @@ public class StartActivity extends AppCompatActivity {
 
     }
 
-    private void DoDokumentation() {
-        FileDownload download = new FileDownload(StartActivity.this);
-        download.setTitle("Dokumentation");
-        download.setMessage("Die Dokumentation wird heruntergeladen, dieser Vorgang kann einen Moment dauern...");
-        download.setURL("https://oses.mobi/docs/oses_nutzungshinweise.pdf");
-        download.setLocalDirectory("Dokumente/");
-        download.setCancelable(true);
-        download.setOnDownloadFinishedListener(new OnDownloadFinishedListener() {
-            @Override
-            public void onDownloadFinished(File file) {
-                Uri fileUri = FileProvider.getUriForFile(StartActivity.this, "de.stm.oses.FileProvider", file);
-
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setDataAndType(fileUri, "application/pdf");
-                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION+Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-
-                // Falls keine entsprechende Activity existiert (kein PDF-Reader installiert)
-                try {
-                    startActivity(intent);
-                } catch (ActivityNotFoundException e) {
-                    new NoPdfReaderInstalledDialog().show(getSupportFragmentManager(), "no_pdf_dialog");
-                }
-            }
-
-            @Override
-            public void onTextReceived(String res) {
-
-            }
-
-            @Override
-            public void onException(Exception e) {
-
-            }
-
-            @Override
-            public void onUnknownStatus(int status) {
-
-            }
-        });
-
-        download.execute();
-    }
 
     @Override
     public void onBackPressed() {
@@ -803,6 +751,7 @@ public class StartActivity extends AppCompatActivity {
             String StatusMessage = "";
 
             String SessionUsername = "";
+            int SessionUserId = -1;
             int SessionGroup = 90;
             int SessionEst = 0;
             String SessionEstText = "";
@@ -843,6 +792,7 @@ public class StartActivity extends AppCompatActivity {
                 DataGB = json.getString("DataGB");
 
                 SessionUsername = json.getString("SessionUsername");
+                SessionUserId = json.getInt("SessionId");
                 SessionGroup = json.getInt("SessionGruppe");
                 SessionVorname = json.getString("SessionVorname");
                 SessionNachname = json.getString("SessionName");
@@ -878,6 +828,7 @@ public class StartActivity extends AppCompatActivity {
                 editor.putString("StatusMessage", StatusMessage);
                 editor.putString("StatusCode", StatusCode);
                 editor.putString("SessionUsername", SessionUsername);
+                editor.putInt("SessionUserId", SessionUserId);
                 editor.putInt("SessionGruppe", SessionGroup);
                 editor.putInt("SessionEst", SessionEst);
                 editor.putString("SessionEstText", SessionEstText);

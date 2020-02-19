@@ -462,7 +462,7 @@ public class OSESBase {
     }
 
     public int getFassiStatus() {
-     if (iFassiStatus == STATUS_UNKNOWN) {
+        if (iFassiStatus == STATUS_UNKNOWN) {
             if (!FirebaseRemoteConfig.getInstance().getBoolean("allow_scan_fassi")) {
                 iFassiStatus = STATUS_NOT_ALLOWED;
             } else if (isPackageInstalled("de.bahn.dbs.mc", context.getPackageManager())) {
@@ -477,7 +477,7 @@ public class OSESBase {
 
 
     public boolean hasStoragePermission() {
-       return ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+        return ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
     }
 
     public void rebuildWorkingDirectory() {
@@ -512,7 +512,7 @@ public class OSESBase {
                         continue;
 
                     String bezeichner = split[1];
-                    String datum = split[2].substring(0, split[2].length()-4);
+                    String datum = split[2].substring(0, split[2].length() - 4);
 
                     SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY);
                     try {

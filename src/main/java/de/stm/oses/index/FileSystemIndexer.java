@@ -1,9 +1,11 @@
 package de.stm.oses.index;
 
 import android.database.sqlite.SQLiteConstraintException;
+import android.os.Bundle;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.parser.PdfReaderContentParser;
@@ -30,13 +32,15 @@ public class FileSystemIndexer {
     private final String mPath;
     private final FirebaseRemoteConfig mFirebaseRemoteConfig;
     private final NotificationHelper mNotificationHelper;
+    private final FirebaseAnalytics mFirebaseAnalytics;
     private String mAppTitle;
 
-    public FileSystemIndexer(String path, FileSystemDatabase database, NotificationHelper notificationHelper, String appTitle) {
+    public FileSystemIndexer(String path, FileSystemDatabase database, NotificationHelper notificationHelper, FirebaseAnalytics analytics, String appTitle) {
         mIndex = database;
         mPath = path;
         mNotificationHelper = notificationHelper;
         mAppTitle = appTitle;
+        mFirebaseAnalytics = analytics;
 
         // Remote Config
         mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
@@ -98,6 +102,11 @@ public class FileSystemIndexer {
             }
 
         }
+
+        Bundle data = new Bundle();
+        data.putLong("files", fsFiles.size());
+        data.putString("directory", directory.getAbsolutePath());
+        mFirebaseAnalytics.logEvent("oses_file_index_addfiles", data);
 
     }
 
