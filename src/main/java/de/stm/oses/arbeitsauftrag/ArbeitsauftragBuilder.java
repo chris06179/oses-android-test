@@ -93,7 +93,6 @@ public class ArbeitsauftragBuilder {
             }
         }
 
-        read.removeAnnotations();
         read.removeUnusedObjects();
     }
 
