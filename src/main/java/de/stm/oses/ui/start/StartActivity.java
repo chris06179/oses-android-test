@@ -46,7 +46,7 @@ import java.util.Calendar;
 
 import de.stm.oses.R;
 import de.stm.oses.dialogs.IndexInfoDialog;
-import de.stm.oses.dokumente.DokumenteFragment;
+import de.stm.oses.ui.dokumente.DokumenteFragment;
 import de.stm.oses.helper.FileDownload;
 import de.stm.oses.helper.FileDownload.OnDownloadFinishedListener;
 import de.stm.oses.helper.MenuAdapter;

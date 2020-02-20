@@ -1,4 +1,4 @@
-package de.stm.oses.dokumente;
+package de.stm.oses.ui.dokumente;
 
 import android.content.ActivityNotFoundException;
 import android.content.Context;
