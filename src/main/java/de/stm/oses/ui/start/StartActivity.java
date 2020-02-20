@@ -143,6 +143,8 @@ public class StartActivity extends AppCompatActivity {
         mFirebaseAnalytics.setUserProperty("gb", OSES.getSession().getGBText());
         mFirebaseAnalytics.setUserId(String.valueOf(OSES.getSession().getUserId()));
 
+        Crashlytics.setUserIdentifier(String.valueOf(OSES.getSession().getUserId()));
+
         Toolbar toolbar = findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
 

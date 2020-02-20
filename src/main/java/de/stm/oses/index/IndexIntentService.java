@@ -8,6 +8,7 @@ import android.os.Environment;
 
 import androidx.annotation.Nullable;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
@@ -26,16 +27,24 @@ public class IndexIntentService extends IntentService {
         IndexFinishedEvent() {}
     }
 
+    private class NoFilesFoundException extends Exception {}
+
     public static boolean startService(Context context, OSESBase OSES) {
 
         if (!OSES.hasStoragePermission()) {
             return false;
         }
 
+        Crashlytics.setInt("dilocStatus", OSES.getDilocStatus());
+        Crashlytics.setInt("fassiStatus", OSES.getFassiStatus());
+
         boolean bScanDiloc = (OSES.getSession().getPreferences().getBoolean("scanDiloc", true) && OSES.getDilocStatus() == OSESBase.STATUS_INSTALLED);
         boolean bScanFassi = (OSES.getSession().getPreferences().getBoolean("scanFassi", true) && OSES.getFassiStatus() == OSESBase.STATUS_INSTALLED);
 
         if (bScanDiloc || bScanFassi) {
+
+            Crashlytics.setBool("scanDiloc", bScanDiloc);
+            Crashlytics.setBool("scanFassi", bScanFassi);
 
             Intent serviceIntent = new Intent(context, IndexIntentService.class);
             serviceIntent.putExtra("scanDiloc", bScanDiloc);
@@ -56,6 +65,8 @@ public class IndexIntentService extends IntentService {
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
 
+        Crashlytics.log("start indexer");
+
         // weitere Requests in der selben Instanz verhindern
         if (alreadyStarted || intent == null)
             return;
@@ -74,17 +85,31 @@ public class IndexIntentService extends IntentService {
         FileSystemDatabase database = FileSystemDatabase.getInstance(getApplicationContext());
         NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext());
 
-        if (bScanDiloc)
-            new FileSystemIndexer(dilocPath, database, notificationHelper, analytics, "DiLoc|Sync").execute();
-        if (bScanFassi)
-            new FileSystemIndexer(fassiPath, database, notificationHelper, analytics, "FASSI-MOVE").execute();
+        if (bScanDiloc) {
+            Crashlytics.log("execute FileSystemIndexer DiLoc");
+            new FileSystemIndexer(dilocPath, database, notificationHelper,"DiLoc|Sync").execute();
+        }
+        if (bScanFassi) {
+            Crashlytics.log("execute FileSystemIndexer FASSI");
+            new FileSystemIndexer(fassiPath, database, notificationHelper, "FASSI-MOVE").execute();
+        }
 
         EventBus.getDefault().post(new IndexFinishedEvent());
 
+        long filesCount = database.fileSystemEntryDao().getCount();
+        long arbeitsauftragCount = database.arbeitsauftragEntryDao().getCount();
+
+        Crashlytics.setLong("filesCount", filesCount);
+        Crashlytics.setLong("arbeitsauftragCount", arbeitsauftragCount);
+        Crashlytics.log("stop indexer");
+
+        if (filesCount == 0) {
+            Crashlytics.logException(new NoFilesFoundException());
+        }
 
         Bundle data = new Bundle();
-        data.putLong("files", database.fileSystemEntryDao().getCount());
-        data.putLong("arbeitsauftrag", database.arbeitsauftragEntryDao().getCount());
+        data.putLong("files", filesCount);
+        data.putLong("arbeitsauftrag", arbeitsauftragCount);
         analytics.logEvent("oses_file_index_finished", data);
 
     }
