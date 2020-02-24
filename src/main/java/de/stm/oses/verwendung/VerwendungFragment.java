@@ -53,7 +53,7 @@ import de.stm.oses.fcm.MessagingService;
 import de.stm.oses.helper.FileDownload;
 import de.stm.oses.helper.OSESBase;
 import de.stm.oses.helper.SwipeRefreshListFragment;
-import de.stm.oses.index.IndexIntentService;
+import de.stm.oses.index.IndexJobIntentService;
 
 
 public class VerwendungFragment extends SwipeRefreshListFragment implements ActionMode.Callback, DilocInfoDialogFragment.DilocInfoDialogListener {
@@ -257,7 +257,7 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
     }
 
     private void startFileIndexer() {
-        if (IndexIntentService.startService(getActivity(), OSES)) {
+        if (IndexJobIntentService.enqueueWork(getActivity(), OSES)) {
             if (!OSES.getSession().getSessionIndexReminder()) {
                 IndexInfoDialog dialog = IndexInfoDialog.newInstance();
                 dialog.show(getChildFragmentManager(), "indexInfoDialog");
@@ -597,7 +597,7 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessageEvent(IndexIntentService.IndexFinishedEvent event) {
+    public void onMessageEvent(IndexJobIntentService.IndexFinishedEvent event) {
         ArbeitsausftragIntentService.startService(requireActivity(),OSES, getListAdapter().getArrayList());
     }
 

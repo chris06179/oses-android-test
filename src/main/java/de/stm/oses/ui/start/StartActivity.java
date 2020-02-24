@@ -52,7 +52,7 @@ import de.stm.oses.helper.FileDownload.OnDownloadFinishedListener;
 import de.stm.oses.helper.MenuAdapter;
 import de.stm.oses.helper.MenuClass;
 import de.stm.oses.helper.OSESBase;
-import de.stm.oses.index.IndexIntentService;
+import de.stm.oses.index.IndexJobIntentService;
 import de.stm.oses.schichten.SchichtenFragment;
 import de.stm.oses.ui.browser.BrowserFragment;
 import de.stm.oses.ui.login.LoginActivity;
@@ -102,7 +102,7 @@ public class StartActivity extends AppCompatActivity {
     }
 
     private void startFileIndexer() {
-        if (IndexIntentService.startService(this, OSES)) {
+        if (IndexJobIntentService.enqueueWork(this, OSES)) {
             if (!OSES.getSession().getSessionIndexReminder()) {
                 IndexInfoDialog dialog = IndexInfoDialog.newInstance();
                 dialog.show(getSupportFragmentManager(), "indexInfoDialog");

@@ -81,20 +81,25 @@
         android:title="Debug">
         <SwitchPreference
             android:defaultValue="false"
+            android:key="useFileLogging"
+            android:summary="Erstelle ausführliche Logs über Anwendungsprozesse. Aktiviere diese Funktion nur, wenn du dazu aufgefordert wirst, da durch diese Funktion eine erhöhte Systemlast entstehen kann (Zurück-Button betätigen bis die App geschlossen wird)!"
+            android:title="Protokolldatei schreiben" />
+        <SwitchPreference
+            android:defaultValue="false"
             android:key="debugUseDevServer"
-            android:summary="Benutername und Passwort ergänzen, nur für berechtigte Personen!"
+            android:summary="Benutzername und Passwort ergänzen, nur für berechtigte Personen!"
             android:title="Entwicklungsserver verwenden" />
         <EditTextPreference
             android:defaultValue="Username"
             android:dependency="debugUseDevServer"
             android:key="debugDevServerUser"
-            android:title="Benutzername" />
+            android:title="Benutzername (nicht OSES-Login)" />
         <EditTextPreference
             android:defaultValue="Password"
             android:dependency="debugUseDevServer"
             android:inputType="textPassword"
             android:key="debugDevServerPass"
-            android:title="Passwort" />
+            android:title="Passwort (nicht OSES-Login)" />
     </PreferenceCategory>
 
 </PreferenceScreen>

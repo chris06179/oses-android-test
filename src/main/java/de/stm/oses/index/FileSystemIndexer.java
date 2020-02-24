@@ -3,6 +3,8 @@ package de.stm.oses.index;
 import android.database.sqlite.SQLiteConstraintException;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.crashlytics.android.Crashlytics;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.itextpdf.text.pdf.PdfReader;
@@ -31,25 +33,34 @@ public class FileSystemIndexer {
     private final FirebaseRemoteConfig mFirebaseRemoteConfig;
     private final NotificationHelper mNotificationHelper;
     private String mAppTitle;
+    private boolean isStopped;
 
-    public FileSystemIndexer(String path, FileSystemDatabase database, NotificationHelper notificationHelper, String appTitle) {
+    FileSystemIndexer(String path, FileSystemDatabase database, NotificationHelper notificationHelper, String appTitle) {
         mIndex = database;
         mPath = path;
         mNotificationHelper = notificationHelper;
         mAppTitle = appTitle;
-
-        // Remote Config
         mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+    }
 
-        Crashlytics.setString("app", appTitle);
-        Crashlytics.setString("path", mPath);
+    void doStopCurrentWork() {
+      isStopped = true;
+    }
+
+    private boolean isStopped() {
+        return isStopped;
     }
 
     public void execute() {
 
-        checkUpdatedFiles();
-        addNewFiles();
-        updateContentType();
+        if (!isStopped())
+            checkUpdatedFiles();
+        if (!isStopped())
+            addNewFiles();
+        if (!isStopped())
+            updateContentType();
+
+        mNotificationHelper.removeIndexNotification();
 
     }
 
@@ -79,7 +90,6 @@ public class FileSystemIndexer {
 
     private void addNewFiles() {
 
-
         mNotificationHelper.showIndexNotification(mAppTitle,"Prüfe auf neue Dateien...", 0,0);
 
         File directory = new File(mPath);
@@ -102,9 +112,6 @@ public class FileSystemIndexer {
 
         }
 
-        Crashlytics.setBool("directoryExists", directory.exists());
-        Crashlytics.setInt("fsFiles", fsFiles.size());
-
     }
 
     @FileSystemEntry.FileContent
@@ -112,7 +119,13 @@ public class FileSystemIndexer {
 
         File file = databaseFile.getFile();
 
+        if (!file.exists())
+            return FileSystemEntry.FILECONTENT_OTHER;
+
         if (!file.getName().substring(file.getName().lastIndexOf(".") + 1).toLowerCase().equals("pdf"))
+            return FileSystemEntry.FILECONTENT_OTHER;
+
+        if (file.length() / (1024 * 1024) > FirebaseRemoteConfig.getInstance().getLong("indexer_max_filesize"))
             return FileSystemEntry.FILECONTENT_OTHER;
 
         try {
@@ -129,12 +142,16 @@ public class FileSystemIndexer {
             // Prüfe auf den ersten 4 Seiten ob es sich um ein Dokument mit Arbeitsaufträgen handelt
             for (int k = 1; k <= read.getNumberOfPages(); k++) {
 
+                if (isStopped())
+                    return FileSystemEntry.FILECONTENT_UNKNOWN;
+
                 TextExtractionStrategy strategy = parser.processContent(k, new SimpleTextExtractionStrategy());
                 String text = strategy.getResultantText();
 
-
                 if (pIsArbeitsauftragEDITH.matcher(text).matches()) {
                     List<ArbeitsauftragEntry> result = scanEdith(read, parser, databaseFile);
+                    if (isStopped())
+                        return FileSystemEntry.FILECONTENT_UNKNOWN;
                     if (result.isEmpty()) {
                         return FileSystemEntry.FILECONTENT_OTHER;
                     } else {
@@ -145,6 +162,8 @@ public class FileSystemIndexer {
 
                 if (pIsArbeitsauftragMBRAIL.matcher(text).matches()) {
                     List<ArbeitsauftragEntry> result = scanMBRail(read, parser, databaseFile);
+                    if (isStopped())
+                        return FileSystemEntry.FILECONTENT_UNKNOWN;
                     if (result.isEmpty()) {
                         return FileSystemEntry.FILECONTENT_OTHER;
                     } else {
@@ -174,8 +193,6 @@ public class FileSystemIndexer {
 
         List<FileSystemEntry> all = mIndex.fileSystemEntryDao().getUnknown();
 
-        Crashlytics.setInt("unknownFilesCount", all.size());
-
         for (int i = 0; i < all.size(); i++) {
             FileSystemEntry databaseFile = all.get(i);
 
@@ -186,12 +203,14 @@ public class FileSystemIndexer {
             databaseFile.contentType = checkFileContent(databaseFile);
             mIndex.fileSystemEntryDao().update(databaseFile);
 
-        }
+            if (isStopped())
+                return;
 
-        mNotificationHelper.removeIndexNotification();
+        }
 
     }
 
+    @NonNull
     private ArrayList<ArbeitsauftragEntry> scanEdith(PdfReader read, PdfReaderContentParser parser, FileSystemEntry databaseFile) {
 
         ArrayList<ArbeitsauftragEntry> arbeitsauftragList = new ArrayList<>();
@@ -218,6 +237,9 @@ public class FileSystemIndexer {
             String lastBezeichner = "";
 
             for (int i = 1; i <= read.getNumberOfPages(); i++) {
+
+                if (isStopped())
+                    return new ArrayList<>();
 
                 try {
 
@@ -298,7 +320,7 @@ public class FileSystemIndexer {
 
             }
 
-            Log.d("AAINDEXER", String.valueOf(arbeitsauftragList.size()));
+            Log.d("INDEXER", String.valueOf(arbeitsauftragList.size()));
 
         } catch (Exception | OutOfMemoryError | NoClassDefFoundError e) {
             Crashlytics.setString("File", databaseFile.getFile().getAbsolutePath());
@@ -308,6 +330,7 @@ public class FileSystemIndexer {
         return arbeitsauftragList;
     }
 
+    @NonNull
     private ArrayList<ArbeitsauftragEntry> scanMBRail(PdfReader read, PdfReaderContentParser parser, FileSystemEntry databaseFile) {
 
         ArrayList<ArbeitsauftragEntry> arbeitsauftragList = new ArrayList<>();
@@ -330,6 +353,9 @@ public class FileSystemIndexer {
             String lastBezeichner = "";
 
             for (int i = 1; i <= read.getNumberOfPages(); i++) {
+
+                if (isStopped())
+                    return new ArrayList<>();
 
                 try {
 

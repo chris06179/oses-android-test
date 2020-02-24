@@ -2,15 +2,23 @@
 <!-- START xml_defaults -->
 <defaultsMap>
 
+
+
+    <!-- Max FileSize in MegaBytes-->
+    <entry>
+        <key>indexer_max_filesize</key>
+        <value>10</value>
+    </entry>
+
     <!-- DiLoc Verzeichnis -->
     <entry>
-        <key>dilocPath</key>
+        <key>diloc_path</key>
         <value>/sync/fs-data/</value>
     </entry>
 
     <!-- FASSI Verzeichnis -->
     <entry>
-        <key>fassiPath</key>
+        <key>fassi_path</key>
         <value>/fassi-move-unknown-folder-placeholder/</value>
     </entry>
 

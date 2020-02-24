@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,6 +26,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     private static final int PERMISSION_REQUEST_STORAGE_DILOC = 5600;
 
     private SettingsViewModel model;
+    private long lastClick;
+    private int clicks;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -38,16 +41,15 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 index.setSummary("Derzeit sind keine Dokumente indiziert!");
             } else {
                 index.setEnabled(true);
-                index.setSummary("Derzeit sind "+fileSystemStatus.fileSystemCount+" Dokumente mit "+fileSystemStatus.arbeitsauftragCount+" Arbeitsaufträgen indiziert");
+                index.setSummary("Derzeit sind " + fileSystemStatus.fileSystemCount + " Dokumente mit " + fileSystemStatus.arbeitsauftragCount + " Arbeitsaufträgen indiziert");
             }
-       });
+        });
     }
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         final OSESBase OSES = new OSESBase(requireContext());
         addPreferencesFromResource(R.xml.preferences);
-
 
 
         Preference notificationsv26 = findPreference("notificationsv26");
@@ -60,9 +62,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 return true;
             });
         }
-
-        Preference version = findPreference("version");
-        version.setSummary(OSES.getVersion());
 
         Preference versioncode = findPreference("versioncode");
         versioncode.setSummary(String.valueOf(OSES.getVersionCode()));
@@ -122,26 +121,52 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             scanFassi.setSummary("FASSI-MOVE wurde auf diesem Endgerät nicht gefunden. Funktion nicht verfügbar.");
         }
 
-
-        if (OSES.getSession().getGroup() > 10) {
-            PreferenceCategory devCat = findPreference("debugCategory");
-            getPreferenceScreen().removePreference(devCat);
-        } else {
-
-            SwitchPreference devModeSwitch = findPreference("debugUseDevServer");
-            devModeSwitch.setOnPreferenceChangeListener((preference, newValue) -> {
-                if (((boolean) newValue)) {
-                    TextView devModeText =  requireActivity().findViewById(R.id.devModeText);
-                    devModeText.setVisibility(View.VISIBLE);
-                } else {
-                    TextView devModeText = requireActivity().findViewById(R.id.devModeText);
-                    devModeText.setVisibility(View.GONE);
-                }
-
-                return true;
-
-            });
+        if (OSES.getDilocStatus() == OSESBase.STATUS_NOT_ALLOWED && OSES.getFassiStatus() == OSESBase.STATUS_NOT_ALLOWED) {
+            PreferenceCategory aaCategory = findPreference("aaCategory");
+            aaCategory.setVisible(false);
+            model.resetIndex();
         }
+
+        PreferenceCategory devCat = findPreference("debugCategory");
+
+
+        if (OSES.getSession().getGroup() < 11 || OSES.getSession().getPreferences().getBoolean("useFileLogging", false)) {
+            devCat.setVisible(true);
+        } else {
+            devCat.setVisible(false);
+        }
+
+
+        SwitchPreference devModeSwitch = findPreference("debugUseDevServer");
+        devModeSwitch.setOnPreferenceChangeListener((preference, newValue) -> {
+            if (((boolean) newValue)) {
+                TextView devModeText = requireActivity().findViewById(R.id.devModeText);
+                devModeText.setVisibility(View.VISIBLE);
+            } else {
+                TextView devModeText = requireActivity().findViewById(R.id.devModeText);
+                devModeText.setVisibility(View.GONE);
+            }
+
+            return true;
+
+        });
+
+
+        Preference version = findPreference("version");
+        version.setSummary(OSES.getVersion());
+        version.setOnPreferenceClickListener(preference -> {
+            if (System.currentTimeMillis() - lastClick < 1000) {
+                clicks++;
+                if (clicks > 10) {
+                    devCat.setVisible(true);
+                    Toast.makeText(requireContext(), "Entwickleroptionen aktiviert!", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                clicks = 0;
+            }
+            lastClick = System.currentTimeMillis();
+            return true;
+        });
 
 
     }
