@@ -7,7 +7,7 @@
     <!-- Max FileSize in MegaBytes-->
     <entry>
         <key>indexer_max_filesize</key>
-        <value>10</value>
+        <value>100</value>
     </entry>
 
     <!-- DiLoc Verzeichnis -->
