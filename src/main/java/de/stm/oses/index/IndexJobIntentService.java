@@ -8,12 +8,12 @@ import android.os.Environment;
 import androidx.annotation.NonNull;
 import androidx.core.app.JobIntentService;
 
-import com.crashlytics.android.Crashlytics;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
 import org.greenrobot.eventbus.EventBus;
 
+import de.stm.oses.application.OsesApplication;
 import de.stm.oses.helper.OSESBase;
 import de.stm.oses.index.database.FileSystemDatabase;
 import de.stm.oses.notification.NotificationHelper;
@@ -57,6 +57,8 @@ public class IndexJobIntentService extends JobIntentService {
     @Override
     protected void onHandleWork(@NonNull Intent intent) {
 
+        OsesApplication.getInstance().getLogger().log("INDEXER","Starte Work...");
+
         // weitere Requests in der selben Instanz verhindern
         if (alreadyStarted || isStopped())
             return;
@@ -65,6 +67,8 @@ public class IndexJobIntentService extends JobIntentService {
 
         boolean bScanDiloc = intent.getBooleanExtra("scanDiloc", false);
         boolean bScanFassi = intent.getBooleanExtra("scanFassi", false);
+
+        OsesApplication.getInstance().getLogger().log("INDEXER","Parameter - DiLoc "+bScanDiloc+" / FASSI "+bScanFassi);
 
         FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.getInstance();
         FirebaseAnalytics analytics = FirebaseAnalytics.getInstance(getApplicationContext());
@@ -87,6 +91,7 @@ public class IndexJobIntentService extends JobIntentService {
 
         if (isStopped()) {
             analytics.logEvent("oses_file_index_force_stop", null);
+            OsesApplication.getInstance().getLogger().log("INDEXER","Work durch System unterbrochen!");
             return;
         }
 
@@ -99,6 +104,8 @@ public class IndexJobIntentService extends JobIntentService {
         analytics.logEvent("oses_file_index_finished", data);
 
         EventBus.getDefault().post(new IndexFinishedEvent());
+
+        OsesApplication.getInstance().getLogger().log("INDEXER","Work beendet! Dateien: "+filesCount+" - Arbeitsaufträge: "+arbeitsauftragCount);
 
     }
 

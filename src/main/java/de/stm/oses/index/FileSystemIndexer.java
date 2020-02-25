@@ -1,7 +1,6 @@
 package de.stm.oses.index;
 
 import android.database.sqlite.SQLiteConstraintException;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -21,6 +20,7 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.stm.oses.application.OsesApplication;
 import de.stm.oses.index.database.FileSystemDatabase;
 import de.stm.oses.index.entities.ArbeitsauftragEntry;
 import de.stm.oses.index.entities.FileSystemEntry;
@@ -41,6 +41,8 @@ public class FileSystemIndexer {
         mNotificationHelper = notificationHelper;
         mAppTitle = appTitle;
         mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+
+        OsesApplication.getInstance().getLogger().log("INDEXER","Construct FileSystemIndexer - "+mPath+" - "+appTitle);
     }
 
     void doStopCurrentWork() {
@@ -62,6 +64,9 @@ public class FileSystemIndexer {
 
         mNotificationHelper.removeIndexNotification();
 
+        OsesApplication.getInstance().getLogger().log("INDEXER","Destroy FileSystemIndexer");
+
+
     }
 
     private List<File> findFile(File aFile) {
@@ -78,9 +83,12 @@ public class FileSystemIndexer {
 
     private void checkUpdatedFiles() {
 
+        OsesApplication.getInstance().getLogger().log("INDEXER","Prüfe auf geänderte Dateien...");
+
         for (FileSystemEntry databaseFile : mIndex.fileSystemEntryDao().getAll()) {
             File fsFile = new File(databaseFile.path + "/" + databaseFile.filename);
             if (!fsFile.exists() || (fsFile.lastModified() != databaseFile.lastModified)) {
+                OsesApplication.getInstance().getLogger().log("INDEXER","Datei geändert: "+fsFile.getAbsolutePath());
                 mIndex.fileSystemEntryDao().delete(databaseFile);
             }
         }
@@ -90,10 +98,13 @@ public class FileSystemIndexer {
 
     private void addNewFiles() {
 
+        OsesApplication.getInstance().getLogger().log("INDEXER","Liste Verzeichnisinhalt...");
         mNotificationHelper.showIndexNotification(mAppTitle,"Prüfe auf neue Dateien...", 0,0);
 
         File directory = new File(mPath);
         List<File> fsFiles = findFile(directory);
+
+        OsesApplication.getInstance().getLogger().log("INDEXER","Gefundene Dateien: "+fsFiles.size());
 
         for (File fsFile : fsFiles) {
 
@@ -106,6 +117,7 @@ public class FileSystemIndexer {
 
             try {
                 mIndex.fileSystemEntryDao().insert(entry);
+                OsesApplication.getInstance().getLogger().log("INDEXER","Datei hinzugefügt: "+fsFile.getAbsolutePath());
             } catch (SQLiteConstraintException ignored) {
 
             }
@@ -118,6 +130,8 @@ public class FileSystemIndexer {
     private int checkFileContent(FileSystemEntry databaseFile) {
 
         File file = databaseFile.getFile();
+
+        OsesApplication.getInstance().getLogger().log("INDEXER", "  Dateigröße: "+file.length()+" bytes");
 
         if (!file.exists())
             return FileSystemEntry.FILECONTENT_OTHER;
@@ -138,6 +152,8 @@ public class FileSystemIndexer {
 
             Pattern pIsArbeitsauftragEDITH = Pattern.compile(isArbeitsauftragEDITH, Pattern.DOTALL + Pattern.MULTILINE);
             Pattern pIsArbeitsauftragMBRAIL = Pattern.compile(isArbeitsauftragMBRAIL, Pattern.DOTALL + Pattern.MULTILINE);
+
+            OsesApplication.getInstance().getLogger().log("INDEXER", "  PDF-Pages: "+read.getNumberOfPages());
 
             // Prüfe auf den ersten 4 Seiten ob es sich um ein Dokument mit Arbeitsaufträgen handelt
             for (int k = 1; k <= read.getNumberOfPages(); k++) {
@@ -179,6 +195,7 @@ public class FileSystemIndexer {
             }
 
         } catch (Exception | OutOfMemoryError | NoClassDefFoundError e) {
+            OsesApplication.getInstance().getLogger().log("INDEXER", "  Handled Exception: "+e.getMessage());
             Crashlytics.setString("File", file.getAbsolutePath());
             Crashlytics.logException(e);
             return FileSystemEntry.FILECONTENT_EXCEPTION;
@@ -191,17 +208,21 @@ public class FileSystemIndexer {
 
     private void updateContentType () {
 
+        OsesApplication.getInstance().getLogger().log("INDEXER","Überprüfe Content Type...");
+
         List<FileSystemEntry> all = mIndex.fileSystemEntryDao().getUnknown();
 
         for (int i = 0; i < all.size(); i++) {
             FileSystemEntry databaseFile = all.get(i);
 
-            Log.d("INDEXER", i+1 + " / " + all.size() + ": " + databaseFile.filename);
+            OsesApplication.getInstance().getLogger().log("INDEXER", i+1 + " / " + all.size() + ": " +databaseFile.path +"/"+ databaseFile.filename);
 
             mNotificationHelper.showIndexNotification(mAppTitle,(i+1)+" / "+all.size()+" Dateien durchsucht", all.size()-1,i);
 
             databaseFile.contentType = checkFileContent(databaseFile);
             mIndex.fileSystemEntryDao().update(databaseFile);
+
+            OsesApplication.getInstance().getLogger().log("INDEXER", "  Type:" +databaseFile.contentType);
 
             if (isStopped())
                 return;
@@ -228,8 +249,6 @@ public class FileSystemIndexer {
             Pattern pDatumsbereich = Pattern.compile(datumsbereichEDITH, Pattern.MULTILINE);
             Pattern pLetzteBearbeitung = Pattern.compile(letzteBearbeitungEDITH, Pattern.MULTILINE);
 
-            Log.d("AAINDEXER", databaseFile.filename);
-
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMAN);
             SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd.MM.yyyy, HH:mm", Locale.GERMAN);
 
@@ -252,12 +271,13 @@ public class FileSystemIndexer {
                     Matcher bezeichnerMatcher = pSchicht.matcher(text);
                     if (bezeichnerMatcher.find() && bezeichnerMatcher.groupCount() == 1) {
                         bezeichner = bezeichnerMatcher.group(1);
-                        Log.d("AAINDEXER Bezeichner", bezeichner != null ? bezeichner : "");
                     }
 
                     if (bezeichner == null) {
                         continue;
                     }
+
+                    OsesApplication.getInstance().getLogger().log("INDEXER", "  "+bezeichner);
 
                     if (!lastBezeichner.equals(bezeichner)) {
 
@@ -314,15 +334,17 @@ public class FileSystemIndexer {
                     }
 
                 } catch (Exception e) {
+                    OsesApplication.getInstance().getLogger().log("INDEXER", "  Handled Exception: "+e.getMessage());
                     Crashlytics.setString("File", databaseFile.getFile().getAbsolutePath());
                     Crashlytics.logException(e);
                 }
 
             }
 
-            Log.d("INDEXER", String.valueOf(arbeitsauftragList.size()));
+            OsesApplication.getInstance().getLogger().log("INDEXER", "  Anzahl Arbeitsaufträge: "+arbeitsauftragList.size());
 
         } catch (Exception | OutOfMemoryError | NoClassDefFoundError e) {
+            OsesApplication.getInstance().getLogger().log("INDEXER", "  Handled Exception: "+e.getMessage());
             Crashlytics.setString("File", databaseFile.getFile().getAbsolutePath());
             Crashlytics.logException(e);
         }
@@ -346,8 +368,6 @@ public class FileSystemIndexer {
             Pattern pDatum = Pattern.compile(datumMBRAIL, Pattern.MULTILINE);
             Pattern pLetzteBearbeitung = Pattern.compile(letzteBearbeitungMBRAIL, Pattern.MULTILINE);
 
-            Log.d("AAINDEXER", databaseFile.filename);
-
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMAN);
 
             String lastBezeichner = "";
@@ -368,12 +388,13 @@ public class FileSystemIndexer {
                     Matcher bezeichnerMatcher = pSchicht.matcher(text);
                     if (bezeichnerMatcher.find() && bezeichnerMatcher.groupCount() == 1) {
                         bezeichner = bezeichnerMatcher.group(1);
-                        Log.d("AAINDEXER Bezeichner", bezeichner != null ? bezeichner : "");
                     }
 
                     if (bezeichner == null) {
                         continue;
                     }
+
+                    OsesApplication.getInstance().getLogger().log("INDEXER", "  "+bezeichner);
 
                     if (!lastBezeichner.equals(bezeichner)) {
 
@@ -419,16 +440,17 @@ public class FileSystemIndexer {
                     }
 
                 } catch (Exception e) {
+                    OsesApplication.getInstance().getLogger().log("INDEXER", "  Handled Exception: "+e.getMessage());
                     Crashlytics.setString("File", databaseFile.getFile().getAbsolutePath());
                     Crashlytics.logException(e);
                 }
 
             }
 
-            Log.d("AAINDEXER", String.valueOf(arbeitsauftragList.size()));
-
+            OsesApplication.getInstance().getLogger().log("INDEXER", "  Anzahl Arbeitsaufträge: "+arbeitsauftragList.size());
 
         } catch (Exception | OutOfMemoryError | NoClassDefFoundError e) {
+            OsesApplication.getInstance().getLogger().log("INDEXER", "  Handled Exception: "+e.getMessage());
             Crashlytics.setString("File", databaseFile.getFile().getAbsolutePath());
             Crashlytics.logException(e);
         }

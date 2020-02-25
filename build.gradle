@@ -94,20 +94,22 @@ dependencies {
     implementation 'com.itextpdf:itextg:5.5.10'
     //implementation 'com.tom_roush:pdfbox-android:1.8.9.1'
     implementation 'org.greenrobot:eventbus:3.2.0'
-    implementation 'androidx.room:room-runtime:2.2.3'
+    implementation 'androidx.room:room-runtime:2.2.4'
     implementation 'androidx.preference:preference:1.1.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.2.0'
     implementation 'androidx.lifecycle:lifecycle-livedata:2.2.0'
     implementation 'androidx.lifecycle:lifecycle-common-java8:2.2.0'
-    implementation 'com.google.firebase:firebase-inappmessaging-display:19.0.3'
 
     implementation 'androidx.navigation:navigation-fragment:2.2.1'
     implementation 'androidx.navigation:navigation-ui:2.2.1'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation 'androidx.core:core:1.2.0'
 
-    annotationProcessor 'androidx.room:room-compiler:2.2.3'
+    annotationProcessor 'androidx.room:room-compiler:2.2.4'
     debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'
+
+    implementation 'com.madgag.spongycastle:core:1.58.0.0'
+    implementation 'com.madgag.spongycastle:prov:1.58.0.0'
 
 }
 

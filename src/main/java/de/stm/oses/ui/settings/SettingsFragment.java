@@ -19,6 +19,7 @@ import androidx.preference.SwitchPreference;
 import java.util.Calendar;
 
 import de.stm.oses.R;
+import de.stm.oses.application.OsesApplication;
 import de.stm.oses.helper.OSESBase;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
@@ -149,6 +150,14 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
             return true;
 
+        });
+
+        findPreference("useFileLogging").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                OsesApplication.getInstance().getLogger().setUseFileLogging((boolean) newValue);
+                return true;
+            }
         });
 
 
