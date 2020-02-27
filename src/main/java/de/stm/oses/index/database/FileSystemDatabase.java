@@ -14,7 +14,7 @@ import de.stm.oses.index.dao.FileSystemEntryDao;
 import de.stm.oses.index.entities.ArbeitsauftragEntry;
 import de.stm.oses.index.entities.FileSystemEntry;
 
-@Database(entities = {FileSystemEntry.class, ArbeitsauftragEntry.class}, version = 2)
+@Database(entities = {FileSystemEntry.class, ArbeitsauftragEntry.class}, version = 3)
 @TypeConverters({Converters.class})
 public abstract class FileSystemDatabase extends RoomDatabase {
 
@@ -32,16 +32,16 @@ public abstract class FileSystemDatabase extends RoomDatabase {
         return Room.databaseBuilder(
                 context,
                 FileSystemDatabase.class,
-                DB_NAME).addMigrations(MIGRATION_1_2).fallbackToDestructiveMigration().build();
+                DB_NAME).addMigrations(MIGRATION_1_3).fallbackToDestructiveMigration().build();
     }
 
-    private static final Migration MIGRATION_1_2 = new Migration(1, 2) {
+    private static final Migration MIGRATION_1_3 = new Migration(1, 2) {
         @Override
         public void migrate(SupportSQLiteDatabase database) {
             database.execSQL("ALTER TABLE arbeitsauftrag ADD COLUMN est TEXT;");
-            database.execSQL("ALTER TABLE arbeitsauftrag ADD COLUMN est_db TEXT;");
-            database.execSQL("ALTER TABLE arbeitsauftrag ADD COLUMN est_de TEXT;");
-            database.execSQL("ALTER TABLE arbeitsauftrag ADD COLUMN beginn TEXT;");
+            database.execSQL("ALTER TABLE arbeitsauftrag ADD COLUMN ort_start TEXT;");
+            database.execSQL("ALTER TABLE arbeitsauftrag ADD COLUMN ort_ende TEXT;");
+            database.execSQL("ALTER TABLE arbeitsauftrag ADD COLUMN start TEXT;");
             database.execSQL("ALTER TABLE arbeitsauftrag ADD COLUMN ende TEXT;");
 
             database.execSQL("DELETE FROM files WHERE content_type = 1 OR content_type = 2");
