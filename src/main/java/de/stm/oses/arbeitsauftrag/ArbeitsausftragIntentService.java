@@ -115,7 +115,7 @@ public class ArbeitsausftragIntentService extends IntentService {
                 continue;
             }
 
-            ArbeitsauftragWithFileEntry arbeitsauftragWithFile = FileSystemDatabase.getInstance(getApplicationContext()).arbeitsauftragEntryDao().getFileForVerwendung(schicht.getBezeichner().replaceAll("[^0-9]", ""), schicht.getDatumDate());
+            ArbeitsauftragWithFileEntry arbeitsauftragWithFile = FileSystemDatabase.getInstance(getApplicationContext()).arbeitsauftragEntryDao().getFileForVerwendung(schicht.getBezeichner().replaceAll("[^0-9]", ""), schicht.getDatumDate(), "%"+schicht.getEst()+"%");
 
             if (arbeitsauftragWithFile == null) {
                 continue;

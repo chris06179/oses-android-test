@@ -32,6 +32,21 @@ public class ArbeitsauftragEntry {
     @ColumnInfo(name = "datum_bis")
     public Date datumBis;
 
+    @ColumnInfo(name = "est")
+    public String est;
+
+    @ColumnInfo(name = "est_start")
+    public String estStart;
+
+    @ColumnInfo(name = "est_ende")
+    public String estEnde;
+
+    @ColumnInfo(name = "start")
+    public String start;
+
+    @ColumnInfo(name = "ende")
+    public String ende;
+
     @ColumnInfo(name = "last_edit")
     public Date lastEdit;
 

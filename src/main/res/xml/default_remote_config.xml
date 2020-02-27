@@ -68,6 +68,20 @@
         <key>letzteBearbeitungEDITH</key>
         <value>Letzte Bearbeitung:\s*(\d{2}\.\d{2}\.\d{4},\s\d{2}:\d{2})</value>
     </entry>
+    <entry>
+        <key>startEDITH</key>
+        <value>^AZ\sTarif:\n(\d{2}:\d{2})\s?([A-Za-z]+)?$</value>
+    </entry>
+    <entry>
+        <key>endeEDITH</key>
+        <value>^Fahrzeit\sauf\sTfz:\n(\d{2}:\d{2})\s?([A-Za-z]+)?$</value>
+    </entry>
+    <entry>
+        <key>estEDITH</key>
+        <value>^Einsatzstelle:(?:\n.*Änderungsgründe:\n)?\s?([A-Za-z]+\s?[A-Za-z]*)\s+\d+$</value>
+    </entry>
+
+
 
     <!-- Arbeistauftrag Pattern MBRAIL -->
     <entry>
@@ -81,6 +95,18 @@
     <entry>
         <key>letzteBearbeitungMBRAIL</key>
         <value>Stand:\s*(\d{2}\.\d{2}\.\d{4})$</value>
+    </entry>
+    <entry>
+        <key>startMBRAIL</key>
+        <value>^AZ\sTarif:\n(\d{2}:\d{2})\s?([A-Z]+)?$</value>
+    </entry>
+    <entry>
+        <key>endeMBRAIL</key>
+        <value>^Fahrzeit\sauf\sTfz:\n(\d{2}:\d{2})\s?([A-Z]+)?$</value>
+    </entry>
+    <entry>
+        <key>estMBRAIL</key>
+        <value>^Änderungsgründe:\n([A-Z]+\s?[A-Z])\s+\d+$</value>
     </entry>
 
 </defaultsMap>

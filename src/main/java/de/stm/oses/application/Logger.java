@@ -37,14 +37,14 @@ public class Logger {
             return;
 
         SimpleDateFormat dayformat = new SimpleDateFormat("yyyy_MM_dd", Locale.GERMAN);
-        SimpleDateFormat timeformat = new SimpleDateFormat("hh:mm:ss", Locale.GERMAN);
+        SimpleDateFormat timeformat = new SimpleDateFormat("HH:mm:ss", Locale.GERMAN);
 
         File logFile = new File(Environment.getExternalStorageDirectory()+"/OSES/logs/"+dayformat.format(new Date())+".log");
         if (!logFile.exists())
         {
             try
             {
-                //logFile.mkdirs();
+                logFile.getParentFile().mkdirs();
                 logFile.createNewFile();
             }
             catch (IOException e)

@@ -243,11 +243,17 @@ public class FileSystemIndexer {
             String datumEDITH = mFirebaseRemoteConfig.getString("datumEDITH");
             String datumsbereichEDITH = mFirebaseRemoteConfig.getString("datumsbereichEDITH");
             String letzteBearbeitungEDITH = mFirebaseRemoteConfig.getString("letzteBearbeitungEDITH");
+            String estEDITH = mFirebaseRemoteConfig.getString("estEDITH");
+            String startEDITH = mFirebaseRemoteConfig.getString("startEDITH");
+            String endeEDITH = mFirebaseRemoteConfig.getString("endeEDITH");
 
             Pattern pSchicht = Pattern.compile(schichtEDITH, Pattern.MULTILINE);
             Pattern pDatum = Pattern.compile(datumEDITH, Pattern.DOTALL + Pattern.MULTILINE);
             Pattern pDatumsbereich = Pattern.compile(datumsbereichEDITH, Pattern.MULTILINE);
             Pattern pLetzteBearbeitung = Pattern.compile(letzteBearbeitungEDITH, Pattern.MULTILINE);
+            Pattern pEst = Pattern.compile(estEDITH, Pattern.MULTILINE);
+            Pattern pStart = Pattern.compile(startEDITH, Pattern.MULTILINE);
+            Pattern pEnde = Pattern.compile(endeEDITH, Pattern.MULTILINE);
 
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMAN);
             SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd.MM.yyyy, HH:mm", Locale.GERMAN);
@@ -313,6 +319,45 @@ public class FileSystemIndexer {
                             if (datumStart != null && datumEnd != null) {
                                 entry.datumVon = dateFormat.parse(datumStart);
                                 entry.datumBis = dateFormat.parse(datumEnd);
+                            }
+                        }
+
+                        // Einsatzstelle
+                        Matcher estMatcher = pEst.matcher(text);
+                        if (estMatcher.find() && estMatcher.groupCount() == 1) {
+                            String est = estMatcher.group(1);
+                            if (est != null) {
+                                entry.est = est;
+                            }
+                        }
+
+                        // Start
+                        Matcher startMatcher = pStart.matcher(text);
+                        if (startMatcher.find() && startMatcher.groupCount() >= 1) {
+                            String start = startMatcher.group(1);
+                            if (start != null) {
+                                entry.start = start;
+                            }
+                            if (startMatcher.groupCount() == 2) {
+                                String est_start = startMatcher.group(2);
+                                if (est_start != null) {
+                                    entry.estStart = est_start;
+                                }
+                            }
+                        }
+
+                        // Ende
+                        Matcher endeMatcher = pEnde.matcher(text);
+                        if (endeMatcher.find() && endeMatcher.groupCount() >= 1) {
+                            String ende = endeMatcher.group(1);
+                            if (ende != null) {
+                                entry.ende = ende;
+                            }
+                            if (endeMatcher.groupCount() == 2) {
+                                String est_ende = endeMatcher.group(2);
+                                if (est_ende != null) {
+                                    entry.estEnde = est_ende;
+                                }
                             }
                         }
 
