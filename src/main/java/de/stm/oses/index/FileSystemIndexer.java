@@ -339,9 +339,9 @@ public class FileSystemIndexer {
                                 entry.start = start;
                             }
                             if (startMatcher.groupCount() == 2) {
-                                String est_start = startMatcher.group(2);
-                                if (est_start != null) {
-                                    entry.estStart = est_start;
+                                String ort_start = startMatcher.group(2);
+                                if (ort_start != null) {
+                                    entry.ortStart = ort_start;
                                 }
                             }
                         }
@@ -354,9 +354,9 @@ public class FileSystemIndexer {
                                 entry.ende = ende;
                             }
                             if (endeMatcher.groupCount() == 2) {
-                                String est_ende = endeMatcher.group(2);
-                                if (est_ende != null) {
-                                    entry.estEnde = est_ende;
+                                String ort_ende = endeMatcher.group(2);
+                                if (ort_ende != null) {
+                                    entry.ortEnde = ort_ende;
                                 }
                             }
                         }
