@@ -19,7 +19,7 @@ public interface ArbeitsauftragEntryDao {
     List<ArbeitsauftragEntry> getAll();
 
     @Transaction
-    @Query("SELECT * FROM arbeitsauftrag WHERE bezeichner = :bezeichner AND (datum = :datum OR (datum_von <= :datum AND datum_bis >= :datum)) AND (est LIKE :est OR est_start LIKE :est OR est_ende LIKE :est) ORDER by datum_von, last_edit ASC LIMIT 1")
+    @Query("SELECT * FROM arbeitsauftrag WHERE bezeichner = :bezeichner AND (datum = :datum OR (datum_von <= :datum AND datum_bis >= :datum)) AND (est LIKE :est OR ort_start LIKE :est OR ort_ende LIKE :est) ORDER by datum_von, last_edit ASC LIMIT 1")
     ArbeitsauftragWithFileEntry getFileForVerwendung(String bezeichner, Date datum, String est);
 
     @Query("SELECT count(*) FROM arbeitsauftrag")
