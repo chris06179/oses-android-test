@@ -251,7 +251,7 @@ public class FileSystemIndexer {
             Pattern pDatum = Pattern.compile(datumEDITH, Pattern.DOTALL + Pattern.MULTILINE);
             Pattern pDatumsbereich = Pattern.compile(datumsbereichEDITH, Pattern.MULTILINE);
             Pattern pLetzteBearbeitung = Pattern.compile(letzteBearbeitungEDITH, Pattern.MULTILINE);
-            Pattern pEst = Pattern.compile(estEDITH, Pattern.MULTILINE);
+            Pattern pEst = Pattern.compile(estEDITH, Pattern.DOTALL + Pattern.MULTILINE);
             Pattern pStart = Pattern.compile(startEDITH, Pattern.MULTILINE);
             Pattern pEnde = Pattern.compile(endeEDITH, Pattern.MULTILINE);
 
@@ -375,7 +375,8 @@ public class FileSystemIndexer {
                                 arbeitsauftragList.get(arbeitsauftragList.size() - 1).lastEdit = dateTimeFormat.parse(letzteBearbeitung);
                             }
                         }
-                        arbeitsauftragList.get(arbeitsauftragList.size() - 1).pages.add(i);
+                        if (arbeitsauftragList.size() > 0)
+                            arbeitsauftragList.get(arbeitsauftragList.size() - 1).pages.add(i);
                     }
 
                 } catch (Exception e) {
@@ -408,10 +409,12 @@ public class FileSystemIndexer {
             String schichtMBRAIL = mFirebaseRemoteConfig.getString("schichtMBRAIL");
             String datumMBRAIL = mFirebaseRemoteConfig.getString("datumMBRAIL");
             String letzteBearbeitungMBRAIL = mFirebaseRemoteConfig.getString("letzteBearbeitungMBRAIL");
+            String startEndeEstMBRAIL = mFirebaseRemoteConfig.getString("startEndeEstMBRAIL");
 
             Pattern pSchicht = Pattern.compile(schichtMBRAIL, Pattern.MULTILINE);
             Pattern pDatum = Pattern.compile(datumMBRAIL, Pattern.MULTILINE);
             Pattern pLetzteBearbeitung = Pattern.compile(letzteBearbeitungMBRAIL, Pattern.MULTILINE);
+            Pattern pStartEndeEst = Pattern.compile(startEndeEstMBRAIL, Pattern.MULTILINE);
 
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMAN);
 
@@ -467,6 +470,23 @@ public class FileSystemIndexer {
                             }
                         }
 
+                        // Start, Ende, Einsatzstelle
+                        Matcher startEndeEstMatcher = pStartEndeEst.matcher(text);
+                        if (startEndeEstMatcher.find() && startEndeEstMatcher.groupCount() == 3) {
+                            String start = startEndeEstMatcher.group(1);
+                            if (start != null) {
+                                entry.start = start;
+                            }
+                            String ende = startEndeEstMatcher.group(2);
+                            if (ende != null) {
+                                entry.ende = ende;
+                            }
+                            String est = startEndeEstMatcher.group(3);
+                            if (est != null) {
+                                entry.est = est;
+                            }
+                        }
+
                         entry.pages.add(i);
 
                         arbeitsauftragList.add(entry);
@@ -481,7 +501,8 @@ public class FileSystemIndexer {
                                 arbeitsauftragList.get(arbeitsauftragList.size() - 1).lastEdit = dateFormat.parse(letzteBearbeitung);
                             }
                         }
-                        arbeitsauftragList.get(arbeitsauftragList.size() - 1).pages.add(i);
+                        if (arbeitsauftragList.size() > 0)
+                            arbeitsauftragList.get(arbeitsauftragList.size() - 1).pages.add(i);
                     }
 
                 } catch (Exception e) {
