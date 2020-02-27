@@ -35,11 +35,11 @@ public class ArbeitsauftragEntry {
     @ColumnInfo(name = "est")
     public String est;
 
-    @ColumnInfo(name = "est_start")
-    public String estStart;
+    @ColumnInfo(name = "ort_start")
+    public String ortStart;
 
-    @ColumnInfo(name = "est_ende")
-    public String estEnde;
+    @ColumnInfo(name = "ort_ende")
+    public String ortEnde;
 
     @ColumnInfo(name = "start")
     public String start;
