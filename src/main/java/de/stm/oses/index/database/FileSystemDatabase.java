@@ -35,7 +35,7 @@ public abstract class FileSystemDatabase extends RoomDatabase {
                 DB_NAME).addMigrations(MIGRATION_1_3).fallbackToDestructiveMigration().build();
     }
 
-    private static final Migration MIGRATION_1_3 = new Migration(1, 2) {
+    private static final Migration MIGRATION_1_3 = new Migration(1, 3) {
         @Override
         public void migrate(SupportSQLiteDatabase database) {
             database.execSQL("ALTER TABLE arbeitsauftrag ADD COLUMN est TEXT;");
