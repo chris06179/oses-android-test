@@ -34,8 +34,8 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.preference.PreferenceManager;
 
-import com.crashlytics.android.Crashlytics;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
 import org.json.JSONObject;
@@ -143,7 +143,7 @@ public class StartActivity extends AppCompatActivity {
         mFirebaseAnalytics.setUserProperty("gb", OSES.getSession().getGBText());
         mFirebaseAnalytics.setUserId(String.valueOf(OSES.getSession().getUserId()));
 
-        Crashlytics.setUserIdentifier(String.valueOf(OSES.getSession().getUserId()));
+        FirebaseCrashlytics.getInstance().setUserId(String.valueOf(OSES.getSession().getUserId()));
 
         Toolbar toolbar = findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
@@ -902,8 +902,8 @@ public class StartActivity extends AppCompatActivity {
                                 launchIntent.setData(Uri.parse("market://details?id="+appPackageName));
                                 startActivity(launchIntent);
                             } catch (ActivityNotFoundException | NullPointerException e) {
-                                Crashlytics.log("opening GPLAY failed");
-                                Crashlytics.logException(e);
+                                FirebaseCrashlytics.getInstance().log("opening GPLAY failed");
+                                FirebaseCrashlytics.getInstance().recordException(e);
                             } finally {
                                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
                             }

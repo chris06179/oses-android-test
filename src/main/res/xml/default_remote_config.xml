@@ -49,6 +49,10 @@
         <key>isArbeitsauftragMBRAIL</key>
         <value>.*Schicht\n[0-9]+$.*</value>
     </entry>
+    <entry>
+        <key>isArbeitsauftragIPD</key>
+        <value>.*Dienst-Nr\.:\s[0-9]+[A-Za-z]*$.*</value>
+    </entry>
 
 
     <!-- Arbeistauftrag Pattern EDITH -->
@@ -99,6 +103,36 @@
     <entry>
         <key>startEndeEstMBRAIL</key>
         <value>^OE1.*(\d{2}:\d{2})\s(\d{2}:\d{2})\s(\w+\s?\d?)$</value>
+    </entry>
+
+    <!-- Arbeistauftrag Pattern IPD -->
+    <entry>
+        <key>schichtIPD</key>
+        <value>^Dienst-Nr\.:\s([0-9A-Za-z]+)$</value>
+    </entry>
+    <entry>
+        <key>datumIPD</key>
+        <value>^Gültig am\s(\d{2}\.\d{2}\.\d{4})$</value>
+    </entry>
+    <entry>
+        <key>datumsbereichIPD</key>
+        <value>^Gültigkeitszeitraum: (\d{2}\.\d{2}\.\d{4})$.*-\s(\d{2}\.\d{2}\.\d{4})$</value>
+    </entry>
+    <entry>
+        <key>gedrucktIPD</key>
+        <value>DB intern, gedruckt am:\s(\d{2}\.\d{2}\.\d{4},\s\d{2}:\d{2})</value>
+    </entry>
+    <entry>
+        <key>estIPD</key>
+        <value>^Einsatzstelle:\s([A-Za-z]+\s*[A-Za-z]+)\s*\d+$</value>
+    </entry>
+    <entry>
+        <key>startIPD</key>
+        <value>Dienstbeginn:\s(\d{2}:\d{2})</value>
+    </entry>
+    <entry>
+        <key>endeIPD</key>
+        <value>Dienstende:\s(\d{2}:\d{2})</value>
     </entry>
 
 </defaultsMap>

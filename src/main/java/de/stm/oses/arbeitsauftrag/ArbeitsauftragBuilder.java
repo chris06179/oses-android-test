@@ -5,7 +5,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.pdf.PRStream;
 import com.itextpdf.text.pdf.PdfArray;
@@ -19,10 +19,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.regex.Pattern;
 
 import de.stm.oses.index.entities.ArbeitsauftragWithFileEntry;
-import de.stm.oses.index.entities.FileSystemEntry;
 import de.stm.oses.verwendung.VerwendungClass;
 
 public class ArbeitsauftragBuilder {
@@ -33,13 +31,15 @@ public class ArbeitsauftragBuilder {
     public static final int TYPE_ONLINE = 3;
     public static final int TYPE_EXTRACTING = 4;
 
-    private VerwendungClass verwendung;
+    private final VerwendungClass verwendung;
+    private final FirebaseCrashlytics mCrashlytics;
 
     public ArbeitsauftragBuilder(VerwendungClass verwendung) {
         this.verwendung = verwendung;
+        mCrashlytics = FirebaseCrashlytics.getInstance();
     }
 
-    private void cleanPdfFile(PdfReader read, ArbeitsauftragWithFileEntry arbeitsauftragWithFile) throws IOException {
+    private void cleanPdfFile(PdfReader read) throws IOException {
 
         // Aufräumen - PDF Splitter - eingebettete Dateien
         PdfDictionary root = read.getCatalog();
@@ -47,7 +47,7 @@ public class ArbeitsauftragBuilder {
         if (names != null)
             names.remove(PdfName.EMBEDDEDFILES);
 
-        // Aufräumen - Grafiküberlagerung (Roter Balken) / Wasserzeichen entfernen
+        // Aufräumen - Wasserzeichen entfernen
         for (int i = 1; i <= read.getNumberOfPages(); i++) {
             PdfDictionary dict = read.getPageN(i);
             PdfArray contents = dict.getAsArray(PdfName.CONTENTS);
@@ -73,18 +73,6 @@ public class ArbeitsauftragBuilder {
 
                     String data = new String(PdfReader.getStreamBytes(stream), "ISO-8859-2");
 
-                    if (arbeitsauftragWithFile.file.contentType == FileSystemEntry.FILECONTENT_EDITH) {
-
-                        int size = data.length();
-                        Pattern pImage = Pattern.compile("q.[0-9]+\\s[0-9]+\\s[0-9]+\\s[0-9]+\\s[0-9]+\\s[0-9]+\\scm.\\/[^X][a-zA-Z]*[0-9]+\\sDo.Q", Pattern.MULTILINE + Pattern.DOTALL);
-                        data = pImage.matcher(data).replaceAll("");
-                        stream.setData(data.getBytes("ISO-8859-2"));
-
-                        if (data.length() != size)
-                            Log.d("AA", "Grafiküberlagerung entfernt!");
-
-                    }
-
                     if (data.contains("www.A-PDF.com")) {
                         contents.remove(k);
                         Log.d("AA", "Wasserzeichen entfernt!");
@@ -101,10 +89,11 @@ public class ArbeitsauftragBuilder {
         try {
 
             PdfReader read = new PdfReader(new FileInputStream(arbeitsauftragWithFile.file.getFile()));
+            PdfReader.unethicalreading = true;
             read.selectPages(arbeitsauftragWithFile.arbeitsauftrag.pages);
 
             try {
-                cleanPdfFile(read, arbeitsauftragWithFile);
+                cleanPdfFile(read);
             } catch (IOException ignored) {
 
             }
@@ -120,11 +109,11 @@ public class ArbeitsauftragBuilder {
             return file;
 
         } catch (OutOfMemoryError | NoClassDefFoundError | DocumentException | IOException e) {
-            Crashlytics.setString("Bezeichner", verwendung.getBezeichner());
-            Crashlytics.setString("Datum", verwendung.getDatumFormatted("dd.MM.yyyy"));
-            Crashlytics.setString("Est", verwendung.getEst());
-            Crashlytics.setString("File", arbeitsauftragWithFile.file.getFile().getAbsolutePath());
-            Crashlytics.logException(e);
+            mCrashlytics.setCustomKey("Bezeichner", verwendung.getBezeichner());
+            mCrashlytics.setCustomKey("Datum", verwendung.getDatumFormatted("dd.MM.yyyy"));
+            mCrashlytics.setCustomKey("Est", verwendung.getEst());
+            mCrashlytics.setCustomKey("File", arbeitsauftragWithFile.file.getFile().getAbsolutePath());
+            mCrashlytics.recordException(e);
         }
 
         return null;

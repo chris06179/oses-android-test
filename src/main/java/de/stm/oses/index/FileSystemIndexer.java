@@ -4,7 +4,7 @@ import android.database.sqlite.SQLiteConstraintException;
 
 import androidx.annotation.NonNull;
 
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.parser.PdfReaderContentParser;
@@ -34,6 +34,7 @@ public class FileSystemIndexer {
     private final NotificationHelper mNotificationHelper;
     private String mAppTitle;
     private boolean isStopped;
+    private FirebaseCrashlytics mCrashlytics;
 
     FileSystemIndexer(String path, FileSystemDatabase database, NotificationHelper notificationHelper, String appTitle) {
         mIndex = database;
@@ -43,6 +44,8 @@ public class FileSystemIndexer {
         mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
 
         OsesApplication.getInstance().getLogger().log("INDEXER","Construct FileSystemIndexer - "+mPath+" - "+appTitle);
+
+        mCrashlytics = FirebaseCrashlytics.getInstance();
     }
 
     void doStopCurrentWork() {
@@ -149,9 +152,11 @@ public class FileSystemIndexer {
 
             String isArbeitsauftragEDITH = mFirebaseRemoteConfig.getString("isArbeitsauftragEDITH");
             String isArbeitsauftragMBRAIL = mFirebaseRemoteConfig.getString("isArbeitsauftragMBRAIL");
+            String isArbeitsauftragIPD = mFirebaseRemoteConfig.getString("isArbeitsauftragIPD");
 
             Pattern pIsArbeitsauftragEDITH = Pattern.compile(isArbeitsauftragEDITH, Pattern.DOTALL + Pattern.MULTILINE);
             Pattern pIsArbeitsauftragMBRAIL = Pattern.compile(isArbeitsauftragMBRAIL, Pattern.DOTALL + Pattern.MULTILINE);
+            Pattern pIsArbeitsauftragIPD = Pattern.compile(isArbeitsauftragIPD, Pattern.DOTALL + Pattern.MULTILINE);
 
             OsesApplication.getInstance().getLogger().log("INDEXER", "  PDF-Pages: "+read.getNumberOfPages());
 
@@ -188,6 +193,18 @@ public class FileSystemIndexer {
                     }
                 }
 
+                if (pIsArbeitsauftragIPD.matcher(text).matches()) {
+                    List<ArbeitsauftragEntry> result = scanIPD(read, parser, databaseFile);
+                    if (isStopped())
+                        return FileSystemEntry.FILECONTENT_UNKNOWN;
+                    if (result.isEmpty()) {
+                        return FileSystemEntry.FILECONTENT_OTHER;
+                    } else {
+                        mIndex.arbeitsauftragEntryDao().insertAll(result);
+                        return FileSystemEntry.FILECONTENT_IPD;
+                    }
+                }
+
                 if (k == 10) {
                     break;
                 }
@@ -196,8 +213,8 @@ public class FileSystemIndexer {
 
         } catch (Exception | OutOfMemoryError | NoClassDefFoundError e) {
             OsesApplication.getInstance().getLogger().log("INDEXER", "  Handled Exception: "+e.getMessage());
-            Crashlytics.setString("File", file.getAbsolutePath());
-            Crashlytics.logException(e);
+            mCrashlytics.setCustomKey("File", file.getAbsolutePath());
+            mCrashlytics.recordException(e);
             return FileSystemEntry.FILECONTENT_EXCEPTION;
         }
 
@@ -381,8 +398,8 @@ public class FileSystemIndexer {
 
                 } catch (Exception e) {
                     OsesApplication.getInstance().getLogger().log("INDEXER", "  Handled Exception: "+e.getMessage());
-                    Crashlytics.setString("File", databaseFile.getFile().getAbsolutePath());
-                    Crashlytics.logException(e);
+                    mCrashlytics.setCustomKey("File", databaseFile.getFile().getAbsolutePath());
+                    mCrashlytics.recordException(e);
                 }
 
             }
@@ -391,8 +408,8 @@ public class FileSystemIndexer {
 
         } catch (Exception | OutOfMemoryError | NoClassDefFoundError e) {
             OsesApplication.getInstance().getLogger().log("INDEXER", "  Handled Exception: "+e.getMessage());
-            Crashlytics.setString("File", databaseFile.getFile().getAbsolutePath());
-            Crashlytics.logException(e);
+            mCrashlytics.setCustomKey("File", databaseFile.getFile().getAbsolutePath());
+            mCrashlytics.recordException(e);
         }
 
         return arbeitsauftragList;
@@ -507,8 +524,8 @@ public class FileSystemIndexer {
 
                 } catch (Exception e) {
                     OsesApplication.getInstance().getLogger().log("INDEXER", "  Handled Exception: "+e.getMessage());
-                    Crashlytics.setString("File", databaseFile.getFile().getAbsolutePath());
-                    Crashlytics.logException(e);
+                    mCrashlytics.setCustomKey("File", databaseFile.getFile().getAbsolutePath());
+                    mCrashlytics.recordException(e);
                 }
 
             }
@@ -517,12 +534,168 @@ public class FileSystemIndexer {
 
         } catch (Exception | OutOfMemoryError | NoClassDefFoundError e) {
             OsesApplication.getInstance().getLogger().log("INDEXER", "  Handled Exception: "+e.getMessage());
-            Crashlytics.setString("File", databaseFile.getFile().getAbsolutePath());
-            Crashlytics.logException(e);
+            mCrashlytics.setCustomKey("File", databaseFile.getFile().getAbsolutePath());
+            mCrashlytics.recordException(e);
         }
 
         return  arbeitsauftragList;
 
+    }
+
+    @NonNull
+    private ArrayList<ArbeitsauftragEntry> scanIPD(PdfReader read, PdfReaderContentParser parser, FileSystemEntry databaseFile) {
+
+        ArrayList<ArbeitsauftragEntry> arbeitsauftragList = new ArrayList<>();
+
+        try {
+
+            FirebaseRemoteConfig mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+            String schichtIPD = mFirebaseRemoteConfig.getString("schichtIPD");
+            String datumIPD = mFirebaseRemoteConfig.getString("datumIPD");
+            String datumsbereichIPD = mFirebaseRemoteConfig.getString("datumsbereichIPD");
+            String gedrucktIPD = mFirebaseRemoteConfig.getString("gedrucktIPD");
+            String estIPD = mFirebaseRemoteConfig.getString("estIPD");
+            String startIPD = mFirebaseRemoteConfig.getString("startIPD");
+            String endeIPD = mFirebaseRemoteConfig.getString("endeIPD");
+
+            Pattern pSchicht = Pattern.compile(schichtIPD, Pattern.MULTILINE);
+            Pattern pDatum = Pattern.compile(datumIPD, Pattern.MULTILINE);
+            Pattern pDatumsbereich = Pattern.compile(datumsbereichIPD, Pattern.DOTALL + Pattern.MULTILINE);
+            Pattern pGedruckt = Pattern.compile(gedrucktIPD, Pattern.MULTILINE);
+            Pattern pEst = Pattern.compile(estIPD, Pattern.MULTILINE);
+            Pattern pStart = Pattern.compile(startIPD, Pattern.MULTILINE);
+            Pattern pEnde = Pattern.compile(endeIPD, Pattern.MULTILINE);
+
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMAN);
+            SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd.MM.yyyy, HH:mm", Locale.GERMAN);
+
+
+            String lastBezeichner = "";
+
+            for (int i = 1; i <= read.getNumberOfPages(); i++) {
+
+                if (isStopped())
+                    return new ArrayList<>();
+
+                try {
+
+                    TextExtractionStrategy strategy = parser.processContent(i, new SimpleTextExtractionStrategy());
+                    String text = strategy.getResultantText();
+
+                    String bezeichner = null;
+
+                    // Bezeichner
+                    Matcher bezeichnerMatcher = pSchicht.matcher(text);
+                    if (bezeichnerMatcher.find() && bezeichnerMatcher.groupCount() == 1) {
+                        bezeichner = bezeichnerMatcher.group(1);
+                    }
+
+                    if (bezeichner == null) {
+                        continue;
+                    }
+
+                    OsesApplication.getInstance().getLogger().log("INDEXER", "  "+bezeichner);
+
+                    if (!lastBezeichner.equals(bezeichner)) {
+
+                        ArbeitsauftragEntry entry = new ArbeitsauftragEntry();
+                        lastBezeichner = bezeichner;
+
+                        entry.bezeichner = bezeichner;
+                        entry.fileId = databaseFile.id;
+
+                        // Datum
+                        Matcher datumMatcher = pDatum.matcher(text);
+                        if (datumMatcher.find() && datumMatcher.groupCount() == 1) {
+                            String datum = datumMatcher.group(1);
+                            if (datum != null) {
+                                entry.datum = dateFormat.parse(datum);
+                            }
+                        }
+
+                        // gedruckt am
+                        Matcher gedrucktMatcher = pGedruckt.matcher(text);
+                        if (gedrucktMatcher.find() && gedrucktMatcher.groupCount() == 1) {
+                            String letzteBearbeitung = gedrucktMatcher.group(1);
+                            if (letzteBearbeitung != null) {
+                                entry.lastEdit = dateTimeFormat.parse(letzteBearbeitung);
+                            }
+                        }
+
+                        // Datumsbereich
+                        Matcher datumsbereichMatcher = pDatumsbereich.matcher(text);
+                        if (datumsbereichMatcher.find() && datumsbereichMatcher.groupCount() == 2) {
+                            String datumStart = datumsbereichMatcher.group(1);
+                            String datumEnd = datumsbereichMatcher.group(2);
+                            if (datumStart != null && datumEnd != null) {
+                                entry.datumVon = dateFormat.parse(datumStart);
+                                entry.datumBis = dateFormat.parse(datumEnd);
+                            }
+                        }
+
+                        // Einsatzstelle
+                        Matcher estMatcher = pEst.matcher(text);
+                        if (estMatcher.find() && estMatcher.groupCount() == 1) {
+                            String est = estMatcher.group(1);
+                            if (est != null) {
+                                entry.est = est;
+                            }
+                        }
+
+                        // Start
+                        Matcher startMatcher = pStart.matcher(text);
+                        if (startMatcher.find() && startMatcher.groupCount() == 1) {
+                            String start = startMatcher.group(1);
+                            if (start != null) {
+                                entry.start = start;
+                            }
+                        }
+
+                        // Ende
+                        Matcher endeMatcher = pEnde.matcher(text);
+                        if (endeMatcher.find() && endeMatcher.groupCount() == 1) {
+                            String ende = endeMatcher.group(1);
+                            if (ende != null) {
+                                entry.ende = ende;
+                            }
+                        }
+
+                        entry.pages.add(i);
+
+                        arbeitsauftragList.add(entry);
+
+                    } else {
+
+                        // Letzte Bearbeitung
+                        Matcher gedrucktMatcher = pGedruckt.matcher(text);
+                        if (gedrucktMatcher.find() && gedrucktMatcher.groupCount() == 1) {
+                            String letzteBearbeitung = gedrucktMatcher.group(1);
+                            if (letzteBearbeitung != null) {
+                                arbeitsauftragList.get(arbeitsauftragList.size() - 1).lastEdit = dateTimeFormat.parse(letzteBearbeitung);
+                            }
+                        }
+                        if (arbeitsauftragList.size() > 0)
+                            arbeitsauftragList.get(arbeitsauftragList.size() - 1).pages.add(i);
+                    }
+
+                } catch (Exception e) {
+                    OsesApplication.getInstance().getLogger().log("INDEXER", "  Handled Exception: "+e.getMessage());
+                    mCrashlytics.setCustomKey("File", databaseFile.getFile().getAbsolutePath());
+                    mCrashlytics.recordException(e);
+                }
+
+            }
+
+            OsesApplication.getInstance().getLogger().log("INDEXER", "  Anzahl Arbeitsaufträge: "+arbeitsauftragList.size());
+
+        } catch (Exception | OutOfMemoryError | NoClassDefFoundError e) {
+            OsesApplication.getInstance().getLogger().log("INDEXER", "  Handled Exception: "+e.getMessage());
+            mCrashlytics.setCustomKey("File", databaseFile.getFile().getAbsolutePath());
+            mCrashlytics.recordException(e);
+        }
+
+        return arbeitsauftragList;
     }
 
 

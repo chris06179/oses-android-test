@@ -541,39 +541,17 @@ private class SaveSchicht extends AsyncTask<Void, Void, String> {
 
     protected String doInBackground(Void... params) {
 
-        // Aufenthalt parsen
-        String aufdbh = "0";
-        String aufdbm = "0";
-        String aufdeh = "0";
-        String aufdem = "0";
-        String aufdzh = "0";
-        String aufdzm = "0";
-
-        try {
-            if (sAdd.aufdb.getText().length() > 0) {
-                aufdbh = sAdd.aufdb.getText().toString().split(":")[0];
-                aufdbm = sAdd.aufdb.getText().toString().split(":")[1];
-            }
-            if (sAdd.aufde.getText().length() > 0) {
-                aufdeh = sAdd.aufde.getText().toString().split(":")[0];
-                aufdem = sAdd.aufde.getText().toString().split(":")[1];
-            }
-            if (sAdd.aufdz.getText().length() > 0) {
-                aufdzh = sAdd.aufdz.getText().toString().split(":")[0];
-                aufdzm = sAdd.aufdz.getText().toString().split(":")[1];
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        // Datum parsen
         String[] splitVon = sAdd.von.getText().toString().substring(5).split("\\.");
         String gv = splitVon[2] + '-' + splitVon[1] + '-' + splitVon[0];
 
         String[] splitBis = sAdd.bis.getText().toString().substring(5).split("\\.");
         String gb = splitBis[2] + '-' + splitBis[1] + '-' + splitBis[0];
 
+        // Hashmap aufbauen
         Map<String, String> postdata = new HashMap<>();
 
+        // Session
         postdata.put("session", SessionIdentifier);
 
         // Erforderliche Informationen
@@ -593,12 +571,8 @@ private class SaveSchicht extends AsyncTask<Void, Void, String> {
         postdata.put("kommentar", sAdd.notiz.getText().toString());
         postdata.put("aufdb", sAdd.aufdb.getText().toString());
         postdata.put("aufde", sAdd.aufde.getText().toString());
-        postdata.put("aufdbh", aufdbh);
-        postdata.put("aufdbm", aufdbm);
-        postdata.put("aufdeh", aufdeh);
-        postdata.put("aufdem", aufdem);
-        postdata.put("aufdzh", aufdzh);
-        postdata.put("aufdzm", aufdzm);
+        postdata.put("aufdz", sAdd.aufdz.getText().toString());
+
 
         return OSES.getJSON("https://oses.mobi/api.php?request=schichten&command=addajax", postdata, 60000);
 

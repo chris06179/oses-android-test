@@ -11,7 +11,7 @@ import android.os.AsyncTask;
 
 import androidx.preference.PreferenceManager;
 
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,7 +28,7 @@ import javax.net.ssl.HttpsURLConnection;
 public class OSESRequest extends AsyncTask<String, Integer, Object> {
     private OnRequestFinishedListener mListener;
     @SuppressLint("StaticFieldLeak")
-    private Context context;
+    private final Context context;
     private String url;
     private Map<String, String> params = null;
     private int timeout = 60000;
@@ -195,16 +195,16 @@ public class OSESRequest extends AsyncTask<String, Integer, Object> {
             if (mListener != null)
                 mListener.onRequestUnknown((int) o);
 
-            Crashlytics.log("URL: "+url+ " - Status: "+ o);
-            Crashlytics.logException(new Exception("Unexpected HTTP-Status-Code"));
+            FirebaseCrashlytics.getInstance().log("URL: "+url+ " - Status: "+ o);
+            FirebaseCrashlytics.getInstance().recordException(new Exception("Unexpected HTTP-Status-Code"));
         }
 
         if (o instanceof Exception) { // Programmfehler
             if (mListener != null)
                 mListener.onRequestException((Exception) o);
 
-            Crashlytics.log("URL: "+url);
-            Crashlytics.logException((Exception) o);
+            FirebaseCrashlytics.getInstance().log("URL: "+url);
+            FirebaseCrashlytics.getInstance().recordException((Exception) o);
         }
 
         if (o == null) { // Keine Konnektivität

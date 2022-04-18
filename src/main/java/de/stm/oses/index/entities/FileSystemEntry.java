@@ -16,7 +16,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 public class FileSystemEntry {
 
     @Retention(SOURCE)
-    @IntDef({FILECONTENT_OTHER, FILECONTENT_EDITH, FILECONTENT_MBRAIL, FILECONTENT_UNKNOWN, FILECONTENT_EXCEPTION})
+    @IntDef({FILECONTENT_OTHER, FILECONTENT_EDITH, FILECONTENT_MBRAIL, FILECONTENT_IPD, FILECONTENT_UNKNOWN, FILECONTENT_EXCEPTION})
     public @interface FileContent {}
 
     public static final int FILECONTENT_UNKNOWN = 0;
@@ -25,6 +25,7 @@ public class FileSystemEntry {
 
     public static final int FILECONTENT_EDITH = 1;
     public static final int FILECONTENT_MBRAIL = 2;
+    public static final int FILECONTENT_IPD = 3;
 
     @PrimaryKey(autoGenerate = true)
     public long id;
