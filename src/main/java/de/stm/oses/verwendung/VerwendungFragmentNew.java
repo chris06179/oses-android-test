@@ -593,7 +593,7 @@ public class VerwendungFragmentNew extends RecyclerFragment implements ActionMod
         download.setTitle("Sonderleistung");
         download.setMessage("Das Dokument wird heruntergeladen, dieser Vorgang kann einen Moment dauern...");
         download.setURL(url);
-        download.setLocalDirectory("Dokumente/");
+        download.setLocalDirectory("/Dokumente/");
         download.setOnDownloadFinishedListener(new FileDownload.OnDownloadFinishedListener() {
             @Override
             public void onDownloadFinished(File file) {

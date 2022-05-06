@@ -27,8 +27,14 @@ import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +64,19 @@ public class NotificationHelper extends ContextWrapper {
      */
     public NotificationHelper(Context ctx) {
         super(ctx);
+    }
+
+    public void subscribeToTopics() {
+        FirebaseMessaging.getInstance().subscribeToTopic("news").addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful())
+                    Log.d("TOPIC", "news YES");
+                else
+                    Log.d("TOPIC", "news NO");
+            }
+        });
+        FirebaseMessaging.getInstance().subscribeToTopic("update");
     }
 
     public void refreshNotificationChannels() {

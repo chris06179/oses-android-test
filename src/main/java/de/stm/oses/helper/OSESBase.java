@@ -1,23 +1,26 @@
 package de.stm.oses.helper;
 
-import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
+import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.os.Environment;
 import android.view.ContextThemeWrapper;
 
-import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.google.android.play.core.appupdate.AppUpdateInfo;
+import com.google.android.play.core.appupdate.AppUpdateManager;
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
+import com.google.android.play.core.install.model.AppUpdateType;
+import com.google.android.play.core.install.model.UpdateAvailability;
+import com.google.android.play.core.tasks.Task;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -25,11 +28,7 @@ import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -447,99 +446,35 @@ public class OSESBase {
         }
     }
 
-    public int getDilocStatus() {
-        if (iDilocStatus == STATUS_UNKNOWN) {
-            if (!FirebaseRemoteConfig.getInstance().getBoolean("allow_scan_diloc")) {
-                iDilocStatus = STATUS_NOT_ALLOWED;
-            } else if (isPackageInstalled("de.diloc.DiLocSyncMobile", context.getPackageManager())) {
-                iDilocStatus = STATUS_INSTALLED;
-            } else {
-                iDilocStatus = STATUS_NOT_INSTALLED;
-            }
-        }
+    public static void checkForAppUpdate(Activity activity) {
 
-        return iDilocStatus;
-    }
+        AppUpdateManager appUpdateManager = AppUpdateManagerFactory.create(activity);
 
-    public int getFassiStatus() {
-        if (iFassiStatus == STATUS_UNKNOWN) {
-            if (!FirebaseRemoteConfig.getInstance().getBoolean("allow_scan_fassi")) {
-                iFassiStatus = STATUS_NOT_ALLOWED;
-            } else if (isPackageInstalled("de.bahn.dbs.mc", context.getPackageManager())) {
-                iFassiStatus = STATUS_INSTALLED;
-            } else {
-                iFassiStatus = STATUS_NOT_INSTALLED;
-            }
-        }
+        // Returns an intent object that you use to check for an update.
+        Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
 
-        return iFassiStatus;
-    }
-
-
-    public boolean hasStoragePermission() {
-        return ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
-    }
-
-    public void rebuildWorkingDirectory() {
-
-        if (hasStoragePermission()) {
-
-            File oldpath = new File(Environment.getExternalStorageDirectory().getPath() + "/OSES/docs/");
-
-            if (oldpath.exists())
-                oldpath.renameTo(new File(Environment.getExternalStorageDirectory().getPath() + "/OSES/Dokumente/"));
-
-            oldpath = new File(Environment.getExternalStorageDirectory().getPath() + "/OSES/install/");
-
-            if (oldpath.exists())
-                oldpath.renameTo(new File(Environment.getExternalStorageDirectory().getPath() + "/OSES/APK/"));
-
-
-            File olddir = new File(Environment.getExternalStorageDirectory().getPath() + "/OSES/Dokumente/Arbeitsaufträge/");
-
-            if (!olddir.exists())
-                return;
-
-            File[] files = olddir.listFiles();
-
-            for (File file :
-                    files) {
-
-                if (file.getName().contains(".pdf")) {
-                    String[] split = file.getName().split("_");
-
-                    if (split.length != 3)
-                        continue;
-
-                    String bezeichner = split[1];
-                    String datum = split[2].substring(0, split[2].length() - 4);
-
-                    SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY);
-                    try {
-                        Date date = format.parse(datum);
-
-                        SimpleDateFormat month = new SimpleDateFormat("yyyy/MM - MMMM", Locale.GERMANY);
-                        SimpleDateFormat day = new SimpleDateFormat("dd.MM.yyyy_EE", Locale.GERMANY);
-
-                        String newpath = Environment.getExternalStorageDirectory().getPath() + "/OSES/Dokumente/Arbeitsaufträge/" + month.format(date) + "/Arbeitsauftrag_" + day.format(date).replaceAll(".$", "") + "_" + bezeichner.replaceAll("\\s", "_") + ".pdf";
-                        File dest = new File(newpath);
-
-                        dest.getParentFile().mkdirs();
-                        file.renameTo(dest);
-
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                        continue;
-                    }
-
-
+        // Checks that the platform will allow the specified type of update.
+        appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                    // This example applies an immediate update. To apply a flexible update
+                    // instead, pass in AppUpdateType.FLEXIBLE
+                    && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
+                // Request the update.
+                try {
+                    appUpdateManager.startUpdateFlowForResult(
+                            // Pass the intent that is returned by 'getAppUpdateInfo()'.
+                            appUpdateInfo,
+                            // Or 'AppUpdateType.FLEXIBLE' for flexible updates.
+                            AppUpdateType.IMMEDIATE,
+                            // The current activity making the update request.
+                            activity,
+                            // Include a request code to later monitor this update request.
+                            0);
+                } catch (IntentSender.SendIntentException e) {
+                    e.printStackTrace();
                 }
-
             }
-
-        }
+        });
 
     }
-
-
 }

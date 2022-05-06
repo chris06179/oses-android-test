@@ -7,10 +7,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceFragmentCompat;
@@ -24,28 +21,9 @@ import de.stm.oses.helper.OSESBase;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
 
-    private static final int PERMISSION_REQUEST_STORAGE_DILOC = 5600;
-
-    private SettingsViewModel model;
     private long lastClick;
     private int clicks;
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        model = new ViewModelProvider(this).get(SettingsViewModel.class);
-
-        Preference index = findPreference("index");
-        model.getFileSystemStatus().observe(getViewLifecycleOwner(), fileSystemStatus -> {
-            if (fileSystemStatus.fileSystemCount == 0) {
-                index.setEnabled(false);
-                index.setSummary("Derzeit sind keine Dokumente indiziert!");
-            } else {
-                index.setEnabled(true);
-                index.setSummary("Derzeit sind " + fileSystemStatus.fileSystemCount + " Dokumente mit " + fileSystemStatus.arbeitsauftragCount + " Arbeitsaufträgen indiziert");
-            }
-        });
-    }
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -69,11 +47,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
         Preference copyright = findPreference("copyright");
 
-        Preference index = findPreference("index");
-        index.setOnPreferenceClickListener(preference -> {
-            model.resetIndex();
-            return true;
-        });
 
 
         Calendar c = Calendar.getInstance();
@@ -81,62 +54,13 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
         copyright.setSummary("© " + year + " Steiner Media");
 
-        Preference scanDiloc = findPreference("scanDiloc");
-
-        scanDiloc.setOnPreferenceChangeListener((preference, newValue) -> {
-            if (((boolean) newValue) && !OSES.hasStoragePermission()) {
-                requestPermissions(new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_STORAGE_DILOC);
-            } else {
-                model.resetIndex();
-            }
-
-            return true;
-        });
-
-        if (OSES.getDilocStatus() == OSESBase.STATUS_INSTALLED) {
-            scanDiloc.setEnabled(true);
-        } else if (OSES.getDilocStatus() == OSESBase.STATUS_NOT_ALLOWED) {
-            scanDiloc.setVisible(false);
-        } else {
-            scanDiloc.setEnabled(false);
-            scanDiloc.setSummary("Diloc|Sync wurde auf diesem Endgerät nicht gefunden. Funktion nicht verfügbar.");
-        }
-
-        Preference scanFassi = findPreference("scanFassi");
-
-        scanFassi.setOnPreferenceChangeListener((preference, newValue) -> {
-            if (((boolean) newValue) && !OSES.hasStoragePermission()) {
-                requestPermissions(new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_STORAGE_DILOC);
-            } else {
-                model.resetIndex();
-            }
-            return true;
-        });
-
-        if (OSES.getFassiStatus() == OSESBase.STATUS_INSTALLED) {
-            scanFassi.setEnabled(true);
-        } else if (OSES.getFassiStatus() == OSESBase.STATUS_NOT_ALLOWED) {
-            scanFassi.setVisible(false);
-        } else {
-            scanFassi.setEnabled(false);
-            scanFassi.setSummary("FASSI-MOVE wurde auf diesem Endgerät nicht gefunden. Funktion nicht verfügbar.");
-        }
-
-        if (OSES.getDilocStatus() == OSESBase.STATUS_NOT_ALLOWED && OSES.getFassiStatus() == OSESBase.STATUS_NOT_ALLOWED) {
-            PreferenceCategory aaCategory = findPreference("aaCategory");
-            aaCategory.setVisible(false);
-            model.resetIndex();
-        }
-
         PreferenceCategory devCat = findPreference("debugCategory");
-
 
         if (OSES.getSession().getGroup() < 11 || OSES.getSession().getPreferences().getBoolean("useFileLogging", false)) {
             devCat.setVisible(true);
         } else {
             devCat.setVisible(false);
         }
-
 
         SwitchPreference devModeSwitch = findPreference("debugUseDevServer");
         devModeSwitch.setOnPreferenceChangeListener((preference, newValue) -> {

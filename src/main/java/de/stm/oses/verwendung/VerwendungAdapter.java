@@ -2,8 +2,6 @@ package de.stm.oses.verwendung;
 
 import android.content.Context;
 import android.graphics.Color;
-import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +11,9 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -266,15 +267,11 @@ public class VerwendungAdapter extends ArrayAdapter<VerwendungClass> {
                     itemHolder.aa_icon.setAlpha(1f);
                     itemHolder.aa_extracting.setVisibility(View.GONE);
                     break;
-                case ArbeitsauftragBuilder.TYPE_DILOC:
                 case ArbeitsauftragBuilder.TYPE_ONLINE:
                     itemHolder.aa_icon.setVisibility(View.VISIBLE);
                     itemHolder.aa_icon.setAlpha(0.5f);
                     itemHolder.aa_extracting.setVisibility(View.GONE);
                     break;
-                case ArbeitsauftragBuilder.TYPE_EXTRACTING:
-                    itemHolder.aa_icon.setVisibility(View.GONE);
-                    itemHolder.aa_extracting.setVisibility(View.VISIBLE);
             }
 
             int countab = 0;

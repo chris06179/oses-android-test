@@ -139,6 +139,9 @@ public class BrowserFragment extends Fragment {
         if (request.equals("hilfe"))
             bar.setTitle("Hilfe");
 
+        if (request.equals("datenschutz"))
+            bar.setTitle("Datenschutzerklärung");
+
 
         Bundle extra = new Bundle();
         extra.putString("request", request);
@@ -276,7 +279,7 @@ public class BrowserFragment extends Fragment {
         download.setTitle("Dokumentation");
         download.setMessage("Die Dokumentation wird heruntergeladen, dieser Vorgang kann einen Moment dauern...");
         download.setURL("https://oses.mobi/docs/oses_nutzungshinweise.pdf");
-        download.setLocalDirectory("Dokumente/");
+        download.setLocalDirectory("/Dokumente/");
         download.setCancelable(true);
         download.setOnDownloadFinishedListener(new FileDownload.OnDownloadFinishedListener() {
             @Override

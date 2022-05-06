@@ -2,137 +2,15 @@
 <!-- START xml_defaults -->
 <defaultsMap>
 
-
-
-    <!-- Max FileSize in MegaBytes-->
+    <!-- Menu-->
     <entry>
-        <key>indexer_max_filesize</key>
-        <value>100</value>
-    </entry>
-
-    <!-- DiLoc Verzeichnis -->
-    <entry>
-        <key>diloc_path</key>
-        <value>/sync/fs-data/</value>
-    </entry>
-
-    <!-- FASSI Verzeichnis -->
-    <entry>
-        <key>fassi_path</key>
-        <value>/fassi-move-unknown-folder-placeholder/</value>
-    </entry>
-
-    <!-- Arbeitsauftrag Upload -->
-    <entry>
-        <key>allow_arbeitsauftrag_upload</key>
-        <value>true</value>
-    </entry>
-
-    <!-- DiLOC -->
-    <entry>
-        <key>allow_scan_diloc</key>
-        <value>true</value>
-    </entry>
-
-    <!-- FASSI -->
-    <entry>
-        <key>allow_scan_fassi</key>
+        <key>menu_show_privacy</key>
         <value>false</value>
     </entry>
 
-    <!-- Arbeistauftrag Pattern Index -->
     <entry>
-        <key>isArbeitsauftragEDITH</key>
-        <value>.*Schicht:\s*[VF]?\s*[0-9]*\s*([(][VF]\s*[0-9]*[)])?$.*</value>
-    </entry>
-    <entry>
-        <key>isArbeitsauftragMBRAIL</key>
-        <value>.*Schicht\n[0-9]+$.*</value>
-    </entry>
-    <entry>
-        <key>isArbeitsauftragIPD</key>
-        <value>.*Dienst-Nr\.:\s[0-9]+[A-Za-z]*$.*</value>
-    </entry>
-
-
-    <!-- Arbeistauftrag Pattern EDITH -->
-    <entry>
-        <key>schichtEDITH</key>
-        <value>Schicht:\s*[VF]?\s*(\d*)\s*(?:[(][VF]\s*[0-9]*[)])?$</value>
-    </entry>
-    <entry>
-        <key>datumEDITH</key>
-        <value>Gültig am:$.*den\s(\d{2}\.\d{2}\.\d{4})$</value>
-    </entry>
-    <entry>
-        <key>datumsbereichEDITH</key>
-        <value>^(\d{2}\.\d{2}\.\d{4})\s-\s(\d{2}\.\d{2}\.\d{4})$</value>
-    </entry>
-    <entry>
-        <key>letzteBearbeitungEDITH</key>
-        <value>Letzte Bearbeitung:\s*(\d{2}\.\d{2}\.\d{4},\s\d{2}:\d{2})</value>
-    </entry>
-    <entry>
-        <key>startEDITH</key>
-        <value>^AZ\sTarif:\n(\d{2}:\d{2})\s?([A-Za-z]+)?$</value>
-    </entry>
-    <entry>
-        <key>endeEDITH</key>
-        <value>^Fahrzeit\sauf\sTfz:\n(\d{2}:\d{2})\s?([A-Za-z]+)?$</value>
-    </entry>
-    <entry>
-        <key>estEDITH</key>
-        <value>^Einsatzstelle:(?:\n.*Änderungsgründe:\n)?\s?([A-Za-z]+\s*[A-Za-z]+)\s*\d+$</value>
-    </entry>
-
-
-
-    <!-- Arbeistauftrag Pattern MBRAIL -->
-    <entry>
-        <key>schichtMBRAIL</key>
-        <value>Schicht\n([0-9]+)$</value>
-    </entry>
-    <entry>
-        <key>datumMBRAIL</key>
-        <value>[A-Za-z]{2},\sden\s(\d{2}\.\d{2}\.\d{4})$</value>
-    </entry>
-    <entry>
-        <key>letzteBearbeitungMBRAIL</key>
-        <value>Stand:\s*(\d{2}\.\d{2}\.\d{4})$</value>
-    </entry>
-    <entry>
-        <key>startEndeEstMBRAIL</key>
-        <value>^OE1.*(\d{2}:\d{2})\s(\d{2}:\d{2})\s(\w+\s?\d?)$</value>
-    </entry>
-
-    <!-- Arbeistauftrag Pattern IPD -->
-    <entry>
-        <key>schichtIPD</key>
-        <value>^Dienst-Nr\.:\s([0-9A-Za-z]+)$</value>
-    </entry>
-    <entry>
-        <key>datumIPD</key>
-        <value>^Gültig am\s(\d{2}\.\d{2}\.\d{4})$</value>
-    </entry>
-    <entry>
-        <key>datumsbereichIPD</key>
-        <value>^Gültigkeitszeitraum: (\d{2}\.\d{2}\.\d{4})$.*-\s(\d{2}\.\d{2}\.\d{4})$</value>
-    </entry>
-    <entry>
-        <key>gedrucktIPD</key>
-        <value>DB intern, gedruckt am:\s(\d{2}\.\d{2}\.\d{4},\s\d{2}:\d{2})</value>
-    </entry>
-    <entry>
-        <key>estIPD</key>
-        <value>^Einsatzstelle:\s([A-Za-z]+\s*[A-Za-z]+)\s*\d+$</value>
-    </entry>
-    <entry>
-        <key>startIPD</key>
-        <value>Dienstbeginn:\s(\d{2}:\d{2})</value>
-    </entry>
-    <entry>
-        <key>endeIPD</key>
-        <value>Dienstende:\s(\d{2}:\d{2})</value>
+        <key>menu_show_help</key>
+        <value>false</value>
     </entry>
 
 </defaultsMap>

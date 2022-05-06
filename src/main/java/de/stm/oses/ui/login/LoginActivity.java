@@ -51,9 +51,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+
         OSES = new OSESBase(this);
 
-        new NotificationHelper(this).refreshNotificationChannels();
+        NotificationHelper notify = new NotificationHelper(this);
+        notify.refreshNotificationChannels();
+        notify.subscribeToTopics();
 
         try {
             PreferenceManager.setDefaultValues(this, R.xml.preferences, true);
@@ -64,14 +67,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         // Obtain the FirebaseAnalytics instance.
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
-        // Arbeitsverzeichnis aufräumen und anpassen -> ab v345
-        OSES.rebuildWorkingDirectory();
-
         if (!OSES.getSession().getIdentifier().equals("")) {
             Intent intent = new Intent(LoginActivity.this, StartActivity.class);
             startActivity(intent);
             finish();
+            return;
         }
+
+        OSESBase.checkForAppUpdate(this);
 
         Toolbar toolbar = findViewById(R.id.oses_start_toolbar);
         setSupportActionBar(toolbar);
@@ -123,6 +126,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         // Handle presses on the action bar items
         if (item.getItemId() == R.id.action_login_imprint) {
             ImprintOnClick();
+            return true;
+        }
+        if (item.getItemId() == R.id.action_login_privacy) {
+            DatenschutzOnClick();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -304,6 +311,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private void ImprintOnClick() {
 
         String url = "https://oses.mobi/index.php?action=imprint";
+        CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+        builder.setToolbarColor(ContextCompat.getColor(LoginActivity.this, R.color.oses_green));
+        CustomTabsIntent customTabsIntent = builder.build();
+        customTabsIntent.launchUrl(this, Uri.parse(url));
+
+    }
+
+    private void DatenschutzOnClick() {
+
+        String url = "https://oses.mobi/index.php?action=datenschutz";
         CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
         builder.setToolbarColor(ContextCompat.getColor(LoginActivity.this, R.color.oses_green));
         CustomTabsIntent customTabsIntent = builder.build();

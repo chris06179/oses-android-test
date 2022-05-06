@@ -3,6 +3,7 @@ package de.stm.oses.fcm;
 import android.app.Notification;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -25,6 +26,8 @@ public class MessagingService extends FirebaseMessagingService {
     public void onMessageReceived(RemoteMessage message) {
 
         NotificationHelper mNotificationHelper = new NotificationHelper(this);
+
+        Log.d("FCM", "new message");
 
         Map<String, String> data = message.getData();
         String type = data.get("type");

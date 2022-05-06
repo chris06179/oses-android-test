@@ -1,13 +1,10 @@
 package de.stm.oses.verwendung;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
 import org.json.JSONArray;
@@ -315,11 +312,11 @@ public class VerwendungClass implements Parcelable {
 
         // Arbeitsauftrag
 
-        if (getKat().equals("S") && ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+        if (getKat().equals("S")) {
 
             ArbeitsauftragBuilder auftrag = new ArbeitsauftragBuilder(this);
 
-            arbeitsauftragCacheFile = auftrag.getExtractedCacheFile();
+            arbeitsauftragCacheFile = auftrag.getExtractedCacheFile(context);
 
             if (arbeitsauftragCacheFile != null) {
                 arbeitsauftrag = ArbeitsauftragBuilder.TYPE_CACHED;
@@ -759,10 +756,6 @@ public class VerwendungClass implements Parcelable {
     public void setArbeitsauftragCacheFile(File file) {
         arbeitsauftragCacheFile = file;
         arbeitsauftrag = ArbeitsauftragBuilder.TYPE_CACHED;
-    }
-
-    public void setArbeitsauftragExtracting() {
-        this.arbeitsauftrag = ArbeitsauftragBuilder.TYPE_EXTRACTING;
     }
 
     public void setArbeitsauftragType(int type) {

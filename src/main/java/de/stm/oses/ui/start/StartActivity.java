@@ -1,7 +1,5 @@
 package de.stm.oses.ui.start;
 
-import android.app.Dialog;
-import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -45,16 +43,14 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import de.stm.oses.R;
-import de.stm.oses.dialogs.IndexInfoDialog;
-import de.stm.oses.ui.dokumente.DokumenteFragment;
 import de.stm.oses.helper.FileDownload;
 import de.stm.oses.helper.FileDownload.OnDownloadFinishedListener;
 import de.stm.oses.helper.MenuAdapter;
 import de.stm.oses.helper.MenuClass;
 import de.stm.oses.helper.OSESBase;
-import de.stm.oses.index.IndexJobIntentService;
 import de.stm.oses.schichten.SchichtenFragment;
 import de.stm.oses.ui.browser.BrowserFragment;
+import de.stm.oses.ui.dokumente.DokumenteFragment;
 import de.stm.oses.ui.login.LoginActivity;
 import de.stm.oses.ui.settings.SettingsFragment;
 import de.stm.oses.verwendung.VerwendungFragment;
@@ -77,6 +73,7 @@ public class StartActivity extends AppCompatActivity {
 
     public FileDownload CurrentFileDownload;
     private FirebaseAnalytics mFirebaseAnalytics;
+    private FirebaseRemoteConfig mFirebaseRemoteConfig;
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -101,16 +98,6 @@ public class StartActivity extends AppCompatActivity {
 
     }
 
-    private void startFileIndexer() {
-        if (IndexJobIntentService.enqueueWork(this, OSES)) {
-            if (!OSES.getSession().getSessionIndexReminder()) {
-                IndexInfoDialog dialog = IndexInfoDialog.newInstance();
-                dialog.show(getSupportFragmentManager(), "indexInfoDialog");
-                OSES.getSession().setSessionIndexReminder(true);
-            }
-        }
-    }
-
 
     // Called when the activity is first created.
     @Override
@@ -121,6 +108,8 @@ public class StartActivity extends AppCompatActivity {
         // Obtain the FirebaseAnalytics instance.
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
+        // Auf Update prüfen
+        OSESBase.checkForAppUpdate(this);
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(StartActivity.this);
         boolean useDev = settings.getBoolean("debugUseDevServer", false);
@@ -134,8 +123,8 @@ public class StartActivity extends AppCompatActivity {
         OSES = new OSESBase(this);
 
         // Settings holen, blockiere Upload zum Server
-        final FirebaseRemoteConfig mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
-        mFirebaseRemoteConfig.setDefaultsAsync(R.xml.default_remote_config).addOnCompleteListener(task -> startFileIndexer());
+        mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+        mFirebaseRemoteConfig.setDefaultsAsync(R.xml.default_remote_config);
         mFirebaseRemoteConfig.fetchAndActivate();
 
         mFirebaseAnalytics.setUserProperty("est", OSES.getSession().getEstText());
@@ -250,6 +239,11 @@ public class StartActivity extends AppCompatActivity {
                     case 94:
                         setMenuSelection(id);
                         openWebView("impressum");
+                        setDrawer(false);
+                        return;
+                    case 96:
+                        setMenuSelection(id);
+                        openWebView("datenschutz");
                         setDrawer(false);
                         return;
                     case 95:
@@ -551,6 +545,9 @@ public class StartActivity extends AppCompatActivity {
     }
 
     private ArrayList<MenuClass> generateMenu() {
+        boolean showHelp = mFirebaseRemoteConfig.getBoolean("menu_show_help");
+        boolean showPrivacy = mFirebaseRemoteConfig.getBoolean("menu_show_privacy");
+
         ArrayList<MenuClass> items = new ArrayList<>();
         items.add(new MenuClass("Einstieg"));
         items.add(new MenuClass(R.drawable.ic_action_cloud, "Aktuelles", 11, ""));
@@ -565,9 +562,12 @@ public class StartActivity extends AppCompatActivity {
         items.add(new MenuClass(R.drawable.ic_action_settings, "Einstellungen", 82, ""));
         items.add(new MenuClass(R.drawable.ic_action_cancel, "Abmelden", 84, ""));
         items.add(new MenuClass("Sonstiges"));
-        //items.add(new MenuClass(R.drawable.ic_action_help, "Hilfe", 92, ""));
+        if (showHelp)
+            items.add(new MenuClass(R.drawable.ic_action_help, "Hilfe", 92, ""));
         items.add(new MenuClass(R.drawable.ic_action_donate, "Spenden", 95, ""));
         items.add(new MenuClass(R.drawable.ic_action_about, "Nutzungsbedingungen", 93, ""));
+        if (showPrivacy)
+            items.add(new MenuClass(R.drawable.ic_action_privacy, "Datenschutzerklärung", 96, ""));
         items.add(new MenuClass(R.drawable.ic_action_para, "Impressum", 94, ""));
         items.add(new MenuClass(R.drawable.ic_action_web_site, "Webversion", 99, ""));
 
@@ -719,17 +719,6 @@ public class StartActivity extends AppCompatActivity {
     }
 
 
-    private boolean isInstalledViaPlayStore() {
-
-        return true;
-
-       // String installer = getPackageManager().getInstallerPackageName(getPackageName());
-
-        //return installer != null && installer.equals("com.android.vending");
-
-    }
-
-
     private class CheckSession extends AsyncTask<String, Void, String> {
 
         protected String doInBackground(String... params) {
@@ -873,162 +862,7 @@ public class StartActivity extends AppCompatActivity {
                         DoWebpage(WebpageURL, WebpageTitle, WebpageMessage, WebpageIdent);
 
                 }
-
-
             }
-
-            final String UpdateFile = UpdateFileName;
-
-            if (StatusCode.equals("100")) {
-
-                mFirebaseAnalytics.logEvent("OSES_update_start", null);
-
-                AlertDialog.Builder alert = new AlertDialog.Builder(StartActivity.this);
-
-                alert.setCancelable(false);
-
-                alert.setPositiveButton("Weiter", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-
-                        if (isInstalledViaPlayStore()) {
-
-                            final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
-                            try {
-                                Toast.makeText(StartActivity.this, "Weiterleitung zum Google Play Store...", Toast.LENGTH_SHORT).show();
-                                Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.android.vending");
-                                ComponentName comp = new ComponentName("com.android.vending", "com.google.android.finsky.activities.LaunchUrlHandlerActivity"); // package name and activity
-                                launchIntent.setComponent(comp);
-                                launchIntent.setData(Uri.parse("market://details?id="+appPackageName));
-                                startActivity(launchIntent);
-                            } catch (ActivityNotFoundException | NullPointerException e) {
-                                FirebaseCrashlytics.getInstance().log("opening GPLAY failed");
-                                FirebaseCrashlytics.getInstance().recordException(e);
-                            } finally {
-                                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
-                            }
-
-                            mFirebaseAnalytics.logEvent("OSES_update_gplay", null);
-
-                            finish();
-                        }
-
-                        else {
-
-                            mFirebaseAnalytics.logEvent("OSES_update_self", null);
-                            FileDownload download = new FileDownload(StartActivity.this);
-                            download.setTitle("Aktualisierung");
-                            download.setMessage("Installationsdatei wird heruntergeladen, dieser Vorgang kann einige Minuten dauern...");
-                            download.setURL("https://oses.mobi/android/" + UpdateFile);
-                            download.setLocalDirectory("APK/");
-                            download.setLocalFilename("OSES.apk");
-                            download.setOnDownloadFinishedListener(onUpdateResponse);
-                            download.execute();
-
-                        }
-                    }
-                });
-                alert.setNegativeButton("Abbrechen", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.dismiss();
-                        finish();
-                    }
-                });
-                final AlertDialog dialog = alert.create();
-
-                LinearLayout linear = new LinearLayout(StartActivity.this);
-
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-
-                params.setMargins(10, 10, 10, 10);
-
-                WebView wv = new WebView(StartActivity.this);
-                wv.setLayoutParams(params);
-                wv.loadUrl("https://oses.mobi/api.php?request=changelog&androidversion=" + OSES.getVersionCode() + "&session=" + OSES.getSession().getIdentifier());
-
-                wv.setWebViewClient(new WebViewClient() {
-
-                    @Override
-                    public void onPageFinished(WebView view, String url) {
-
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                dialog.getButton(Dialog.BUTTON_POSITIVE).setEnabled(true);
-                            }
-                        }, 2000);
-
-                    }
-                });
-
-                linear.addView(wv);
-                dialog.setView(linear);
-                dialog.show();
-                dialog.getButton(Dialog.BUTTON_POSITIVE).setEnabled(false);
-
-            }
-
-            if (StatusCode.equals("101")) {
-
-                AlertDialog.Builder alert = new AlertDialog.Builder(StartActivity.this);
-
-                alert.setCancelable(false);
-
-                alert.setPositiveButton("WOLOLOO", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        FileDownload download = new FileDownload(StartActivity.this);
-                        download.setTitle("Aktualisierung (BETA)");
-                        download.setMessage("Installationsdatei wird heruntergeladen, dieser Vorgang kann einige Minuten dauern...");
-                        download.setURL("https://oses.mobi/android/" + UpdateFile);
-                        download.setLocalDirectory("APK/");
-                        download.setLocalFilename("OSES_BETA.apk");
-                        download.setOnDownloadFinishedListener(onUpdateResponse);
-                        download.execute();
-                    }
-                });
-                alert.setNegativeButton("Abbrechen", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.dismiss();
-                        finish();
-                    }
-                });
-                final AlertDialog dialog = alert.create();
-
-                LinearLayout linear = new LinearLayout(StartActivity.this);
-
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-
-                params.setMargins(10, 10, 10, 10);
-
-                WebView wv = new WebView(StartActivity.this);
-                wv.setLayoutParams(params);
-                wv.loadUrl("https://oses.mobi/api.php?request=changelog&beta=1&androidversion=" + OSES.getVersionCode() + "&session=" + OSES.getSession().getIdentifier());
-
-                wv.setWebViewClient(new WebViewClient() {
-
-                    @Override
-                    public void onPageFinished(WebView view, String url) {
-
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                dialog.getButton(Dialog.BUTTON_POSITIVE).setEnabled(true);
-                            }
-                        }, 2500);
-
-                    }
-                });
-
-                linear.addView(wv);
-                dialog.setView(linear);
-                dialog.show();
-                dialog.getButton(Dialog.BUTTON_POSITIVE).setEnabled(false);
-
-            }
-
 
             if (StatusCode.equals("402")) {
 
