@@ -71,12 +71,12 @@
         android:layout_above="@+id/verwendungadd_bottom_buttons"
         android:baselineAligned="false">
 
-        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        <fragment
             android:id="@+id/map"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_weight="1"
-            android:name="com.google.android.gms.maps.MapFragment" />
+            android:name="com.google.android.gms.maps.SupportMapFragment" />
 
         <View
             android:layout_width="5dp"

@@ -1,5 +1,6 @@
 package de.stm.oses.helper;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -7,9 +8,10 @@ import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
 
-import com.crashlytics.android.Crashlytics;
+import androidx.preference.PreferenceManager;
+
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,11 +27,14 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class OSESRequest extends AsyncTask<String, Integer, Object> {
     private OnRequestFinishedListener mListener;
-    private Context context;
+    @SuppressLint("StaticFieldLeak")
+    private final Context context;
     private String url;
     private Map<String, String> params = null;
     private int timeout = 60000;
     private String version;
+
+    // TODO: 05.02.2020 Context aus Klasse entfernen -> genrell neuen Netzwerkcode verwenden
 
     public interface OnRequestFinishedListener {
         void onRequestFinished(String response);
@@ -81,6 +86,9 @@ public class OSESRequest extends AsyncTask<String, Integer, Object> {
         ConnectivityManager cm =
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
+        if (cm == null) {
+            return null;
+        }
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         boolean isConnected = activeNetwork != null &&
                 activeNetwork.isConnectedOrConnecting();
@@ -187,16 +195,16 @@ public class OSESRequest extends AsyncTask<String, Integer, Object> {
             if (mListener != null)
                 mListener.onRequestUnknown((int) o);
 
-            Crashlytics.log("URL: "+url+ " - Status: "+String.valueOf((int) o));
-            Crashlytics.logException(new Exception("Unexpected HTTP-Status-Code"));
+            FirebaseCrashlytics.getInstance().log("URL: "+url+ " - Status: "+ o);
+            FirebaseCrashlytics.getInstance().recordException(new Exception("Unexpected HTTP-Status-Code"));
         }
 
         if (o instanceof Exception) { // Programmfehler
             if (mListener != null)
                 mListener.onRequestException((Exception) o);
 
-            Crashlytics.log("URL: "+url);
-            Crashlytics.logException((Exception) o);
+            FirebaseCrashlytics.getInstance().log("URL: "+url);
+            FirebaseCrashlytics.getInstance().recordException((Exception) o);
         }
 
         if (o == null) { // Keine Konnektivität

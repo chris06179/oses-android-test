@@ -4,8 +4,6 @@ import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -26,6 +24,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.codetroopers.betterpickers.timepicker.TimePickerBuilder;
 import com.codetroopers.betterpickers.timepicker.TimePickerDialogFragment;
@@ -105,39 +106,39 @@ public class SchichtenAddActivity extends AppCompatActivity implements View.OnCl
         Spinner est;
 
         public SchichtAddHolder(SchichtenAddActivity activity) {
-            toolbar = (Toolbar) activity.findViewById(R.id.schichtadd_toolbar);
+            toolbar = activity.findViewById(R.id.schichtadd_toolbar);
 
-            back = (Button) activity.findViewById(R.id.schichtadd_back);
-            save = (Button) activity.findViewById(R.id.schichtadd_save);
-            abcbutton = (ToggleButton) activity.findViewById(R.id.schichtadd_abcbutton);
+            back = activity.findViewById(R.id.schichtadd_back);
+            save = activity.findViewById(R.id.schichtadd_save);
+            abcbutton = activity.findViewById(R.id.schichtadd_abcbutton);
 
-            baureihen_box = (LinearLayout) activity.findViewById(R.id.schichtadd_baureihen_box);
-            pause_box = (LinearLayout) activity.findViewById(R.id.schichtadd_pause_box);
-            auf_box = (LinearLayout) activity.findViewById(R.id.schichtadd_auf_box);
-            fpla_box = (LinearLayout) activity.findViewById(R.id.schichtadd_fpla_box);
+            baureihen_box = activity.findViewById(R.id.schichtadd_baureihen_box);
+            pause_box = activity.findViewById(R.id.schichtadd_pause_box);
+            auf_box = activity.findViewById(R.id.schichtadd_auf_box);
+            fpla_box = activity.findViewById(R.id.schichtadd_fpla_box);
 
-            auftitle = (TextView) activity.findViewById(R.id.schichtadd_auftitle);
+            auftitle = activity.findViewById(R.id.schichtadd_auftitle);
 
-            rilstatus = (ImageView) activity.findViewById(R.id.schichtadd_rilstatus);
-            rilprogress = (ProgressBar) activity.findViewById(R.id.schichtadd_rilprogress);
+            rilstatus = activity.findViewById(R.id.schichtadd_rilstatus);
+            rilprogress = activity.findViewById(R.id.schichtadd_rilprogress);
 
-            db = (EditText) activity.findViewById(R.id.schichtadd_db);
-            de = (EditText) activity.findViewById(R.id.schichtadd_de);
-            schicht = (EditText) activity.findViewById(R.id.schichtadd_schicht);
-            fpla = (EditText) activity.findViewById(R.id.schichtadd_fpla);
-            von = (EditText) activity.findViewById(R.id.schichtadd_von);
-            bis = (EditText) activity.findViewById(R.id.schichtadd_bis);
-            pausein = (EditText) activity.findViewById(R.id.schichtadd_pausein);
-            baureihen = (EditText) activity.findViewById(R.id.schichtadd_baureihen);
-            notiz = (EditText) activity.findViewById(R.id.schichtadd_notiz);
+            db = activity.findViewById(R.id.schichtadd_db);
+            de = activity.findViewById(R.id.schichtadd_de);
+            schicht = activity.findViewById(R.id.schichtadd_schicht);
+            fpla = activity.findViewById(R.id.schichtadd_fpla);
+            von = activity.findViewById(R.id.schichtadd_von);
+            bis = activity.findViewById(R.id.schichtadd_bis);
+            pausein = activity.findViewById(R.id.schichtadd_pausein);
+            baureihen = activity.findViewById(R.id.schichtadd_baureihen);
+            notiz = activity.findViewById(R.id.schichtadd_notiz);
             aufdb = activity.findViewById(R.id.schichtadd_aufdb);
             aufde = activity.findViewById(R.id.schichtadd_aufde);
             aufdz = activity.findViewById(R.id.schichtadd_aufdz);
 
-            gbereich = (Spinner) activity.findViewById(R.id.schichtadd_gbereich);
-            funktion = (Spinner) activity.findViewById(R.id.schichtadd_funktion);
-            pause = (Spinner) activity.findViewById(R.id.schichtadd_pause);
-            est = (Spinner) activity.findViewById(R.id.schichtadd_est);
+            gbereich = activity.findViewById(R.id.schichtadd_gbereich);
+            funktion = activity.findViewById(R.id.schichtadd_funktion);
+            pause = activity.findViewById(R.id.schichtadd_pause);
+            est = activity.findViewById(R.id.schichtadd_est);
 
             back.setOnClickListener(activity);
             save.setOnClickListener(activity);
@@ -178,7 +179,7 @@ public class SchichtenAddActivity extends AppCompatActivity implements View.OnCl
 
         setResult(400);
 
-        OSES = new OSESBase(SchichtenAddActivity.this);
+        OSES = new OSESBase(this);
 
         try {
             ests = OSES.getEstAdapter(OSES.getSession().getEst(), true);
@@ -452,7 +453,7 @@ public class SchichtenAddActivity extends AppCompatActivity implements View.OnCl
 		if (c >= 10)
 			return String.valueOf(c);
 		else
-			return "0" + String.valueOf(c);
+			return "0" + c;
 	}
 
     @Override
@@ -540,39 +541,17 @@ private class SaveSchicht extends AsyncTask<Void, Void, String> {
 
     protected String doInBackground(Void... params) {
 
-        // Aufenthalt parsen
-        String aufdbh = "0";
-        String aufdbm = "0";
-        String aufdeh = "0";
-        String aufdem = "0";
-        String aufdzh = "0";
-        String aufdzm = "0";
-
-        try {
-            if (sAdd.aufdb.getText().length() > 0) {
-                aufdbh = sAdd.aufdb.getText().toString().split(":")[0];
-                aufdbm = sAdd.aufdb.getText().toString().split(":")[1];
-            }
-            if (sAdd.aufde.getText().length() > 0) {
-                aufdeh = sAdd.aufde.getText().toString().split(":")[0];
-                aufdem = sAdd.aufde.getText().toString().split(":")[1];
-            }
-            if (sAdd.aufdz.getText().length() > 0) {
-                aufdzh = sAdd.aufdz.getText().toString().split(":")[0];
-                aufdzm = sAdd.aufdz.getText().toString().split(":")[1];
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        // Datum parsen
         String[] splitVon = sAdd.von.getText().toString().substring(5).split("\\.");
         String gv = splitVon[2] + '-' + splitVon[1] + '-' + splitVon[0];
 
         String[] splitBis = sAdd.bis.getText().toString().substring(5).split("\\.");
         String gb = splitBis[2] + '-' + splitBis[1] + '-' + splitBis[0];
 
+        // Hashmap aufbauen
         Map<String, String> postdata = new HashMap<>();
 
+        // Session
         postdata.put("session", SessionIdentifier);
 
         // Erforderliche Informationen
@@ -592,12 +571,8 @@ private class SaveSchicht extends AsyncTask<Void, Void, String> {
         postdata.put("kommentar", sAdd.notiz.getText().toString());
         postdata.put("aufdb", sAdd.aufdb.getText().toString());
         postdata.put("aufde", sAdd.aufde.getText().toString());
-        postdata.put("aufdbh", aufdbh);
-        postdata.put("aufdbm", aufdbm);
-        postdata.put("aufdeh", aufdeh);
-        postdata.put("aufdem", aufdem);
-        postdata.put("aufdzh", aufdzh);
-        postdata.put("aufdzm", aufdzm);
+        postdata.put("aufdz", sAdd.aufdz.getText().toString());
+
 
         return OSES.getJSON("https://oses.mobi/api.php?request=schichten&command=addajax", postdata, 60000);
 

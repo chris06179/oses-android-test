@@ -81,12 +81,12 @@ public class FaxAdapter extends RecyclerView.Adapter<FaxAdapter.FaxViewHolder>{
 
         FaxViewHolder(View itemView) {
             super(itemView);
-            name = (TextView) itemView.findViewById(R.id.fax_name);
-            dist = (TextView) itemView.findViewById(R.id.fax_dist);
-            beschreibung = (TextView) itemView.findViewById(R.id.fax_beschreibung);
-            gb = (TextView) itemView.findViewById(R.id.fax_gb);
-            main = (RelativeLayout) itemView.findViewById(R.id.fax_layout);
-            frame = (FrameLayout) itemView.findViewById(R.id.fax_frame);
+            name = itemView.findViewById(R.id.fax_name);
+            dist = itemView.findViewById(R.id.fax_dist);
+            beschreibung = itemView.findViewById(R.id.fax_beschreibung);
+            gb = itemView.findViewById(R.id.fax_gb);
+            main = itemView.findViewById(R.id.fax_layout);
+            frame = itemView.findViewById(R.id.fax_frame);
         }
     }
 

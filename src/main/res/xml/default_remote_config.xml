@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- START xml_defaults -->
+<defaultsMap>
+
+    <!-- Menu-->
+    <entry>
+        <key>menu_show_privacy</key>
+        <value>false</value>
+    </entry>
+
+    <entry>
+        <key>menu_show_help</key>
+        <value>false</value>
+    </entry>
+
+</defaultsMap>
+    <!-- END xml_defaults -->

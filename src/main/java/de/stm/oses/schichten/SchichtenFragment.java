@@ -9,10 +9,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.view.ActionMode;
 import android.view.HapticFeedbackConstants;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,6 +18,11 @@ import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 
@@ -238,7 +239,7 @@ public class SchichtenFragment extends SwipeRefreshListFragment implements Actio
         return true;
     }
 
-    // Called each time the action mode is shown. Always called after onCreateActionMode, but
+    // Called each lastModified the action mode is shown. Always called after onCreateActionMode, but
     // may be called multiple times if the mode is invalidated.
     @Override
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
@@ -277,7 +278,7 @@ public class SchichtenFragment extends SwipeRefreshListFragment implements Actio
         setHasOptionsMenu(true);
         setRetainInstance(true);
 
-        OSES = new OSESBase(getActivity().getApplicationContext());
+        OSES = new OSESBase(requireContext());
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(getActivity());
 
@@ -449,7 +450,7 @@ public class SchichtenFragment extends SwipeRefreshListFragment implements Actio
 
     public void RemoveListSelection(boolean notifyChange) {
 
-        for (int i = 0; i < ((SchichtenAdapter) getListAdapter()).getCount(); i++) {
+        for (int i = 0; i < getListAdapter().getCount(); i++) {
             ((SchichtenAdapter) getListAdapter()).getItem(i).setSelected(false);
         }
         if (notifyChange)

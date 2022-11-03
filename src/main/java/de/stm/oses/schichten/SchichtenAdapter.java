@@ -46,7 +46,7 @@ public class SchichtenAdapter extends ArrayAdapter<SchichtenClass> {
             }
 
 
-                FrameLayout container = (FrameLayout) rowView.findViewById(R.id.schicht_container);
+                FrameLayout container = rowView.findViewById(R.id.schicht_container);
 
                 if (item.isSelected())
                     container.setForeground(ContextCompat.getDrawable(getContext(), R.drawable.list_selector));
@@ -55,26 +55,26 @@ public class SchichtenAdapter extends ArrayAdapter<SchichtenClass> {
 
  
               // Init Views
-                TextView schicht = (TextView) rowView.findViewById(R.id.schicht_schicht);
+                TextView schicht = rowView.findViewById(R.id.schicht_schicht);
 
-                TextView von = (TextView) rowView.findViewById(R.id.schicht_von);
-                TextView bis = (TextView) rowView.findViewById(R.id.schicht_bis);
+                TextView von = rowView.findViewById(R.id.schicht_von);
+                TextView bis = rowView.findViewById(R.id.schicht_bis);
 
-                TextView pause = (TextView) rowView.findViewById(R.id.schicht_pause);
+                TextView pause = rowView.findViewById(R.id.schicht_pause);
 
 
 
-                TextView est = (TextView) rowView.findViewById(R.id.schicht_est);
+                TextView est = rowView.findViewById(R.id.schicht_est);
 
-                TextView az = (TextView) rowView.findViewById(R.id.schicht_az);
+                TextView az = rowView.findViewById(R.id.schicht_az);
 
-                TextView funktion = (TextView) rowView.findViewById(R.id.schicht_funktion);
+                TextView funktion = rowView.findViewById(R.id.schicht_funktion);
 
-                TextView gvgb = (TextView) rowView.findViewById(R.id.schicht_gvgb);
+                TextView gvgb = rowView.findViewById(R.id.schicht_gvgb);
 
-                TextView kommentar = (TextView) rowView.findViewById(R.id.schicht_kommentar);
+                TextView kommentar = rowView.findViewById(R.id.schicht_kommentar);
 
-                RelativeLayout kommentar_container = (RelativeLayout) rowView.findViewById(R.id.schicht_kommentar_container);
+                RelativeLayout kommentar_container = rowView.findViewById(R.id.schicht_kommentar_container);
 
 
 

@@ -1,8 +1,11 @@
 package de.stm.oses.fcm;
 
 import android.app.Notification;
+import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
+import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -14,7 +17,7 @@ import java.util.Map;
 import de.stm.oses.helper.OSESBase;
 import de.stm.oses.notification.NotificationHelper;
 
-public class ListenerService extends FirebaseMessagingService {
+public class MessagingService extends FirebaseMessagingService {
 
     public static class RefreshVerwendungEvent {
     }
@@ -24,6 +27,8 @@ public class ListenerService extends FirebaseMessagingService {
 
         NotificationHelper mNotificationHelper = new NotificationHelper(this);
 
+        Log.d("FCM", "new message");
+
         Map<String, String> data = message.getData();
         String type = data.get("type");
 
@@ -31,7 +36,8 @@ public class ListenerService extends FirebaseMessagingService {
             return;
 
         OSESBase OSES = new OSESBase(this);
-        SharedPreferences notificationSettings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
+        SharedPreferences notificationSettings = OSES.getSession().getPreferences();
 
         if (OSES.getSession().getIdentifier().isEmpty()) {
             return;
@@ -81,4 +87,13 @@ public class ListenerService extends FirebaseMessagingService {
         }
     }
 
+    @Override
+    public void onNewToken(@NonNull String token) {
+
+        SharedPreferences prefs = getSharedPreferences("OSESPrefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("SessionFcmInstanceId", token);
+        editor.apply();
+
+    }
 }

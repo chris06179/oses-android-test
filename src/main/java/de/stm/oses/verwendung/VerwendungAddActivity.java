@@ -9,11 +9,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.fragment.app.Fragment;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
-import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -41,6 +36,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
+import androidx.fragment.app.Fragment;
 
 import com.codetroopers.betterpickers.timepicker.TimePickerBuilder;
 import com.codetroopers.betterpickers.timepicker.TimePickerDialogFragment;
@@ -1020,7 +1021,7 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
         if (c >= 10)
             return String.valueOf(c);
         else
-            return "0" + String.valueOf(c);
+            return "0" + c;
     }
 
     @Override
@@ -1151,7 +1152,7 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
 
         showWaitDialog();
 
-        //Datum parsen
+        // Datum parsen
         String datumStart = "";
         String datumEnde = "";
 
@@ -1167,45 +1168,10 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
             datumEnde = split[2] + "-" + split[1] + "-" + split[0];
         }
 
-        // Aufenthalt parsen
-        String aufdbh = "0";
-        String aufdbm = "0";
-        String aufdeh = "0";
-        String aufdem = "0";
-        String aufdzh = "0";
-        String aufdzm = "0";
-
-        try {
-            if (vAdd.aufdb.getText().length() > 0) {
-                aufdbh = vAdd.aufdb.getText().toString().split(":")[0];
-                aufdbm = vAdd.aufdb.getText().toString().split(":")[1];
-            }
-            if (vAdd.aufde.getText().length() > 0) {
-                aufdeh = vAdd.aufde.getText().toString().split(":")[0];
-                aufdem = vAdd.aufde.getText().toString().split(":")[1];
-            }
-            if (vAdd.aufdz.getText().length() > 0) {
-                aufdzh = vAdd.aufdz.getText().toString().split(":")[0];
-                aufdzm = vAdd.aufdz.getText().toString().split(":")[1];
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        // OAZ parsen
-        String o_azh = "";
-        String o_azm = "";
-
-        try {
-            o_azh = vAdd.oaz.getText().toString().split(":")[0];
-            o_azm = vAdd.oaz.getText().toString().split(":")[1];
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
+        // Hashmap aufbauen
         Map<String, String> postdata = new HashMap<>();
 
+        // Session
         postdata.put("session", OSES.getSession().getIdentifier());
 
         // Grunddaten
@@ -1235,13 +1201,10 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
         postdata.put("apause", String.valueOf(((ListClass) vAdd.apause.getSelectedItem()).getId()));
         postdata.put("apauser", vAdd.apauser.getText().toString());
 
-        //Aufenthalt
-        postdata.put("aufdbh", aufdbh);
-        postdata.put("aufdbm", aufdbm);
-        postdata.put("aufdeh", aufdeh);
-        postdata.put("aufdem", aufdem);
-        postdata.put("aufdzh", aufdzh);
-        postdata.put("aufdzm", aufdzm);
+        // Aufenthalt
+        postdata.put("aufdb", vAdd.aufdb.getText().toString());
+        postdata.put("aufde", vAdd.aufde.getText().toString());
+        postdata.put("aufdz", vAdd.aufdz.getText().toString());
 
         //Anreise -> TODO
         //postdata.put("jsonanreise", jsonanreise);
@@ -1256,8 +1219,8 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
         postdata.put("bbeschreibung", vAdd.bbeschreibung.getText().toString());
 
         //OAZ
-        postdata.put("o_azh", o_azh);
-        postdata.put("o_azm", o_azm);
+        postdata.put("o_az", vAdd.oaz.getText().toString());
+
 
         // Sonstiges
         postdata.put("notiz", vAdd.notiz.getText().toString());

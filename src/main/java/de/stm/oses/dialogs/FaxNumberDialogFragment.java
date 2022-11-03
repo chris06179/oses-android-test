@@ -62,7 +62,7 @@ public class FaxNumberDialogFragment extends DialogFragment {
                 faxDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        final EditText numberView = ((EditText) dialogLayout.findViewById(R.id.fax_dialog_number));
+                        final EditText numberView = dialogLayout.findViewById(R.id.fax_dialog_number);
                         String number;
                         number = numberView.getText().toString();
 

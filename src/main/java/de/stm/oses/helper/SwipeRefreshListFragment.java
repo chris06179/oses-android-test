@@ -16,15 +16,15 @@
 
 package de.stm.oses.helper;
 
-import android.app.ListFragment;
 import android.content.Context;
 import android.os.Bundle;
-
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+
+import androidx.fragment.app.ListFragment;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 /**
  * Subclass of {@link androidx.fragment.app.ListFragment} which provides automatic support for

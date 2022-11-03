@@ -2,16 +2,17 @@ package de.stm.oses.verwendung;
 
 import android.content.Context;
 import android.graphics.Color;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.SortedList;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.SortedListAdapterCallback;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SortedList;
+import androidx.recyclerview.widget.SortedListAdapterCallback;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -110,24 +111,24 @@ public class VerwendungAdapterNew extends RecyclerView.Adapter<RecyclerView.View
 
         VerwendungViewHolder(View rowView) {
             super(rowView);
-            container = (FrameLayout) rowView.findViewById(R.id.verwendung_container);
-            bezeichner = (TextView) rowView.findViewById(R.id.verwendung_bezeichner);
-            von = (TextView) rowView.findViewById(R.id.verwendung_von);
-            bis = (TextView) rowView.findViewById(R.id.verwendung_bis);
-            pause = (TextView) rowView.findViewById(R.id.verwendung_pause);
-            datum = (TextView) rowView.findViewById(R.id.verwendung_datum);
-            est = (TextView) rowView.findViewById(R.id.verwendung_est);
-            az = (TextView) rowView.findViewById(R.id.verwendung_az);
-            mdifferenz = (TextView) rowView.findViewById(R.id.verwendung_mdifferenz);
-            funktion = (TextView) rowView.findViewById(R.id.verwendung_funktion);
-            dbr = (TextView) rowView.findViewById(R.id.verwendung_dbr);
-            der = (TextView) rowView.findViewById(R.id.verwendung_der);
-            apauser = (TextView) rowView.findViewById(R.id.verwendung_apauser);
-            notiz = (TextView) rowView.findViewById(R.id.verwendung_notiz);
-            info = (TextView) rowView.findViewById(R.id.verwendung_info);
-            abweichung_container = (RelativeLayout) rowView.findViewById(R.id.verwendung_abweichung_container);
-            info_container = (RelativeLayout) rowView.findViewById(R.id.verwendung_info_container);
-            notiz_container = (RelativeLayout) rowView.findViewById(R.id.verwendung_notiz_container);
+            container = rowView.findViewById(R.id.verwendung_container);
+            bezeichner = rowView.findViewById(R.id.verwendung_bezeichner);
+            von = rowView.findViewById(R.id.verwendung_von);
+            bis = rowView.findViewById(R.id.verwendung_bis);
+            pause = rowView.findViewById(R.id.verwendung_pause);
+            datum = rowView.findViewById(R.id.verwendung_datum);
+            est = rowView.findViewById(R.id.verwendung_est);
+            az = rowView.findViewById(R.id.verwendung_az);
+            mdifferenz = rowView.findViewById(R.id.verwendung_mdifferenz);
+            funktion = rowView.findViewById(R.id.verwendung_funktion);
+            dbr = rowView.findViewById(R.id.verwendung_dbr);
+            der = rowView.findViewById(R.id.verwendung_der);
+            apauser = rowView.findViewById(R.id.verwendung_apauser);
+            notiz = rowView.findViewById(R.id.verwendung_notiz);
+            info = rowView.findViewById(R.id.verwendung_info);
+            abweichung_container = rowView.findViewById(R.id.verwendung_abweichung_container);
+            info_container = rowView.findViewById(R.id.verwendung_info_container);
+            notiz_container = rowView.findViewById(R.id.verwendung_notiz_container);
             type_block = rowView.findViewById(R.id.verwendung_type_block);
         }
     }
@@ -143,12 +144,12 @@ public class VerwendungAdapterNew extends RecyclerView.Adapter<RecyclerView.View
 
         SumViewHolder(View rowView) {
             super(rowView);
-            sumTitel = (TextView) rowView.findViewById(R.id.verwendung_sum_monat);
-            sumSchichten = (TextView) rowView.findViewById(R.id.verwendung_sum_schichten);
-            sumUrlaub = (TextView) rowView.findViewById(R.id.verwendung_sum_urlaub);
-            sumSoll = (TextView) rowView.findViewById(R.id.verwendung_sum_soll);
-            sumIst = (TextView) rowView.findViewById(R.id.verwendung_sum_ist);
-            sumDifferenz = (TextView) rowView.findViewById(R.id.verwendung_sum_differenz);
+            sumTitel = rowView.findViewById(R.id.verwendung_sum_monat);
+            sumSchichten = rowView.findViewById(R.id.verwendung_sum_schichten);
+            sumUrlaub = rowView.findViewById(R.id.verwendung_sum_urlaub);
+            sumSoll = rowView.findViewById(R.id.verwendung_sum_soll);
+            sumIst = rowView.findViewById(R.id.verwendung_sum_ist);
+            sumDifferenz = rowView.findViewById(R.id.verwendung_sum_differenz);
 
         }
     }

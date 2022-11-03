@@ -1,10 +1,5 @@
-package de.stm.oses;
+package de.stm.oses.ui.start;
 
-import android.app.Dialog;
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
-import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,32 +10,30 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
-import androidx.annotation.NonNull;
-import androidx.core.content.FileProvider;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.view.ActionMode;
-import androidx.appcompat.widget.Toolbar;
-import android.text.Html;
 import android.view.Menu;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.FileProvider;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.preference.PreferenceManager;
+
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
 import org.json.JSONObject;
@@ -48,16 +41,18 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
 
-import de.stm.oses.dokumente.DokumenteFragment;
+import de.stm.oses.R;
 import de.stm.oses.helper.FileDownload;
 import de.stm.oses.helper.FileDownload.OnDownloadFinishedListener;
 import de.stm.oses.helper.MenuAdapter;
 import de.stm.oses.helper.MenuClass;
 import de.stm.oses.helper.OSESBase;
 import de.stm.oses.schichten.SchichtenFragment;
+import de.stm.oses.ui.browser.BrowserFragment;
+import de.stm.oses.ui.dokumente.DokumenteFragment;
+import de.stm.oses.ui.login.LoginActivity;
+import de.stm.oses.ui.settings.SettingsFragment;
 import de.stm.oses.verwendung.VerwendungFragment;
 
 
@@ -78,6 +73,7 @@ public class StartActivity extends AppCompatActivity {
 
     public FileDownload CurrentFileDownload;
     private FirebaseAnalytics mFirebaseAnalytics;
+    private FirebaseRemoteConfig mFirebaseRemoteConfig;
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -112,30 +108,40 @@ public class StartActivity extends AppCompatActivity {
         // Obtain the FirebaseAnalytics instance.
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
+        // Auf Update prüfen
+        OSESBase.checkForAppUpdate(this);
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(StartActivity.this);
         boolean useDev = settings.getBoolean("debugUseDevServer", false);
 
         if (useDev) {
-            TextView devModeText = (TextView) findViewById(R.id.devModeText);
+            TextView devModeText = findViewById(R.id.devModeText);
             if (devModeText != null)
                 devModeText.setVisibility(View.VISIBLE);
         }
 
         OSES = new OSESBase(this);
 
+        // Settings holen, blockiere Upload zum Server
+        mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+        mFirebaseRemoteConfig.setDefaultsAsync(R.xml.default_remote_config);
+        mFirebaseRemoteConfig.fetchAndActivate();
+
         mFirebaseAnalytics.setUserProperty("est", OSES.getSession().getEstText());
         mFirebaseAnalytics.setUserProperty("funktion", String.valueOf(OSES.getSession().getFunktion()));
         mFirebaseAnalytics.setUserProperty("gb", OSES.getSession().getGBText());
+        mFirebaseAnalytics.setUserId(String.valueOf(OSES.getSession().getUserId()));
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        FirebaseCrashlytics.getInstance().setUserId(String.valueOf(OSES.getSession().getUserId()));
+
+        Toolbar toolbar = findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
 
-        ListView mMenuList = (ListView) findViewById(R.id.menu_list);
+        ListView mMenuList = findViewById(R.id.menu_list);
 
-        mLeftDrawer = (LinearLayout) findViewById(R.id.left_drawer);
+        mLeftDrawer = findViewById(R.id.left_drawer);
 
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerLayout = findViewById(R.id.drawer_layout);
 
         if (mDrawerLayout != null) {
 
@@ -182,75 +188,73 @@ public class StartActivity extends AppCompatActivity {
         mMenuList.setAdapter(mMenuAdapter);
 
 
-        mMenuList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mMenuList.setOnItemClickListener((parent, view, position, id) -> {
+            if (id >= 0) {
+                Integer selected = mMenuAdapter.getItem((int) id).getID();
 
-            @Override
-            public void onItemClick(AdapterView<?> a, View arg1,
-                                    int position, long id) {
-
-
-                if (id >= 0) {
-                    Integer selected = mMenuAdapter.getItem((int) id).getID();
-
-                    switch (selected) {
-                        case 11:
-                            setMenuSelection(id);
-                            openWebView("aktuell");
-                            setDrawer(false);
-                            return;
-                        case 22:
-                            setMenuSelection(id);
-                            ChangeFragment(new VerwendungFragment(), "verwendung");
-                            setDrawer(false);
-                            return;
-                        case 21:
-                            setMenuSelection(id);
-                            ChangeFragment(new SchichtenFragment(), "schichten");
-                            setDrawer(false);
-                            return;
-                        case 31:
-                            setMenuSelection(id);
-                            ChangeFragment(new DokumenteFragment(), "dokumente");
-                            setDrawer(false);
-                            return;
-                        case 81:
-                            DoBenutzerprofil();
-                            setDrawer(false);
-                            return;
-                        case 82:
-                            setMenuSelection(id);
-                            ChangeFragment(new SettingsFragment(), "settings");
-                            setDrawer(false);
-                            return;
-                        case 84:
-                            DoLogout();
-                            setDrawer(false);
-                            return;
-                        case 92:
-                            setMenuSelection(id);
-                            openWebView("hilfe");
-                            setDrawer(false);
-                            return;
-                        case 93:
-                            setMenuSelection(id);
-                            openWebView("anb");
-                            setDrawer(false);
-                            return;
-                        case 94:
-                            setMenuSelection(id);
-                            openWebView("impressum");
-                            setDrawer(false);
-                            return;
-                        case 95:
-                            setMenuSelection(id);
-                            openWebView("spenden");
-                            setDrawer(false);
-                            return;
-                        case 99:
-                            OpenOSES();
-                            setDrawer(false);
-                            return;
-                    }
+                switch (selected) {
+                    case 11:
+                        setMenuSelection(id);
+                        openWebView("aktuell");
+                        setDrawer(false);
+                        return;
+                    case 22:
+                        setMenuSelection(id);
+                        ChangeFragment(new VerwendungFragment(), "verwendung");
+                        setDrawer(false);
+                        return;
+                    case 21:
+                        setMenuSelection(id);
+                        ChangeFragment(new SchichtenFragment(), "schichten");
+                        setDrawer(false);
+                        return;
+                    case 31:
+                        setMenuSelection(id);
+                        ChangeFragment(new DokumenteFragment(), "dokumente");
+                        setDrawer(false);
+                        return;
+                    case 81:
+                        DoBenutzerprofil();
+                        setDrawer(false);
+                        return;
+                    case 82:
+                        setMenuSelection(id);
+                        ChangeFragment(new SettingsFragment(), "settings");
+                        setDrawer(false);
+                        return;
+                    case 84:
+                        DoLogout();
+                        setDrawer(false);
+                        return;
+                    case 92:
+                        setMenuSelection(id);
+                        openWebView("hilfe");
+                        setDrawer(false);
+                        return;
+                    case 93:
+                        setMenuSelection(id);
+                        openWebView("anb");
+                        setDrawer(false);
+                        return;
+                    case 94:
+                        setMenuSelection(id);
+                        openWebView("impressum");
+                        setDrawer(false);
+                        return;
+                    case 96:
+                        setMenuSelection(id);
+                        openWebView("datenschutz");
+                        setDrawer(false);
+                        return;
+                    case 95:
+                        setMenuSelection(id);
+                        openWebView("spenden");
+                        setDrawer(false);
+                        return;
+                    case 99:
+                        OpenOSES();
+                        setDrawer(false);
+                        return;
                 }
             }
         });
@@ -264,35 +268,22 @@ public class StartActivity extends AppCompatActivity {
         }
 
 
-        TextView menu_name = (TextView) findViewById(R.id.menu_name);
+        TextView menu_name = findViewById(R.id.menu_name);
         if (menu_name != null)
             menu_name.setText(OSES.getSession().getVorname() + ' ' + OSES.getSession().getNachname());
 
-        TextView menu_est = (TextView) findViewById(R.id.menu_est);
+        TextView menu_est = findViewById(R.id.menu_est);
         if (menu_est != null)
             menu_est.setText(OSES.getSession().getEstText());
 
-        TextView menu_gb = (TextView) findViewById(R.id.menu_gb);
+        TextView menu_gb = findViewById(R.id.menu_gb);
         if (menu_gb != null)
             menu_gb.setText(OSES.getSession().getGBText());
 
-
         new CheckSession().execute();
 
-        // Settings holen, blockiere Upload zum Server
-        final FirebaseRemoteConfig mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
-        Map<String, Object> firebaseRemoteConfigDefaults = new HashMap<>();
-        firebaseRemoteConfigDefaults.put("allow_arbeitsauftrag_upload", true);
-        mFirebaseRemoteConfig.setDefaults(firebaseRemoteConfigDefaults);
-        mFirebaseRemoteConfig.fetch().addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                mFirebaseRemoteConfig.activateFetched();
-            }
-        });
-
-        FragmentManager fragmentManager = getFragmentManager();
-        Fragment running = fragmentManager.findFragmentById(R.id.content_frame);
+        androidx.fragment.app.FragmentManager fragmentManager = getSupportFragmentManager();
+        androidx.fragment.app.Fragment running = fragmentManager.findFragmentById(R.id.content_frame);
 
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
@@ -388,7 +379,7 @@ public class StartActivity extends AppCompatActivity {
                 .setPositiveButton("Weiter zur Webversion", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String url = "https://oses.mobi/system.php?action=pers#ESTA";
+                        String url = "https://oses.mobi/";
                         Intent i = new Intent(Intent.ACTION_VIEW);
                         i.setData(Uri.parse(url));
                         startActivity(i);
@@ -404,7 +395,7 @@ public class StartActivity extends AppCompatActivity {
 
     private void openWebView(String request) {
 
-        FragmentManager fragmentManager = getFragmentManager();
+        FragmentManager fragmentManager = getSupportFragmentManager();
         Fragment running = fragmentManager.findFragmentById(R.id.content_frame);
 
         if (running instanceof BrowserFragment) {
@@ -415,46 +406,10 @@ public class StartActivity extends AppCompatActivity {
 
     }
 
-    private void DoDokumentation() {
-        FileDownload download = new FileDownload(StartActivity.this);
-        download.setTitle("Dokumentation");
-        download.setMessage("Die Dokumentation wird heruntergeladen, dieser Vorgang kann einen Moment dauern...");
-        download.setURL("https://oses.mobi/docs/oses_nutzungshinweise.pdf");
-        download.setLocalDirectory("Dokumente/");
-        download.setCancelable(true);
-        download.setOnDownloadFinishedListener(new OnDownloadFinishedListener() {
-            @Override
-            public void onDownloadFinished(File file) {
-                Uri fileUri = FileProvider.getUriForFile(StartActivity.this, "de.stm.oses.FileProvider", file);
-
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setDataAndType(fileUri, "application/pdf");
-                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION+Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                startActivity(intent);
-            }
-
-            @Override
-            public void onTextReceived(String res) {
-
-            }
-
-            @Override
-            public void onException(Exception e) {
-
-            }
-
-            @Override
-            public void onUnknownStatus(int status) {
-
-            }
-        });
-
-        download.execute();
-    }
 
     @Override
     public void onBackPressed() {
-        FragmentManager fragmentManager = getFragmentManager();
+        FragmentManager fragmentManager = getSupportFragmentManager();
         Fragment running = fragmentManager.findFragmentById(R.id.content_frame);
 
         if (mDrawerLayout != null) {
@@ -514,7 +469,7 @@ public class StartActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         if (mDrawerToggle != null)
             mDrawerToggle.onConfigurationChanged(newConfig);
@@ -567,7 +522,7 @@ public class StartActivity extends AppCompatActivity {
         public void run() {
 
 
-                FragmentManager fragmentManager = getFragmentManager();
+                FragmentManager fragmentManager = getSupportFragmentManager();
                 Fragment running = fragmentManager.findFragmentByTag(ident);
 
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -590,6 +545,9 @@ public class StartActivity extends AppCompatActivity {
     }
 
     private ArrayList<MenuClass> generateMenu() {
+        boolean showHelp = mFirebaseRemoteConfig.getBoolean("menu_show_help");
+        boolean showPrivacy = mFirebaseRemoteConfig.getBoolean("menu_show_privacy");
+
         ArrayList<MenuClass> items = new ArrayList<>();
         items.add(new MenuClass("Einstieg"));
         items.add(new MenuClass(R.drawable.ic_action_cloud, "Aktuelles", 11, ""));
@@ -604,9 +562,12 @@ public class StartActivity extends AppCompatActivity {
         items.add(new MenuClass(R.drawable.ic_action_settings, "Einstellungen", 82, ""));
         items.add(new MenuClass(R.drawable.ic_action_cancel, "Abmelden", 84, ""));
         items.add(new MenuClass("Sonstiges"));
-        items.add(new MenuClass(R.drawable.ic_action_help, "Hilfe", 92, ""));
+        if (showHelp)
+            items.add(new MenuClass(R.drawable.ic_action_help, "Hilfe", 92, ""));
         items.add(new MenuClass(R.drawable.ic_action_donate, "Spenden", 95, ""));
         items.add(new MenuClass(R.drawable.ic_action_about, "Nutzungsbedingungen", 93, ""));
+        if (showPrivacy)
+            items.add(new MenuClass(R.drawable.ic_action_privacy, "Datenschutzerklärung", 96, ""));
         items.add(new MenuClass(R.drawable.ic_action_para, "Impressum", 94, ""));
         items.add(new MenuClass(R.drawable.ic_action_web_site, "Webversion", 99, ""));
 
@@ -651,7 +612,8 @@ public class StartActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,@NonNull String permissions[],@NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case PERMISSION_REQUEST_STORAGE_DOWNLOAD: {
                 // If request is cancelled, the result arrays are empty.
@@ -664,6 +626,8 @@ public class StartActivity extends AppCompatActivity {
             }
         }
     }
+
+
 
 
     private void OpenOSES() {
@@ -690,7 +654,7 @@ public class StartActivity extends AppCompatActivity {
                         editor.clear();
                         editor.apply();
 
-                        Intent intent = new Intent(StartActivity.this, OSESActivity.class);
+                        Intent intent = new Intent(StartActivity.this, LoginActivity.class);
                         startActivity(intent);
                         StartActivity.this.finish();
 
@@ -754,45 +718,6 @@ public class StartActivity extends AppCompatActivity {
 
     }
 
-    private void CloseInfo(View v) throws Exception {
-
-        final LinearLayout infobox = (LinearLayout) findViewById(R.id.infobox);
-
-        assert  infobox != null;
-
-        Animation slide = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_up);
-        slide.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                infobox.setVisibility(View.GONE);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-
-        infobox.startAnimation(slide);
-
-
-    }
-
-    private boolean isInstalledViaPlayStore() {
-
-        return true;
-
-       // String installer = getPackageManager().getInstallerPackageName(getPackageName());
-
-        //return installer != null && installer.equals("com.android.vending");
-
-    }
-
 
     private class CheckSession extends AsyncTask<String, Void, String> {
 
@@ -817,6 +742,7 @@ public class StartActivity extends AppCompatActivity {
             String StatusMessage = "";
 
             String SessionUsername = "";
+            int SessionUserId = -1;
             int SessionGroup = 90;
             int SessionEst = 0;
             String SessionEstText = "";
@@ -857,6 +783,7 @@ public class StartActivity extends AppCompatActivity {
                 DataGB = json.getString("DataGB");
 
                 SessionUsername = json.getString("SessionUsername");
+                SessionUserId = json.getInt("SessionId");
                 SessionGroup = json.getInt("SessionGruppe");
                 SessionVorname = json.getString("SessionVorname");
                 SessionNachname = json.getString("SessionName");
@@ -892,6 +819,7 @@ public class StartActivity extends AppCompatActivity {
                 editor.putString("StatusMessage", StatusMessage);
                 editor.putString("StatusCode", StatusCode);
                 editor.putString("SessionUsername", SessionUsername);
+                editor.putInt("SessionUserId", SessionUserId);
                 editor.putInt("SessionGruppe", SessionGroup);
                 editor.putInt("SessionEst", SessionEst);
                 editor.putString("SessionEstText", SessionEstText);
@@ -909,34 +837,16 @@ public class StartActivity extends AppCompatActivity {
                 // Commit the edits!
                 editor.apply();
 
-                if (!StatusMessage.isEmpty()) {
-                    TextView infotext = (TextView) findViewById(R.id.infotext);
-                    LinearLayout infobox = (LinearLayout) findViewById(R.id.infobox);
 
-                    if (infotext != null)
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            infotext.setText(Html.fromHtml(StatusMessage, Html.FROM_HTML_MODE_LEGACY));
-                        } else
-                            infotext.setText(Html.fromHtml(StatusMessage));
-
-
-                    Animation slide = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_down);
-
-                    if (infobox != null) {
-                        infobox.startAnimation(slide);
-                        infobox.setVisibility(View.VISIBLE);
-                    }
-                }
-
-                TextView menu_name = (TextView) findViewById(R.id.menu_name);
+                TextView menu_name = findViewById(R.id.menu_name);
                 if (menu_name != null)
                     menu_name.setText(SessionVorname + ' ' + SessionNachname);
 
-                TextView menu_est = (TextView) findViewById(R.id.menu_est);
+                TextView menu_est = findViewById(R.id.menu_est);
                 if (menu_est != null)
                     menu_est.setText(SessionEstText);
 
-                TextView menu_gb = (TextView) findViewById(R.id.menu_gb);
+                TextView menu_gb = findViewById(R.id.menu_gb);
                 if (menu_gb != null)
                     menu_gb.setText(SessionGBText);
 
@@ -952,162 +862,7 @@ public class StartActivity extends AppCompatActivity {
                         DoWebpage(WebpageURL, WebpageTitle, WebpageMessage, WebpageIdent);
 
                 }
-
-
             }
-
-            final String UpdateFile = UpdateFileName;
-
-            if (StatusCode.equals("100")) {
-
-                mFirebaseAnalytics.logEvent("OSES_update_start", null);
-
-                AlertDialog.Builder alert = new AlertDialog.Builder(StartActivity.this);
-
-                alert.setCancelable(false);
-
-                alert.setPositiveButton("Weiter", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-
-                        if (isInstalledViaPlayStore()) {
-
-                            final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
-                            try {
-                                Toast.makeText(StartActivity.this, "Weiterleitung zum Google Play Store...", Toast.LENGTH_SHORT).show();
-                                Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.android.vending");
-                                ComponentName comp = new ComponentName("com.android.vending", "com.google.android.finsky.activities.LaunchUrlHandlerActivity"); // package name and activity
-                                launchIntent.setComponent(comp);
-                                launchIntent.setData(Uri.parse("market://details?id="+appPackageName));
-                                startActivity(launchIntent);
-                            } catch (ActivityNotFoundException | NullPointerException e) {
-                                Crashlytics.log("opening GPLAY failed");
-                                Crashlytics.logException(e);
-                            } finally {
-                                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
-                            }
-
-                            mFirebaseAnalytics.logEvent("OSES_update_gplay", null);
-
-                            finish();
-                        }
-
-                        else {
-
-                            mFirebaseAnalytics.logEvent("OSES_update_self", null);
-                            FileDownload download = new FileDownload(StartActivity.this);
-                            download.setTitle("Aktualisierung");
-                            download.setMessage("Installationsdatei wird heruntergeladen, dieser Vorgang kann einige Minuten dauern...");
-                            download.setURL("https://oses.mobi/android/" + UpdateFile);
-                            download.setLocalDirectory("APK/");
-                            download.setLocalFilename("OSES.apk");
-                            download.setOnDownloadFinishedListener(onUpdateResponse);
-                            download.execute();
-
-                        }
-                    }
-                });
-                alert.setNegativeButton("Abbrechen", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.dismiss();
-                        finish();
-                    }
-                });
-                final AlertDialog dialog = alert.create();
-
-                LinearLayout linear = new LinearLayout(StartActivity.this);
-
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-
-                params.setMargins(10, 10, 10, 10);
-
-                WebView wv = new WebView(StartActivity.this);
-                wv.setLayoutParams(params);
-                wv.loadUrl("https://oses.mobi/api.php?request=changelog&androidversion=" + OSES.getVersionCode() + "&session=" + OSES.getSession().getIdentifier());
-
-                wv.setWebViewClient(new WebViewClient() {
-
-                    @Override
-                    public void onPageFinished(WebView view, String url) {
-
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                dialog.getButton(Dialog.BUTTON_POSITIVE).setEnabled(true);
-                            }
-                        }, 2000);
-
-                    }
-                });
-
-                linear.addView(wv);
-                dialog.setView(linear);
-                dialog.show();
-                dialog.getButton(Dialog.BUTTON_POSITIVE).setEnabled(false);
-
-            }
-
-            if (StatusCode.equals("101")) {
-
-                AlertDialog.Builder alert = new AlertDialog.Builder(StartActivity.this);
-
-                alert.setCancelable(false);
-
-                alert.setPositiveButton("WOLOLOO", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        FileDownload download = new FileDownload(StartActivity.this);
-                        download.setTitle("Aktualisierung (BETA)");
-                        download.setMessage("Installationsdatei wird heruntergeladen, dieser Vorgang kann einige Minuten dauern...");
-                        download.setURL("https://oses.mobi/android/" + UpdateFile);
-                        download.setLocalDirectory("APK/");
-                        download.setLocalFilename("OSES_BETA.apk");
-                        download.setOnDownloadFinishedListener(onUpdateResponse);
-                        download.execute();
-                    }
-                });
-                alert.setNegativeButton("Abbrechen", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.dismiss();
-                        finish();
-                    }
-                });
-                final AlertDialog dialog = alert.create();
-
-                LinearLayout linear = new LinearLayout(StartActivity.this);
-
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-
-                params.setMargins(10, 10, 10, 10);
-
-                WebView wv = new WebView(StartActivity.this);
-                wv.setLayoutParams(params);
-                wv.loadUrl("https://oses.mobi/api.php?request=changelog&beta=1&androidversion=" + OSES.getVersionCode() + "&session=" + OSES.getSession().getIdentifier());
-
-                wv.setWebViewClient(new WebViewClient() {
-
-                    @Override
-                    public void onPageFinished(WebView view, String url) {
-
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                dialog.getButton(Dialog.BUTTON_POSITIVE).setEnabled(true);
-                            }
-                        }, 2500);
-
-                    }
-                });
-
-                linear.addView(wv);
-                dialog.setView(linear);
-                dialog.show();
-                dialog.getButton(Dialog.BUTTON_POSITIVE).setEnabled(false);
-
-            }
-
 
             if (StatusCode.equals("402")) {
 
@@ -1122,7 +877,7 @@ public class StartActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int id) {
 
                                 dialog.dismiss();
-                                Intent intent = new Intent(StartActivity.this, OSESActivity.class);
+                                Intent intent = new Intent(StartActivity.this, LoginActivity.class);
                                 startActivity(intent);
                                 StartActivity.this.finish();
 

@@ -10,19 +10,20 @@ import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Message;
-import android.preference.PreferenceManager;
-import androidx.core.content.FileProvider;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.view.ActionMode;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
+import androidx.core.content.FileProvider;
+import androidx.preference.PreferenceManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -63,7 +64,7 @@ public class VerwendungFragmentNew extends RecyclerFragment implements ActionMod
         return true;
     }
 
-    // Called each time the action mode is shown. Always called after onCreateActionMode, but
+    // Called each lastModified the action mode is shown. Always called after onCreateActionMode, but
     // may be called multiple times if the mode is invalidated.
     @Override
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
@@ -109,7 +110,7 @@ public class VerwendungFragmentNew extends RecyclerFragment implements ActionMod
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        OSES = new OSESBase(getActivity());
+        OSES = new OSESBase(requireContext());
         setHasOptionsMenu(true);
         setRetainInstance(true);
 
@@ -592,7 +593,7 @@ public class VerwendungFragmentNew extends RecyclerFragment implements ActionMod
         download.setTitle("Sonderleistung");
         download.setMessage("Das Dokument wird heruntergeladen, dieser Vorgang kann einen Moment dauern...");
         download.setURL(url);
-        download.setLocalDirectory("Dokumente/");
+        download.setLocalDirectory("/Dokumente/");
         download.setOnDownloadFinishedListener(new FileDownload.OnDownloadFinishedListener() {
             @Override
             public void onDownloadFinished(File file) {
@@ -638,7 +639,7 @@ public class VerwendungFragmentNew extends RecyclerFragment implements ActionMod
 
             @Override
             public void onUnknownStatus(int status) {
-                Toast.makeText(getActivity(), "Anwendungsfehler: Der Server hat mit einem unbekannten Statuscode geantwortet! (" + String.valueOf(status) + ")", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "Anwendungsfehler: Der Server hat mit einem unbekannten Statuscode geantwortet! (" + status + ")", Toast.LENGTH_LONG).show();
             }
         });
         download.execute();

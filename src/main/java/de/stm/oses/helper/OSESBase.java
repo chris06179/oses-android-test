@@ -1,20 +1,26 @@
 package de.stm.oses.helper;
 
-import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
+import android.content.IntentSender;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.os.Environment;
-import android.preference.PreferenceManager;
-import androidx.core.content.ContextCompat;
+import android.os.Build;
 import android.view.ContextThemeWrapper;
+
+import androidx.preference.PreferenceManager;
+
+import com.google.android.play.core.appupdate.AppUpdateInfo;
+import com.google.android.play.core.appupdate.AppUpdateManager;
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
+import com.google.android.play.core.install.model.AppUpdateType;
+import com.google.android.play.core.install.model.UpdateAvailability;
+import com.google.android.play.core.tasks.Task;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -22,56 +28,35 @@ import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import de.stm.oses.BuildConfig;
 import de.stm.oses.R;
 
 public class OSESBase {
 
-    public static final int DILOC_STATUS_UNKNOWN = -1;
-    public static final int DILOC_STATUS_NOT_INSTALLED = 0;
-    public static final int DILOC_STATUS_INSTALLED = 1;
+    public static final int STATUS_NOT_ALLOWED = -2;
+    public static final int STATUS_UNKNOWN = -1;
+    public static final int STATUS_NOT_INSTALLED = 0;
+    public static final int STATUS_INSTALLED = 1;
 
 
     private Context context;
     private OSESSession session;
-    private String sVersion;
-    private Integer iVersionCode;
-    private Integer iSDKLevel;
-    private String sSDKString;
-    private int iDilocStatus;
-
+    private int iDilocStatus = STATUS_UNKNOWN;
+    private int iFassiStatus = STATUS_UNKNOWN;
 
     public OSESBase(Context context) {
         this.context = context;
-
-        session = new OSESSession(context);
-
-        PackageInfo packageInfo;
-        try {
-            packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-            this.iVersionCode = packageInfo.versionCode;
-            this.sVersion = packageInfo.versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            this.iVersionCode = 0;
-            this.sVersion = "";
-        }
-
-        this.iSDKLevel = android.os.Build.VERSION.SDK_INT;
-        this.sSDKString = android.os.Build.VERSION.RELEASE;
-
-        this.iDilocStatus = DILOC_STATUS_UNKNOWN;
-
     }
 
     public OSESSession getSession() {
+        if (session == null) {
+            session = new OSESSession(context);
+        }
         return session;
     }
 
@@ -349,19 +334,19 @@ public class OSESBase {
     }
 
     public String getVersion() {
-        return sVersion;
+        return BuildConfig.VERSION_NAME;
     }
 
     public Integer getVersionCode() {
-        return iVersionCode;
+        return BuildConfig.VERSION_CODE;
     }
 
     public Integer getSDKLevel() {
-        return iSDKLevel;
+        return Build.VERSION.SDK_INT;
     }
 
     public String getSDKString() {
-        return sSDKString;
+        return Build.VERSION.RELEASE;
     }
 
     public String getJSON(String url, Map<String, String> params, int timeout) {
@@ -461,82 +446,35 @@ public class OSESBase {
         }
     }
 
-    public int getDilocStatus() {
-        if (iDilocStatus == DILOC_STATUS_UNKNOWN) {
-            if (isPackageInstalled("de.diloc.DiLocSyncMobile", context.getPackageManager())) {
-                iDilocStatus = DILOC_STATUS_INSTALLED;
-            } else {
-                iDilocStatus = DILOC_STATUS_NOT_INSTALLED;
-            }
-        }
+    public static void checkForAppUpdate(Activity activity) {
 
-        return iDilocStatus;
-    }
+        AppUpdateManager appUpdateManager = AppUpdateManagerFactory.create(activity);
 
-    public boolean hasStoragePermission() {
-       return ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
-    }
+        // Returns an intent object that you use to check for an update.
+        Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
 
-    public void rebuildWorkingDirectory() {
-
-        if (hasStoragePermission()) {
-
-            File oldpath = new File(Environment.getExternalStorageDirectory().getPath() + "/OSES/docs/");
-
-            if (oldpath.exists())
-                oldpath.renameTo(new File(Environment.getExternalStorageDirectory().getPath() + "/OSES/Dokumente/"));
-
-            oldpath = new File(Environment.getExternalStorageDirectory().getPath() + "/OSES/install/");
-
-            if (oldpath.exists())
-                oldpath.renameTo(new File(Environment.getExternalStorageDirectory().getPath() + "/OSES/APK/"));
-
-
-            File olddir = new File(Environment.getExternalStorageDirectory().getPath() + "/OSES/Dokumente/Arbeitsaufträge/");
-
-            if (!olddir.exists())
-                return;
-
-            File files[] = olddir.listFiles();
-
-            for (File file :
-                    files) {
-
-                if (file.getName().contains(".pdf")) {
-                    String split[] = file.getName().split("_");
-
-                    if (split.length != 3)
-                        continue;
-
-                    String bezeichner = split[1];
-                    String datum = split[2].substring(0, split[2].length()-4);
-
-                    SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY);
-                    try {
-                        Date date = format.parse(datum);
-
-                        SimpleDateFormat month = new SimpleDateFormat("yyyy/MM - MMMM", Locale.GERMANY);
-                        SimpleDateFormat day = new SimpleDateFormat("dd.MM.yyyy_EE", Locale.GERMANY);
-
-                        String newpath = Environment.getExternalStorageDirectory().getPath() + "/OSES/Dokumente/Arbeitsaufträge/" + month.format(date) + "/Arbeitsauftrag_" + day.format(date).replaceAll(".$", "") + "_" + bezeichner.replaceAll("\\s", "_") + ".pdf";
-                        File dest = new File(newpath);
-
-                        dest.getParentFile().mkdirs();
-                        file.renameTo(dest);
-
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                        continue;
-                    }
-
-
+        // Checks that the platform will allow the specified type of update.
+        appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                    // This example applies an immediate update. To apply a flexible update
+                    // instead, pass in AppUpdateType.FLEXIBLE
+                    && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
+                // Request the update.
+                try {
+                    appUpdateManager.startUpdateFlowForResult(
+                            // Pass the intent that is returned by 'getAppUpdateInfo()'.
+                            appUpdateInfo,
+                            // Or 'AppUpdateType.FLEXIBLE' for flexible updates.
+                            AppUpdateType.IMMEDIATE,
+                            // The current activity making the update request.
+                            activity,
+                            // Include a request code to later monitor this update request.
+                            0);
+                } catch (IntentSender.SendIntentException e) {
+                    e.printStackTrace();
                 }
-
             }
-
-        }
+        });
 
     }
-
-
 }

@@ -1,4 +1,4 @@
-package de.stm.oses;
+package de.stm.oses.ui.login;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
@@ -7,11 +7,6 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings.Secure;
-import androidx.browser.customtabs.CustomTabsIntent;
-import androidx.fragment.app.Fragment;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -21,8 +16,15 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.browser.customtabs.CustomTabsIntent;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.preference.PreferenceManager;
+
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.json.JSONObject;
 
@@ -30,38 +32,51 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.stm.oses.R;
 import de.stm.oses.dialogs.ProgressDialogFragment;
 import de.stm.oses.helper.OSESBase;
 import de.stm.oses.helper.OSESRequest;
 import de.stm.oses.notification.NotificationHelper;
+import de.stm.oses.ui.start.StartActivity;
 
-public class OSESActivity extends AppCompatActivity implements View.OnClickListener {
-	
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
+
     private OSESBase OSES;
     private FirebaseAnalytics mFirebaseAnalytics;
 
-    /** Called when the activity is first created. */
+    /**
+     * Called when the activity is first created.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        OSES = new OSESBase(OSESActivity.this);
-        new NotificationHelper(this);
+        OSES = new OSESBase(this);
+
+        NotificationHelper notify = new NotificationHelper(this);
+        notify.refreshNotificationChannels();
+        notify.subscribeToTopics();
+
+        try {
+            PreferenceManager.setDefaultValues(this, R.xml.preferences, true);
+        } catch (Exception e) {
+            FirebaseCrashlytics.getInstance().recordException(e);
+        }
 
         // Obtain the FirebaseAnalytics instance.
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
-        // Arbeitsverzeichnis aufräumen und anpassen -> ab v345
-        OSES.rebuildWorkingDirectory();
-
         if (!OSES.getSession().getIdentifier().equals("")) {
-            Intent intent = new Intent(OSESActivity.this,StartActivity.class);
+            Intent intent = new Intent(LoginActivity.this, StartActivity.class);
             startActivity(intent);
             finish();
+            return;
         }
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.oses_start_toolbar);
+        OSESBase.checkForAppUpdate(this);
+
+        Toolbar toolbar = findViewById(R.id.oses_start_toolbar);
         setSupportActionBar(toolbar);
 
         if (getSupportActionBar() != null) {
@@ -70,19 +85,19 @@ public class OSESActivity extends AppCompatActivity implements View.OnClickListe
 
         }
 
-                
-        TextView copyright = (TextView)findViewById(R.id.textView4);
+
+        TextView copyright = findViewById(R.id.textView4);
 
         Calendar c = Calendar.getInstance();
         int year = c.get(Calendar.YEAR);
 
         if (copyright != null)
-            copyright.setText("© "+String.valueOf(year)+" Steiner Media - v "+OSES.getVersion());
+            copyright.setText("© " + year + " Steiner Media - v " + OSES.getVersion());
 
-        Button button_about = (Button) findViewById(R.id.login_about);
-        Button button_lost_pass = (Button) findViewById(R.id.login_lost_pass);
-        Button button_registrierung = (Button) findViewById(R.id.login_registrierung);
-        Button button_login = (Button) findViewById(R.id.login_login);
+        Button button_about = findViewById(R.id.login_about);
+        Button button_lost_pass = findViewById(R.id.login_lost_pass);
+        Button button_registrierung = findViewById(R.id.login_registrierung);
+        Button button_login = findViewById(R.id.login_login);
 
         if (button_about != null)
             button_about.setOnClickListener(this);
@@ -109,24 +124,26 @@ public class OSESActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle presses on the action bar items
-        switch (item.getItemId()) {
-            case R.id.action_login_imprint:
-                ImprintOnClick();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == R.id.action_login_imprint) {
+            ImprintOnClick();
+            return true;
         }
+        if (item.getItemId() == R.id.action_login_privacy) {
+            DatenschutzOnClick();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
-    
+
     private void LoginOnClick() {
-    	
-    	boolean stop = false;
+
+        boolean stop = false;
 
         String username;
         String password;
-    	
-    	EditText usernameEdit = (EditText)findViewById(R.id.username);
-		EditText passwordEdit = (EditText)findViewById(R.id.password);
+
+        EditText usernameEdit = findViewById(R.id.username);
+        EditText passwordEdit = findViewById(R.id.password);
 
         if (usernameEdit != null && passwordEdit != null) {
 
@@ -168,7 +185,7 @@ public class OSESActivity extends AppCompatActivity implements View.OnClickListe
             postdata.put("username", username);
             postdata.put("password", password);
             postdata.put("device", android_id);
-            postdata.put("model", android.os.Build.MODEL+"|"+android.os.Build.PRODUCT);
+            postdata.put("model", android.os.Build.MODEL + "|" + android.os.Build.PRODUCT);
             postdata.put("gcm_regid", OSES.getSession().getSessionFcmInstanceId());
             postdata.put("androidversion", String.valueOf(OSES.getVersionCode()));
 
@@ -199,16 +216,16 @@ public class OSESActivity extends AppCompatActivity implements View.OnClickListe
                         }
 
                     } catch (Exception e) {
-                        Crashlytics.logException(e);
+                        FirebaseCrashlytics.getInstance().recordException(e);
                     }
 
                     if (!StatusCode.equals("200")) {
 
                         mFirebaseAnalytics.logEvent("OSES_login_failed", null);
-                        Toast.makeText(OSESActivity.this, "Anmeldung fehlgeschlagen! Benutzername oder Passwort ist nicht korrekt!", Toast.LENGTH_LONG).show();
+                        Toast.makeText(LoginActivity.this, "Anmeldung fehlgeschlagen! Benutzername oder Passwort ist nicht korrekt!", Toast.LENGTH_LONG).show();
 
 
-                    }  else {
+                    } else {
 
                         mFirebaseAnalytics.logEvent("OSES_login_ok", null);
 
@@ -218,7 +235,7 @@ public class OSESActivity extends AppCompatActivity implements View.OnClickListe
                         editor.putString("SessionIdentifier", SessionIdentifier);
                         editor.apply();
 
-                        Intent intent = new Intent(OSESActivity.this,StartActivity.class);
+                        Intent intent = new Intent(LoginActivity.this, StartActivity.class);
                         startActivity(intent);
 
                         finish();
@@ -231,19 +248,19 @@ public class OSESActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void onRequestException(Exception e) {
                     hideWaitDialog();
-                    Toast.makeText(OSESActivity.this, "Technischer Fehler beim Anmeldevorgang! Bitte versuch es erneut!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(LoginActivity.this, "Technischer Fehler beim Anmeldevorgang! Bitte versuch es erneut!", Toast.LENGTH_LONG).show();
                 }
 
                 @Override
                 public void onRequestUnknown(int status) {
                     hideWaitDialog();
-                    Toast.makeText(OSESActivity.this, "Der Server hat eine unerwartete Antwort gesendet! Bitte versuch es erneut!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(LoginActivity.this, "Der Server hat eine unerwartete Antwort gesendet! Bitte versuch es erneut!", Toast.LENGTH_LONG).show();
                 }
 
                 @Override
                 public void onIsNotConnected() {
                     hideWaitDialog();
-                    Toast.makeText(OSESActivity.this, "Bitte stelle eine Internetverbindung her um den Anmeldevorgang fortzusetzen!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(LoginActivity.this, "Bitte stelle eine Internetverbindung her um den Anmeldevorgang fortzusetzen!", Toast.LENGTH_LONG).show();
                 }
             });
 
@@ -251,7 +268,7 @@ public class OSESActivity extends AppCompatActivity implements View.OnClickListe
 
 
         }
-   	    
+
     }
 
     private void ShowWaitDialog() {
@@ -275,7 +292,7 @@ public class OSESActivity extends AppCompatActivity implements View.OnClickListe
 
         String url = "https://oses.mobi/index.php?action=acclost";
         CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-        builder.setToolbarColor(ContextCompat.getColor(OSESActivity.this, R.color.oses_green));
+        builder.setToolbarColor(ContextCompat.getColor(LoginActivity.this, R.color.oses_green));
         CustomTabsIntent customTabsIntent = builder.build();
         customTabsIntent.launchUrl(this, Uri.parse(url));
 
@@ -285,7 +302,7 @@ public class OSESActivity extends AppCompatActivity implements View.OnClickListe
 
         String url = "https://oses.mobi/index.php?action=register";
         CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-        builder.setToolbarColor(ContextCompat.getColor(OSESActivity.this, R.color.oses_green));
+        builder.setToolbarColor(ContextCompat.getColor(LoginActivity.this, R.color.oses_green));
         CustomTabsIntent customTabsIntent = builder.build();
         customTabsIntent.launchUrl(this, Uri.parse(url));
 
@@ -295,7 +312,17 @@ public class OSESActivity extends AppCompatActivity implements View.OnClickListe
 
         String url = "https://oses.mobi/index.php?action=imprint";
         CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-        builder.setToolbarColor(ContextCompat.getColor(OSESActivity.this, R.color.oses_green));
+        builder.setToolbarColor(ContextCompat.getColor(LoginActivity.this, R.color.oses_green));
+        CustomTabsIntent customTabsIntent = builder.build();
+        customTabsIntent.launchUrl(this, Uri.parse(url));
+
+    }
+
+    private void DatenschutzOnClick() {
+
+        String url = "https://oses.mobi/index.php?action=datenschutz";
+        CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+        builder.setToolbarColor(ContextCompat.getColor(LoginActivity.this, R.color.oses_green));
         CustomTabsIntent customTabsIntent = builder.build();
         customTabsIntent.launchUrl(this, Uri.parse(url));
 
@@ -305,7 +332,7 @@ public class OSESActivity extends AppCompatActivity implements View.OnClickListe
 
         String url = "https://oses.mobi/index.php?action=about";
         CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-        builder.setToolbarColor(ContextCompat.getColor(OSESActivity.this, R.color.oses_green));
+        builder.setToolbarColor(ContextCompat.getColor(LoginActivity.this, R.color.oses_green));
         CustomTabsIntent customTabsIntent = builder.build();
         customTabsIntent.launchUrl(this, Uri.parse(url));
     }
@@ -328,5 +355,5 @@ public class OSESActivity extends AppCompatActivity implements View.OnClickListe
         }
 
     }
-    
+
 }

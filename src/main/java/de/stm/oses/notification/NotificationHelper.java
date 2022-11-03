@@ -27,14 +27,21 @@ import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
+
+import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import de.stm.oses.R;
-import de.stm.oses.StartActivity;
 import de.stm.oses.helper.OSESBase;
+import de.stm.oses.ui.start.StartActivity;
 
 /**
  * Helper class to manage notification channels, and create notifications.
@@ -43,6 +50,7 @@ public class NotificationHelper extends ContextWrapper {
     private NotificationManager manager;
     public static final String SDL = "sdl";
     public static final String AUSBLEIBE_FAHRAUSLAGEN = "ausbleibe_fahrauslagen";
+    public static final String INDEX = "index";
     public static final String FAX = "fax";
     public static final String NEWS = "news";
     public static final String APPUPDATES = "appupdates";
@@ -56,7 +64,22 @@ public class NotificationHelper extends ContextWrapper {
      */
     public NotificationHelper(Context ctx) {
         super(ctx);
+    }
 
+    public void subscribeToTopics() {
+        FirebaseMessaging.getInstance().subscribeToTopic("news").addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful())
+                    Log.d("TOPIC", "news YES");
+                else
+                    Log.d("TOPIC", "news NO");
+            }
+        });
+        FirebaseMessaging.getInstance().subscribeToTopic("update");
+    }
+
+    public void refreshNotificationChannels() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
 
             List<NotificationChannelGroup> notificationChannelGroups = new ArrayList<>();
@@ -65,15 +88,11 @@ public class NotificationHelper extends ContextWrapper {
             notificationChannelGroups.add(new NotificationChannelGroup("dokumente", "Dokumente"));
             notificationChannelGroups.add(new NotificationChannelGroup("system", "System"));
 
-            //NotificationChannel sdl = new NotificationChannel(SDL, "Sonderleistungszettel", NotificationManager.IMPORTANCE_DEFAULT);
-            //sdl.setDescription("Erinnerung an Sonderleistungszettel bei Schichtende");
-            //sdl.setGroup("dokumente");
-            //notificationChannels.add(sdl);
 
-            //NotificationChannel ausbleibe_fahrauslagen = new NotificationChannel(AUSBLEIBE_FAHRAUSLAGEN, "Ausbleibezeiten & Fahrauslagen", NotificationManager.IMPORTANCE_DEFAULT);
-            //ausbleibe_fahrauslagen.setDescription("Erinnerung an Ausbleibezeit & Fahrauslagen bei Monatsende");
-            //ausbleibe_fahrauslagen.setGroup("dokumente");
-            //notificationChannels.add(ausbleibe_fahrauslagen);
+            NotificationChannel index = new NotificationChannel(INDEX, "Dokumentenindex", NotificationManager.IMPORTANCE_LOW);
+            index.setDescription("Zeigt den Status der Indizierung von Dokumenten im DiLoc|Sync oder FASSI-MOVE Verzeichnis an");
+            index.setGroup("dokumente");
+            notificationChannels.add(index);
 
 
             NotificationChannel fax = new NotificationChannel(FAX, "Faxversand", NotificationManager.IMPORTANCE_MIN);
@@ -96,7 +115,7 @@ public class NotificationHelper extends ContextWrapper {
             notificationChannels.add(sonstige);
 
 
-            OSESBase OSES = new OSESBase(ctx);
+            OSESBase OSES = new OSESBase(getApplicationContext());
 
             if (OSES.getSession().getGroup() == 1) {
                 notificationChannelGroups.add(new NotificationChannelGroup("admin", "Administration"));
@@ -153,7 +172,7 @@ public class NotificationHelper extends ContextWrapper {
                 .setSmallIcon(R.drawable.ic_not_icon)
                 .setContentTitle(title)
                 .setContentText(body)
-                .setCategory(NotificationCompat.CATEGORY_STATUS)
+                .setCategory(NotificationCompat.CATEGORY_RECOMMENDATION)
                 .setOnlyAlertOnce(true)
                 .setAutoCancel(true)
                 .setLargeIcon(getLargeIcon());
@@ -171,7 +190,7 @@ public class NotificationHelper extends ContextWrapper {
                 .setSmallIcon(R.drawable.ic_not_icon)
                 .setContentTitle(title)
                 .setContentText(body)
-                .setCategory(NotificationCompat.CATEGORY_STATUS)
+                .setCategory(NotificationCompat.CATEGORY_PROGRESS)
                 .setLargeIcon(getLargeIcon());
 
         if (progress) mBuilder.setProgress(0,0, true);
@@ -179,6 +198,32 @@ public class NotificationHelper extends ContextWrapper {
         return mBuilder;
     }
 
+    private NotificationCompat.Builder getIndexNotification(String title, String body, int max, int progress) {
+        NotificationCompat.Builder mBuilder =  new NotificationCompat.Builder(this, INDEX)
+                .setSmallIcon(R.drawable.ic_not_icon)
+                .setContentTitle(title)
+                .setContentText(body)
+                .setCategory(NotificationCompat.CATEGORY_PROGRESS)
+                .setOngoing(true)
+                .setTimeoutAfter(120000)
+                .setLargeIcon(getLargeIcon());
+
+        if (max == 0) {
+            mBuilder.setProgress(0,0, true);
+        } else {
+            mBuilder.setProgress(max, progress, false);
+        }
+
+        return mBuilder;
+    }
+
+    public void showIndexNotification(String appTitle, String body, int max, int progress) {
+        getManager().notify("index",0, getIndexNotification(appTitle+"-Verzeichnis wird indiziert...", body, max, progress).build());
+    }
+
+    public void removeIndexNotification() {
+        getManager().cancel("index", 0);
+    }
 
     public void notify(int id, String tag, Notification notification) {
         getManager().notify(tag, id, notification);

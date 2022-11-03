@@ -1,13 +1,11 @@
 package de.stm.oses.verwendung;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.preference.PreferenceManager;
-import androidx.core.content.ContextCompat;
+
+import androidx.preference.PreferenceManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,7 +23,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
-import java.util.TimeZone;
 
 import de.stm.oses.arbeitsauftrag.ArbeitsauftragBuilder;
 
@@ -315,11 +312,11 @@ public class VerwendungClass implements Parcelable {
 
         // Arbeitsauftrag
 
-        if (getKat().equals("S") && ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+        if (getKat().equals("S")) {
 
             ArbeitsauftragBuilder auftrag = new ArbeitsauftragBuilder(this);
 
-            arbeitsauftragCacheFile = auftrag.getExtractedCacheFile();
+            arbeitsauftragCacheFile = auftrag.getExtractedCacheFile(context);
 
             if (arbeitsauftragCacheFile != null) {
                 arbeitsauftrag = ArbeitsauftragBuilder.TYPE_CACHED;
@@ -435,9 +432,8 @@ public class VerwendungClass implements Parcelable {
     public String getDatumFormatted(String format) {
 
         long unixSeconds = datum;
-        Date date = new Date((unixSeconds + 3600) * 1000L); // *1000 is to convert seconds to milliseconds
+        Date date = new Date((unixSeconds) * 1000L); // *1000 is to convert seconds to milliseconds
         SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.GERMANY); // the format of your date
-        sdf.setTimeZone(TimeZone.getTimeZone("GMT+1"));
         return sdf.format(date);
 
     }
@@ -445,7 +441,7 @@ public class VerwendungClass implements Parcelable {
     public Date getDatumDate() {
 
         long unixSeconds = datum;
-        return new Date((unixSeconds + 3600) * 1000L);
+        return new Date((unixSeconds) * 1000L);
 
     }
 
@@ -760,10 +756,6 @@ public class VerwendungClass implements Parcelable {
     public void setArbeitsauftragCacheFile(File file) {
         arbeitsauftragCacheFile = file;
         arbeitsauftrag = ArbeitsauftragBuilder.TYPE_CACHED;
-    }
-
-    public void setArbeitsauftragExtracting() {
-        this.arbeitsauftrag = ArbeitsauftragBuilder.TYPE_EXTRACTING;
     }
 
     public void setArbeitsauftragType(int type) {
