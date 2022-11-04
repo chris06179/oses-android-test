@@ -588,7 +588,7 @@ public class SchichtenFragment extends SwipeRefreshListFragment implements Actio
         final ListAdapter ests;
 
         try {
-            ests = OSES.getEstAdapter();
+            ests = OSES.getEstAdapter(selectedEst);
             if (ests.getSelection() == -1) {
                 ests.setSelection(1);
             }
