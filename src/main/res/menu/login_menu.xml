@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/action_login_privacy"
+        android:icon="@drawable/ic_action_privacy"
+        android:titleCondensed="Datenschutzerklärung"
+        android:title="Datenschtzerklärung" app:showAsAction="never"/>
+
     <item android:id="@+id/action_login_imprint"
         android:icon="@drawable/ic_action_para_white"
         android:titleCondensed="Impressum"

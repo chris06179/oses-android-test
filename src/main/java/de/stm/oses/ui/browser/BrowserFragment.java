@@ -3,8 +3,10 @@ package de.stm.oses.ui.browser;
 import android.annotation.TargetApi;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -13,10 +15,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.animation.AnimationUtils;
+import android.webkit.HttpAuthHandler;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.webkit.WebViewDatabase;
 import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
@@ -24,6 +28,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
+import androidx.preference.PreferenceManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -80,7 +85,7 @@ public class BrowserFragment extends Fragment {
         mRefreshLayout.setSize(SwipeRefreshLayout.LARGE);
 
 
-        mRefreshLayout.setOnRefreshListener(() -> engine.loadUrl("https://oses.mobi/api.php?request=" + request + "&session=" + OSES.getSession().getIdentifier()));
+        mRefreshLayout.setOnRefreshListener(() -> engine.reload());
 
 
     }
@@ -147,7 +152,15 @@ public class BrowserFragment extends Fragment {
         extra.putString("request", request);
         mFirebaseAnalytics.logEvent("OSES_view_webpage", extra);
 
-        engine.loadUrl("https://oses.mobi/api.php?request=" + request + "&session=" + OSES.getSession().getIdentifier());
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(requireActivity());
+        boolean useDev = settings.getBoolean("debugUseDevServer", false);
+        String debugEnv = settings.getString("debugEnv", "work");
+
+        if (useDev) {
+            engine.loadUrl("https://"+debugEnv+".oses.mobi/api.php?request=" + request + "&session=" + OSES.getSession().getIdentifier());
+        } else {
+            engine.loadUrl("https://oses.mobi/api.php?request=" + request + "&session=" + OSES.getSession().getIdentifier());
+        }
 
     }
 
@@ -160,6 +173,14 @@ public class BrowserFragment extends Fragment {
 
         // WEbViewClient festlegen       			
         engine.setWebViewClient(new WebViewClient() {
+
+            @Override
+            public void onReceivedHttpAuthRequest(WebView view, HttpAuthHandler handler, String host, String realm) {
+                SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(requireActivity());
+                final String devUser = settings.getString("debugDevServerUser", "");
+                final String devPass = settings.getString("debugDevServerPass", "");
+                handler.proceed(devUser, devPass);
+            }
 
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
@@ -234,7 +255,7 @@ public class BrowserFragment extends Fragment {
                     view.getContext().startActivity(
                             new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
                     return true;
-                } else if (url != null && url.equals("https://oses.mobi/system.php?action=hinweise")) {
+                } else if (url != null && url.equals("https://static.oses.mobi/docs/oses_nutzungshinweise.pdf")) {
                     DoDokumentation();
                     return true;
                 } else {
@@ -278,7 +299,7 @@ public class BrowserFragment extends Fragment {
         FileDownload download = new FileDownload(requireContext());
         download.setTitle("Dokumentation");
         download.setMessage("Die Dokumentation wird heruntergeladen, dieser Vorgang kann einen Moment dauern...");
-        download.setURL("https://oses.mobi/docs/oses_nutzungshinweise.pdf");
+        download.setURL("https://static.oses.mobi/docs/oses_nutzungshinweise.pdf");
         download.setLocalDirectory("/Dokumente/");
         download.setCancelable(true);
         download.setOnDownloadFinishedListener(new FileDownload.OnDownloadFinishedListener() {

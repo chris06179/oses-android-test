@@ -24,6 +24,20 @@
         <item>BOTH</item>
     </string-array>
 
+    <string-array name="pref_debug_env_entries">
+        <item>Stage</item>
+        <item>Beta</item>
+        <item>Dev</item>
+        <item>Work</item>
+    </string-array>
+
+    <string-array name="pref_debug_env_values">
+        <item>stage</item>
+        <item>beta</item>
+        <item>dev</item>
+        <item>work</item>
+    </string-array>
+
     <string name="oses_logo">OSES Logo</string>
     <string name="anmeldung">Anmeldung</string>
     <string name="verwendung">Verwendung</string>

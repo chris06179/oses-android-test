@@ -7,13 +7,16 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.SwitchPreference;
 
 import java.util.Calendar;
+import java.util.Objects;
 
 import de.stm.oses.R;
 import de.stm.oses.application.OsesApplication;
@@ -67,13 +70,22 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             if (((boolean) newValue)) {
                 TextView devModeText = requireActivity().findViewById(R.id.devModeText);
                 devModeText.setVisibility(View.VISIBLE);
+                devModeText.setText(((ListPreference) Objects.requireNonNull(findPreference("debugEnv"))).getValue());
             } else {
                 TextView devModeText = requireActivity().findViewById(R.id.devModeText);
                 devModeText.setVisibility(View.GONE);
             }
-
             return true;
 
+        });
+
+        ((ListPreference) findPreference("debugEnv")).setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(@NonNull Preference preference, Object newValue) {
+                TextView devModeText = requireActivity().findViewById(R.id.devModeText);
+                devModeText.setText((String) newValue);
+                return true;
+            }
         });
 
         findPreference("useFileLogging").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {

@@ -21,8 +21,6 @@ public class OSESSession {
     private String SessionIdentifier;
     private String SessionFcmInstanceId = "";
     private String SessionLastVerwendung;
-    private boolean SessionDilocReminder;
-    private boolean SessionIndexReminder;
 
     private SharedPreferences preferences;
 
@@ -45,8 +43,6 @@ public class OSESSession {
         SessionIdentifier = settings.getString("SessionIdentifier", "");
         SessionFcmInstanceId = settings.getString("SessionFcmInstanceId", "");
         SessionLastVerwendung = settings.getString("SessionLastVerwendung", null);
-        SessionDilocReminder = settings.getBoolean("SessionDilocReminder", false);
-        SessionIndexReminder = settings.getBoolean("SessionIndexReminder", false);
 
     }
 
@@ -104,25 +100,15 @@ public class OSESSession {
         editor.putString("SessionLastVerwendung", SessionLastVerwendung);
         editor.apply();
     }
-    public boolean getSessionDilocReminder() {
-        return SessionDilocReminder;
-    }
-    public void setSessionDilocReminder(boolean sessionDilocReminder) {
-        SessionDilocReminder = sessionDilocReminder;
-        SharedPreferences settings = context.getSharedPreferences("OSESPrefs", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putBoolean("SessionDilocReminder", SessionDilocReminder);
-        editor.apply();
-    }
 
-    public boolean getSessionIndexReminder() {
-        return SessionIndexReminder;
+    public String getSessionLastVerwendung(int jahr) {
+        SharedPreferences settings = context.getSharedPreferences("OSESPrefs", Context.MODE_PRIVATE);
+        return settings.getString("SessionLastVerwendung"+jahr, null);
     }
-    public void setSessionIndexReminder(boolean sessionIndexReminder) {
-        SessionIndexReminder = sessionIndexReminder;
+    public void setSessionLastVerwendung(int jahr, String sessionLastVerwendung) {
         SharedPreferences settings = context.getSharedPreferences("OSESPrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = settings.edit();
-        editor.putBoolean("SessionIndexReminder", SessionIndexReminder);
+        editor.putString("SessionLastVerwendung"+jahr, sessionLastVerwendung);
         editor.apply();
     }
 }

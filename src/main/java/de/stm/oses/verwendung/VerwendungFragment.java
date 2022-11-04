@@ -673,7 +673,7 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
         download.setTitle("Arbeitsauftrag");
         download.setMessage("Das Dokument wird heruntergeladen, dieser Vorgang kann einen Moment dauern...");
         download.setURL(url);
-        download.setLocalDirectory("/Dokumente/Arbeitsaufträge/" + verwendung.getDatumFormatted("yyyy/MM - MMMM") + "/");
+        download.setLocalDirectory("/Dokumente/Arbeitsaufträge" + verwendung.getDatumFormatted("yyyy/MM - MMMM") + "/");
         download.setLocalFilename("Arbeitsauftrag_" + verwendung.getDatumFormatted("dd.MM.yyyy_EE").replaceAll(".$", "") + "_" + verwendung.getBezeichner().replaceAll("[^A-Za-z0-9]", "_") + ".pdf");
         download.setOnDownloadFinishedListener(new FileDownload.OnDownloadFinishedListener() {
             @Override
@@ -732,7 +732,7 @@ public class VerwendungFragment extends SwipeRefreshListFragment implements Acti
         download.setTitle("Sonderleistung");
         download.setMessage("Das Dokument wird heruntergeladen, dieser Vorgang kann einen Moment dauern...");
         download.setURL(url);
-        download.setLocalDirectory("/Dokumente/Nebengeld/");
+        download.setLocalDirectory("/Dokumente/Nebengeld");
         download.setOnDownloadFinishedListener(new FileDownload.OnDownloadFinishedListener() {
             @Override
             public void onDownloadFinished(File file) {

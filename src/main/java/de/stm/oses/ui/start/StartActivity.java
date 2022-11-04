@@ -1,13 +1,11 @@
 package de.stm.oses.ui.start;
 
-import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
@@ -17,7 +15,6 @@ import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -25,7 +22,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.FileProvider;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -38,7 +34,6 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
 import org.json.JSONObject;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -68,8 +63,6 @@ public class StartActivity extends AppCompatActivity {
     private DrawerLayout mDrawerLayout;
     private LinearLayout mLeftDrawer;
     private ActionBarDrawerToggle mDrawerToggle;
-
-    private OnDownloadFinishedListener onUpdateResponse;
 
     public FileDownload CurrentFileDownload;
     private FirebaseAnalytics mFirebaseAnalytics;
@@ -116,8 +109,11 @@ public class StartActivity extends AppCompatActivity {
 
         if (useDev) {
             TextView devModeText = findViewById(R.id.devModeText);
-            if (devModeText != null)
+            if (devModeText != null) {
                 devModeText.setVisibility(View.VISIBLE);
+                devModeText.setText(settings.getString("debugEnv", "UNKNOWN"));
+            }
+
         }
 
         OSES = new OSESBase(this);
@@ -309,66 +305,6 @@ public class StartActivity extends AppCompatActivity {
 
         fragmentTransaction.commit();
 
-        onUpdateResponse = new OnDownloadFinishedListener() {
-            @Override
-            public void onDownloadFinished(File file) {
-
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    Uri fileUri = FileProvider.getUriForFile(StartActivity.this, "de.stm.oses.FileProvider", file);
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION+Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                    intent.setDataAndType(fileUri, "application/vnd.android.package-archive");
-                    startActivity(intent);
-                } else {
-                    Uri apkUri = Uri.fromFile(file);
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                }
-
-                finish();
-
-            }
-
-            @Override
-            public void onTextReceived(String res) {
-
-            }
-
-            @Override
-            public void onException(Exception e) {
-
-                if (e instanceof FileDownload.NoDownloadPermissionException) {
-
-                    final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
-                    try {
-                        Toast.makeText(StartActivity.this, "Automatisches Update nicht möglich! Weiterleitung zum Google Play Store...", Toast.LENGTH_SHORT).show();
-                        Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.android.vending");
-                        ComponentName comp = new ComponentName("com.android.vending", "com.google.android.finsky.activities.LaunchUrlHandlerActivity"); // package name and activity
-                        launchIntent.setComponent(comp);
-                        launchIntent.setData(Uri.parse("market://details?id="+appPackageName));
-                        startActivity(launchIntent);
-                    } catch (android.content.ActivityNotFoundException anfe) {
-                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
-                    }
-
-                    Bundle extra = new Bundle();
-                    extra.putString("reason", "DOWNLOAD_PERMISSION_REFUSED");
-                    mFirebaseAnalytics.logEvent("OSES_force_update_gplay", extra);
-
-                    finish();
-
-                }
-
-            }
-
-            @Override
-            public void onUnknownStatus(int status) {
-
-            }
-        };
 
     }
 
@@ -611,22 +547,6 @@ public class StartActivity extends AppCompatActivity {
         return super.onPrepareOptionsMenu(menu);
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case PERMISSION_REQUEST_STORAGE_DOWNLOAD: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0 ) {
-                    CurrentFileDownload.resumeAfterPermissionCallback(grantResults[0]);
-                } else {
-                    CurrentFileDownload.resumeAfterPermissionCallback(0);
-                }
-
-            }
-        }
-    }
-
 
 
 
@@ -754,6 +674,7 @@ public class StartActivity extends AppCompatActivity {
 
             String DataEstOwn = "";
             String DataEstAll = "";
+            String DataEstFav = "";
             String DataFunktionen = "";
             String DataGB = "";
 
@@ -777,8 +698,9 @@ public class StartActivity extends AppCompatActivity {
                 if (json.has("UpdateFileName"))
                     UpdateFileName = json.getString("UpdateFileName");
 
-                DataEstOwn = json.getString("DataEstOwn");
-                DataEstAll = json.getString("DataEstAll");
+                DataEstOwn =   json.optString("DataEstOwn", "[]");
+                DataEstAll = json.optString("DataEstAll", "[]");
+                DataEstFav = json.optString("DataEstFav", "[]");
                 DataFunktionen = json.getString("DataFunktionen");
                 DataGB = json.getString("DataGB");
 
@@ -831,6 +753,7 @@ public class StartActivity extends AppCompatActivity {
 
                 editor.putString("DataEstOwn", DataEstOwn);
                 editor.putString("DataEstAll", DataEstAll);
+                editor.putString("DataEstFav", DataEstFav);
                 editor.putString("DataFunktionen", DataFunktionen);
                 editor.putString("DataGB", DataGB);
 

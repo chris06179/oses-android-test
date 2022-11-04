@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:installLocation="auto"
-    android:versionCode="3904"
-    android:versionName="3.9.4">
+    android:versionCode="31000"
+    android:versionName="3.10.0">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -42,7 +42,7 @@
             android:value="@integer/google_play_services_version" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDwPTQAcqsl_U3YMiWsayPxa59g5FClWJg" />
+            android:value="${MAPS_API_KEY}" />
 
         <service
             android:name=".fcm.MessagingService"

@@ -15,7 +15,7 @@ import com.google.android.play.core.appupdate.AppUpdateManager;
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
 import com.google.android.play.core.install.model.AppUpdateType;
 import com.google.android.play.core.install.model.UpdateAvailability;
-import com.google.android.play.core.tasks.Task;
+import com.google.android.gms.tasks.Task;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -74,25 +74,39 @@ public class OSESBase {
 
         String DataEstOwn = settings.getString("DataEstOwn", "[]");
         String DataEstAll = settings.getString("DataEstAll", "[]");
+        String DataEstFav = settings.getString("DataEstFav", "[]");
 
-        JSONArray JSONDataEstOwn = new JSONArray(DataEstOwn);
         ArrayList<ListClass> ests = new ArrayList<ListClass>();
 
-        ests.add(new ListClass(true, "Eigene"));
-        for (int i = 0; i < JSONDataEstOwn.length(); i++)
-            if (session.getEst() == JSONDataEstOwn.getJSONObject(i).getInt("est"))
-                ests.add(new ListClass(JSONDataEstOwn.getJSONObject(i).getInt("est"), JSONDataEstOwn.getJSONObject(i).getString("ort"), R.drawable.ic_home));
-            else
-                ests.add(new ListClass(JSONDataEstOwn.getJSONObject(i).getInt("est"), JSONDataEstOwn.getJSONObject(i).getString("ort"), 0));
+        JSONArray JSONDataEstFav = new JSONArray(DataEstFav);
+        if (JSONDataEstFav.length() > 0) {
+            ests.add(new ListClass( true, "Favoriten"));
+            for (int i = 0; i < JSONDataEstFav.length(); i++)
+                if (session.getEst() == JSONDataEstFav.getJSONObject(i).getInt("id"))
+                    ests.add(new ListClass(JSONDataEstFav.getJSONObject(i).getInt("id"), JSONDataEstFav.getJSONObject(i).getString("ort"), R.drawable.ic_home));
+                else
+                    ests.add(new ListClass(JSONDataEstFav.getJSONObject(i).getInt("id"), JSONDataEstFav.getJSONObject(i).getString("ort"), 0));
+        }
+
+        JSONArray JSONDataEstOwn = new JSONArray(DataEstOwn);
+        if (JSONDataEstOwn.length() > 0) {
+            ests.add(new ListClass(true, "Eigene"));
+            for (int i = 0; i < JSONDataEstOwn.length(); i++)
+                if (session.getEst() == JSONDataEstOwn.getJSONObject(i).getInt("est"))
+                    ests.add(new ListClass(JSONDataEstOwn.getJSONObject(i).getInt("est"), JSONDataEstOwn.getJSONObject(i).getString("ort"), R.drawable.ic_home));
+                else
+                    ests.add(new ListClass(JSONDataEstOwn.getJSONObject(i).getInt("est"), JSONDataEstOwn.getJSONObject(i).getString("ort"), 0));
+        }
 
         JSONArray JSONDataEstAll = new JSONArray(DataEstAll);
-
-        ests.add(new ListClass(true, "Alle"));
-        for (int i = 0; i < JSONDataEstAll.length(); i++)
-            if (session.getEst() == JSONDataEstAll.getJSONObject(i).getInt("id"))
-                ests.add(new ListClass(JSONDataEstAll.getJSONObject(i).getInt("id"), JSONDataEstAll.getJSONObject(i).getString("ort"), R.drawable.ic_home));
-            else
-                ests.add(new ListClass(JSONDataEstAll.getJSONObject(i).getInt("id"), JSONDataEstAll.getJSONObject(i).getString("ort"), 0));
+        if (JSONDataEstAll.length() > 0) {
+            ests.add(new ListClass( true, "Alle"));
+            for (int i = 0; i < JSONDataEstAll.length(); i++)
+                if (session.getEst() == JSONDataEstAll.getJSONObject(i).getInt("id"))
+                    ests.add(new ListClass(JSONDataEstAll.getJSONObject(i).getInt("id"), JSONDataEstAll.getJSONObject(i).getString("ort"), R.drawable.ic_home));
+                else
+                    ests.add(new ListClass(JSONDataEstAll.getJSONObject(i).getInt("id"), JSONDataEstAll.getJSONObject(i).getString("ort"), 0));
+        }
 
         for (int i = 0; i < ests.size(); i++)
             if (ests.get(i).getId() == selected) {
@@ -353,9 +367,10 @@ public class OSESBase {
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         boolean useDev = settings.getBoolean("debugUseDevServer", false);
+        String debugEnv = settings.getString("debugEnv", "work");
 
         if (useDev) {
-            url = url.replace("https://oses.mobi", "https://dev.oses.mobi");
+            url = url.replace("https://oses.mobi", "https://"+debugEnv+".oses.mobi");
         }
 
         try {

@@ -1,19 +1,14 @@
 package de.stm.oses.helper;
 
-import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.webkit.URLUtil;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
 import java.io.BufferedInputStream;
@@ -30,11 +25,8 @@ import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import de.stm.oses.ui.start.StartActivity;
-
 public class FileDownload extends AsyncTask<String, Integer, Object> {
 
-    private static final int PERMISSION_REQUEST_STORAGE_DOWNLOAD = 5500;
     private ProgressDialog mProgressDialog;
     private Context context;
     private String title = "";
@@ -49,24 +41,6 @@ public class FileDownload extends AsyncTask<String, Integer, Object> {
     private boolean resumeRequested;
     private int permissionReponse;
 
-    public class NoDownloadPermissionException extends Exception {
-
-        public NoDownloadPermissionException() {
-        }
-
-        public NoDownloadPermissionException(String detailMessage) {
-            super(detailMessage);
-        }
-
-        public NoDownloadPermissionException(String detailMessage, Throwable throwable) {
-            super(detailMessage, throwable);
-        }
-
-        public NoDownloadPermissionException(Throwable throwable) {
-            super(throwable);
-        }
-
-    }
 
     public interface OnDownloadFinishedListener {
         void onDownloadFinished(File file);
@@ -109,27 +83,7 @@ public class FileDownload extends AsyncTask<String, Integer, Object> {
         this.isCancelable = isCancelable;
     }
 
-    public void resumeAfterPermissionCallback(int grantResult) {
-        this.resumeRequested = true;
-        this.permissionReponse = grantResult;
-    }
-
     protected void onPreExecute() {
-
-        ((StartActivity) context).CurrentFileDownload = this;
-
-        if (ContextCompat.checkSelfPermission(context,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            ActivityCompat.requestPermissions((AppCompatActivity) context,
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    PERMISSION_REQUEST_STORAGE_DOWNLOAD);
-
-            waitForPermissionResponse = true;
-
-        }
-
 
         ((AppCompatActivity) context).setRequestedOrientation(context.getResources().getConfiguration().orientation);
         mProgressDialog = new ProgressDialog(context);
@@ -161,26 +115,12 @@ public class FileDownload extends AsyncTask<String, Integer, Object> {
 
     protected Object doInBackground(String... sUrl) {
 
-        try {  // Warte auf Berechtigung
-            while (waitForPermissionResponse) {
-                Thread.sleep(500);
-
-                if (resumeRequested) {   // Fortsetzen durch Activity angefordert
-                    if (permissionReponse == PackageManager.PERMISSION_GRANTED)
-                        break; // Fortsetzen
-                    else
-                        return new NoDownloadPermissionException(); // Abbrechen
-                }
-            }
-        } catch (InterruptedException e) {
-            return e; // Fehler auffangen und weitergeben
-        }
-
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         boolean useDev = settings.getBoolean("debugUseDevServer", false);
+        String debugEnv = settings.getString("debugEnv", "work");
 
         if (useDev) {
-            surl = surl.replace("https://oses.mobi", "https://dev.oses.mobi");
+            surl = surl.replace("https://oses.mobi", "https://"+debugEnv+".oses.mobi");
         }
 
         try {
@@ -233,7 +173,8 @@ public class FileDownload extends AsyncTask<String, Integer, Object> {
                         localFilename = URLUtil.guessFileName(surl, null, null);
                     }
 
-                    File file = new File(Environment.getExternalStorageDirectory(),"/OSES/"+localDirectory+localFilename);
+
+                    File file = new File(context.getCacheDir(), localDirectory+ "/" +localFilename);
                     file.getParentFile().mkdirs();
 
 

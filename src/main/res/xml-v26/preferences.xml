@@ -32,28 +32,6 @@
             android:title="Benachrichtigungseinstellungen anzeigen" />
     </PreferenceCategory>
 
-    <PreferenceCategory
-        android:key="aaCategory"
-        android:title="Arbeitsaufträge (DB Regio)">
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="scanDiloc"
-            android:summary="Durchsucht das Diloc|Sync-Verzeichnis nach tagesaktuellen Arbeitsaufträgen"
-            android:title="Diloc|Sync-Verzeichnis durchsuchen" />
-
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="scanFassi"
-            android:summary="Durchsucht das FASSI-MOVE-Verzeichnis nach tagesaktuellen Arbeitsaufträgen"
-            android:title="FASSI-MOVE-Verzeichnis durchsuchen" />
-
-        <Preference
-            android:key="index"
-            android:summary="Ermittle Datenbankinhalt..."
-            android:title="Dokumentenindex zurücksetzen" />
-
-    </PreferenceCategory>
-
 
     <PreferenceCategory android:title="Anwendungsinformationen">
         <Preference
@@ -88,7 +66,15 @@
             android:defaultValue="false"
             android:key="debugUseDevServer"
             android:summary="Benutzername und Passwort ergänzen, nur für berechtigte Personen!"
-            android:title="Entwicklungsserver verwenden" />
+            android:title="Bereitstellungsumgebung ändern" />
+        <ListPreference
+            android:defaultValue="work"
+            android:dialogTitle="Bereitstellungsumgebung"
+            android:dependency="debugUseDevServer"
+            android:entries="@array/pref_debug_env_entries"
+            android:entryValues="@array/pref_debug_env_values"
+            android:key="debugEnv"
+            android:title="Bereitstellungsumgebung" />
         <EditTextPreference
             android:defaultValue="Username"
             android:dependency="debugUseDevServer"

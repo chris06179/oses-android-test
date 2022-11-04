@@ -8,12 +8,14 @@ buildscript {
         classpath 'com.android.tools.build:gradle:7.3.1'
         classpath 'com.google.gms:google-services:4.3.14'
         classpath 'com.google.firebase:firebase-crashlytics-gradle:2.9.2'
+        classpath "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin:2.0.1"
     }
 }
 
 allprojects {
 
     repositories {
+        maven { url 'https://jitpack.io' }
         mavenCentral()
         google()
     }
@@ -27,6 +29,8 @@ allprojects {
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
+apply plugin: 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
+
 
 
 android {
@@ -97,11 +101,16 @@ dependencies {
     implementation 'androidx.navigation:navigation-ui:2.5.3'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation 'androidx.core:core:1.9.0'
+    implementation 'com.google.android.play:app-update:2.0.1'
+    implementation 'com.github.cachapa:ExpandableLayout:2.9.2'
+    implementation 'androidx.webkit:webkit:1.5.0'
 
     annotationProcessor 'androidx.room:room-compiler:2.4.3'
 
     implementation 'com.madgag.spongycastle:core:1.58.0.0'
     implementation 'com.madgag.spongycastle:prov:1.58.0.0'
+
+
 
 }
 

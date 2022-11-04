@@ -99,9 +99,10 @@ public class OSESRequest extends AsyncTask<String, Integer, Object> {
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         boolean useDev = settings.getBoolean("debugUseDevServer", false);
+        String debugEnv = settings.getString("debugEnv", "work");
 
         if (useDev) {
-            url = url.replace("https://oses.mobi", "https://dev.oses.mobi");
+            url = url.replace("https://oses.mobi", "https://"+debugEnv+".oses.mobi");
         }
 
 

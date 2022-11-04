@@ -236,7 +236,7 @@ public class DokumenteFragment extends Fragment implements View.OnClickListener 
             download.setTitle(((ListClass) type.getSelectedItem()).getTitle());
             download.setMessage("Das Dokument wird heruntergeladen, dieser Vorgang kann einen Moment dauern...");
             download.setURL(url);
-            download.setLocalDirectory("/Dokumente/Nebengeld/");
+            download.setLocalDirectory("/Dokumente/Nebengeld");
             download.setOnDownloadFinishedListener(new OnDownloadFinishedListener() {
                 @Override
                 public void onDownloadFinished(File file) {
@@ -246,7 +246,7 @@ public class DokumenteFragment extends Fragment implements View.OnClickListener 
                     extra.putString("status", "200");
                     mFirebaseAnalytics.logEvent("OSES_download_doc", extra);
 
-                    Uri fileUri = FileProvider.getUriForFile(getActivity(),"de.stm.oses.FileProvider", file);
+                    Uri fileUri = FileProvider.getUriForFile(requireActivity(),"de.stm.oses.FileProvider", file);
                     Intent intent = new Intent(Intent.ACTION_VIEW);
                     intent.setDataAndType(fileUri, "application/pdf");
                     intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION+Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
@@ -335,10 +335,7 @@ public class DokumenteFragment extends Fragment implements View.OnClickListener 
                     extra.putString("status", "EXCEPTION");
                     mFirebaseAnalytics.logEvent("OSES_download_doc", extra);
 
-                    if (e instanceof FileDownload.NoDownloadPermissionException)
-                        Toast.makeText(getActivity(), "Berechtigungsfehler: Die Datei konnte wegen fehlender Berechtigungen nicht auf das Gerät heruntergeladen werden!", Toast.LENGTH_LONG).show();
-                    else
-                        Toast.makeText(getActivity(), "Anwendungsfehler: " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), "Anwendungsfehler: " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
                 }
 
                 @Override
