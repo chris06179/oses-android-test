@@ -339,6 +339,9 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
         try {
             kategorien = OSES.getKategorieAdapter("S");
             ests = OSES.getEstAdapter(OSES.getSession().getEst(), true);
+            if (ests.getSelection() == -1) {
+                ests.setSelection(1);
+            }
             funktionen = OSES.getFunktionAdapter(Integer.parseInt(Integer.toString(OSES.getSession().getFunktion()).substring(0, 1)), true);
             pausen = OSES.getPauseAdapter(0, false);
             pausenabw = OSES.getPauseAdapter(-1, true);

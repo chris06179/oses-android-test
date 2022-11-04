@@ -588,7 +588,10 @@ public class SchichtenFragment extends SwipeRefreshListFragment implements Actio
         final ListAdapter ests;
 
         try {
-            ests = OSES.getEstAdapter(selectedEst);
+            ests = OSES.getEstAdapter();
+            if (ests.getSelection() == -1) {
+                ests.setSelection(1);
+            }
         } catch (JSONException e) {
             e.printStackTrace();
             Toast.makeText(getActivity().getApplicationContext(), "Fehler: Liste der Einsatzstellen konnte nicht abgerufen werden!", Toast.LENGTH_LONG).show();

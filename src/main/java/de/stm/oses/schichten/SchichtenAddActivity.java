@@ -183,6 +183,9 @@ public class SchichtenAddActivity extends AppCompatActivity implements View.OnCl
 
         try {
             ests = OSES.getEstAdapter(OSES.getSession().getEst(), true);
+            if (ests.getSelection() == -1) {
+                ests.setSelection(1);
+            }
             funktionen = OSES.getFunktionAdapter(Integer.parseInt(Integer.toString(OSES.getSession().getFunktion()).substring(0, 1)), true);
             pausen = OSES.getPauseAdapter(0, false);
             gbereiche = OSES.getGBAdapter(OSES.getSession().getGB(), true);

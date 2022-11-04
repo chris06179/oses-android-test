@@ -32,7 +32,6 @@ apply plugin: 'com.google.firebase.crashlytics'
 apply plugin: 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
 
 
-
 android {
     compileSdkVersion 33
     dexOptions {
@@ -75,7 +74,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-messaging:23.1.0'
     implementation 'com.google.firebase:firebase-core:21.1.1'
     implementation 'com.google.firebase:firebase-config:21.2.0'
-    implementation 'com.google.android.gms:play-services-location:21.0.1'
+    implementation 'com.google.android.gms:play-services-location:20.0.0'
     implementation 'com.google.android.gms:play-services-maps:18.1.0'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.vectordrawable:vectordrawable-animated:1.1.0'

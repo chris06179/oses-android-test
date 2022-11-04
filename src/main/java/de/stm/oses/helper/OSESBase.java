@@ -82,10 +82,10 @@ public class OSESBase {
         if (JSONDataEstFav.length() > 0) {
             ests.add(new ListClass( true, "Favoriten"));
             for (int i = 0; i < JSONDataEstFav.length(); i++)
-                if (session.getEst() == JSONDataEstFav.getJSONObject(i).getInt("id"))
-                    ests.add(new ListClass(JSONDataEstFav.getJSONObject(i).getInt("id"), JSONDataEstFav.getJSONObject(i).getString("ort"), R.drawable.ic_home));
+                if (session.getEst() == JSONDataEstFav.getJSONObject(i).getInt("est"))
+                    ests.add(new ListClass(JSONDataEstFav.getJSONObject(i).getInt("est"), JSONDataEstFav.getJSONObject(i).getString("ort"), R.drawable.ic_home));
                 else
-                    ests.add(new ListClass(JSONDataEstFav.getJSONObject(i).getInt("id"), JSONDataEstFav.getJSONObject(i).getString("ort"), 0));
+                    ests.add(new ListClass(JSONDataEstFav.getJSONObject(i).getInt("est"), JSONDataEstFav.getJSONObject(i).getString("ort"), 0));
         }
 
         JSONArray JSONDataEstOwn = new JSONArray(DataEstOwn);
@@ -108,11 +108,13 @@ public class OSESBase {
                     ests.add(new ListClass(JSONDataEstAll.getJSONObject(i).getInt("id"), JSONDataEstAll.getJSONObject(i).getString("ort"), 0));
         }
 
-        for (int i = 0; i < ests.size(); i++)
+        for (int i = 0; i < ests.size(); i++) {
             if (ests.get(i).getId() == selected) {
                 ests.get(i).setSelected(true);
                 break;
             }
+        }
+
 
         if (isSpinner)
             return new ListSpinnerAdapter(new ContextThemeWrapper(context, R.style.Theme_AppCompat_Light_Dialog), ests);
