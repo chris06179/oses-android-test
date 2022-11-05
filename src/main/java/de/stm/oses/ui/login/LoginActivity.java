@@ -1,12 +1,10 @@
 package de.stm.oses.ui.login;
 
-import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.Settings.Secure;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -16,6 +14,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.browser.customtabs.CustomTabsIntent;
@@ -23,14 +22,18 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
+import com.google.firebase.installations.FirebaseInstallations;
 
 import org.json.JSONObject;
 
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import de.stm.oses.R;
 import de.stm.oses.dialogs.ProgressDialogFragment;
@@ -43,6 +46,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private OSESBase OSES;
     private FirebaseAnalytics mFirebaseAnalytics;
+    private String Fid;
 
     /**
      * Called when the activity is first created.
@@ -51,6 +55,19 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+
+        FirebaseInstallations.getInstance().getId()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (task.isSuccessful()) {
+                            Fid = task.getResult();
+                        } else {
+                            Fid = UUID.randomUUID().toString();
+                        }
+                    }
+                });
+
 
         OSES = new OSESBase(this);
 
@@ -176,15 +193,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
             ShowWaitDialog();
 
-
-            @SuppressLint("HardwareIds")
-            String android_id = Secure.getString(getBaseContext().getContentResolver(),
-                    Secure.ANDROID_ID);
-
             Map<String, String> postdata = new HashMap<>();
             postdata.put("username", username);
             postdata.put("password", password);
-            postdata.put("device", android_id);
+            postdata.put("device", Fid);
             postdata.put("model", android.os.Build.MODEL + "|" + android.os.Build.PRODUCT);
             postdata.put("gcm_regid", OSES.getSession().getSessionFcmInstanceId());
             postdata.put("androidversion", String.valueOf(OSES.getVersionCode()));
