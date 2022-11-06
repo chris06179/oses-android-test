@@ -498,6 +498,7 @@ public class SchichtenFragment extends SwipeRefreshListFragment implements Actio
                 item.setAz(schicht.getString("az"));
 
                 item.setEst(schicht.getString("est"));
+                item.setEstort(schicht.getString("est_ort"));
                 item.setEstid(schicht.getInt("estid"));
 
                 item.setFunktion(schicht.getString("funktion"));

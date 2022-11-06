@@ -357,6 +357,8 @@ public class SchichtenAddActivity extends AppCompatActivity implements View.OnCl
             sAdd.schicht.setText(edit.getSchicht());
             if (!edit.getFpla().equals("0"))
                 sAdd.fpla.setText(edit.getFpla());
+
+            ((ListAdapter) sAdd.est.getAdapter()).addEstIfNotExists(edit.getEstid(), edit.getEstort());
             ((ListSpinnerAdapter) sAdd.est.getAdapter()).setSelectionID(edit.getEstid());
             sAdd.est.setSelection(((ListSpinnerAdapter) sAdd.est.getAdapter()).getSelection());
 

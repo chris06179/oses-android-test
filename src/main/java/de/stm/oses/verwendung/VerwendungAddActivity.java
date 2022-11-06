@@ -77,6 +77,7 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
     private String sid = "";
 
     private ListAdapter ests;
+    private ListAdapter bests;
     private ListAdapter funktionen;
     private ListAdapter pausen;
     private ListAdapter pausenabw;
@@ -342,6 +343,10 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
             if (ests.getSelection() == -1) {
                 ests.setSelection(1);
             }
+            bests = OSES.getEstAdapter(OSES.getSession().getEst(), true);
+            if (bests.getSelection() == -1) {
+                bests.setSelection(1);
+            }
             funktionen = OSES.getFunktionAdapter(Integer.parseInt(Integer.toString(OSES.getSession().getFunktion()).substring(0, 1)), true);
             pausen = OSES.getPauseAdapter(0, false);
             pausenabw = OSES.getPauseAdapter(-1, true);
@@ -452,16 +457,12 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
             }
         });
 
-        try {
-            vAdd.best.setAdapter(OSES.getEstAdapter(OSES.getSession().getEst(), true));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        vAdd.best.setSelection(((ListSpinnerAdapter) vAdd.best.getAdapter()).getSelection());
+        vAdd.best.setAdapter(bests);       
+        vAdd.best.setSelection(bests.getSelection());
         vAdd.best.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                ((ListSpinnerAdapter) vAdd.best.getAdapter()).setSelection((int) l);
+                bests.setSelection((int) l);
             }
 
             @Override
@@ -788,7 +789,9 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
                     vAdd.schicht.setText(edit.getBezeichner());
                     if (!edit.getFpla().equals("0"))
                         vAdd.fpla.setText(edit.getFpla());
-                    setSelectedId(vAdd.est, edit.getEstId());
+                    ((ListAdapter) vAdd.est.getAdapter()).addEstIfNotExists(edit.getEstId(), edit.getEstort());
+                    setSelectedId(vAdd.est, edit.getEstId());                
+                    
                     setSelectedId(vAdd.funktion, edit.getFunktionId());
                     vAdd.db.setText(edit.getDb());
                     vAdd.de.setText(edit.getDe());
@@ -838,6 +841,7 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
                         vAdd.ubeschreibung.setText(edit.getBezeichner());
                     break;
                 case "B":
+                    ((ListAdapter) vAdd.best.getAdapter()).addEstIfNotExists(edit.getEstId(), edit.getEstort());
                     setSelectedId(vAdd.best, edit.getEstId());
                     vAdd.db.setText(edit.getDb());
                     vAdd.de.setText(edit.getDe());
@@ -857,6 +861,8 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
             getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         }
     }
+
+
 
     public String getKategorie() {
         return ((ListClass) vAdd.kategorie.getSelectedItem()).getIdent();

@@ -37,6 +37,7 @@ public class VerwendungClass implements Parcelable {
     private String de;
     private String est;
     private int estid;
+    private String estort;
     private String funktion;
     private int funktionId;
     private String pause;
@@ -96,6 +97,7 @@ public class VerwendungClass implements Parcelable {
         de = in.readString();
         est = in.readString();
         estid = in.readInt();
+        estort = in.readString();
         funktion = in.readString();
         funktionId = in.readInt();
         pause = in.readString();
@@ -155,6 +157,7 @@ public class VerwendungClass implements Parcelable {
         dest.writeString(de);
         dest.writeString(est);
         dest.writeInt(estid);
+        dest.writeString(estort);
         dest.writeString(funktion);
         dest.writeInt(funktionId);
         dest.writeString(pause);
@@ -283,6 +286,7 @@ public class VerwendungClass implements Parcelable {
 
         this.setEst(schicht.getString("est"));
         this.setEstId(schicht.optInt("estid", 0));
+        this.setEstort(schicht.optString("est_ort", ""));
 
         this.setMsoll(schicht.getString("msoll"));
 
@@ -443,6 +447,14 @@ public class VerwendungClass implements Parcelable {
         long unixSeconds = datum;
         return new Date((unixSeconds) * 1000L);
 
+    }
+
+    public String getEstort() {
+        return estort;
+    }
+
+    public void setEstort(String estort) {
+        this.estort = estort;
     }
 
     public void setDatum(int datum) {

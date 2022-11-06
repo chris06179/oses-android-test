@@ -14,6 +14,7 @@ public class SchichtenClass implements Serializable {
     private String de;
     private String est;
     private int estid;
+    private String estort;
     private String funktion;
     private int funktionid;
     private int gbid;
@@ -33,7 +34,13 @@ public class SchichtenClass implements Serializable {
     public SchichtenClass() {
 
     }
-    
+
+    public String getEstort() {
+        return estort;
+    }
+    public void setEstort(String estort) {
+        this.estort = estort;
+    }
     public int getId() {
 		return id;
 	}
