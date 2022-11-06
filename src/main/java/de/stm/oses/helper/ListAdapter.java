@@ -95,7 +95,7 @@ public class ListAdapter extends ArrayAdapter<ListClass> implements Serializable
         }
 
         listClassArrayList.add(new ListClass(true, "Aktuell"));
-        listClassArrayList.add(new ListClass(estId,estort));
+        listClassArrayList.add(new ListClass(estId,estort, 0));
     }
 
     @Override
