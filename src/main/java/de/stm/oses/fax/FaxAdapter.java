@@ -179,7 +179,7 @@ public class FaxAdapter extends RecyclerView.Adapter<FaxAdapter.FaxViewHolder>{
             @Override
             public void onClick(View v) {
                 if (mItemClickListener != null) {
-                    mItemClickListener.onItemClick(v, position);
+                    mItemClickListener.onItemClick(v, holder.getAbsoluteAdapterPosition());
                 }
             }
         });
