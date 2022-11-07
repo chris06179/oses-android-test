@@ -13,6 +13,11 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
+        
+    - name: Access APOD_API_KEY
+      env:
+        MAPS_API_KEY=: $
+      run: echo APOD_API_KEY=\"${{ secrets.MAPS_API_KEY }}" > ./local.properties
     - name: Make gradlew executable
       run: chmod +x ./gradlew
     - name: Build with Gradle
