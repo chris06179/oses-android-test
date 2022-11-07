@@ -790,7 +790,9 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
                     if (!edit.getFpla().equals("0"))
                         vAdd.fpla.setText(edit.getFpla());
                     ((ListAdapter) vAdd.est.getAdapter()).addEstIfNotExists(edit.getEstId(), edit.getEstort());
-                    setSelectedId(vAdd.est, edit.getEstId());                
+                    setSelectedId(vAdd.est, edit.getEstId());
+                    ((ListAdapter) vAdd.best.getAdapter()).addEstIfNotExists(edit.getEstId(), edit.getEstort());
+                    setSelectedId(vAdd.best, edit.getEstId());
                     
                     setSelectedId(vAdd.funktion, edit.getFunktionId());
                     vAdd.db.setText(edit.getDb());
@@ -822,7 +824,10 @@ public class VerwendungAddActivity extends AppCompatActivity implements View.OnC
                     vAdd.schicht.setText(edit.getBezeichner());
                     if (!edit.getFpla().equals("0"))
                         vAdd.fpla.setText(edit.getFpla());
+                    ((ListAdapter) vAdd.est.getAdapter()).addEstIfNotExists(edit.getEstId(), edit.getEstort());
                     setSelectedId(vAdd.est, edit.getEstId());
+                    ((ListAdapter) vAdd.best.getAdapter()).addEstIfNotExists(edit.getEstId(), edit.getEstort());
+                    setSelectedId(vAdd.best, edit.getEstId());
                     setSelectedId(vAdd.funktion, edit.getFunktionId());
                     vAdd.db.setText(edit.getDb());
                     vAdd.de.setText(edit.getDe());

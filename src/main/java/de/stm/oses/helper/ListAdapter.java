@@ -81,20 +81,14 @@ public class ListAdapter extends ArrayAdapter<ListClass> implements Serializable
     }
 
     public void addEstIfNotExists(int estId, String estort) {
-        boolean isInList = false;
         for (ListClass est : listClassArrayList
         ) {
             if (est.getId() == estId) {
-                isInList = true;
-                break;
+                return;
             }
         }
 
-        if (isInList) {
-            return;
-        }
-
-        listClassArrayList.add(new ListClass(true, "Aktuell"));
+        listClassArrayList.add(new ListClass(true, "Aktuell bearbeitet"));
         listClassArrayList.add(new ListClass(estId,estort, 0));
     }
 
