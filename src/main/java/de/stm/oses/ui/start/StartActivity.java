@@ -336,10 +336,9 @@ public class StartActivity extends AppCompatActivity {
 
         if (running instanceof BrowserFragment) {
             ((BrowserFragment) running).setRequest(request);
-        } else
-
-        ChangeFragment(new BrowserFragment(), request);
-
+        } else {
+            ChangeFragment(new BrowserFragment(), request);
+        }   
     }
 
 
